@@ -24,8 +24,7 @@ steps:
         # ── Decode JWT ──────────────────────────────────────────────
         JWT=$(cat $(Pipeline.Workspace)/.workload_identity.jwt)
         PAYLOAD=$(echo $JWT | cut -d'.' -f2)
-        echo "${PAYLOAD}==" | base64 --decode | python3 -m json.tool \
-      > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
+        echo "${PAYLOAD}==" | base64 --decode | python3 -m json.tool > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
        
         ISS=$(cat $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['iss'])")
         SUB=$(cat $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['sub'])")
@@ -47,15 +46,13 @@ steps:
             \"requestedTokenType\": \"urn:ietf:params:oauth:token-type:access_token\",
             \"subjectTokenType\": \"urn:ietf:params:oauth:token-type:jwt\",
             \"subjectToken\": \"$JWT\"
-          }" \
-      > $(Build.ArtifactStagingDirectory)/wif-debug/sts-response.json
+          }" > $(Build.ArtifactStagingDirectory)/wif-debug/sts-response.json
        
         # Extract federated token
         FEDERATED_TOKEN=$(cat $(Build.ArtifactStagingDirectory)/wif-debug/sts-response.json \
           | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('access_token','FAILED'))")
        
-        echo "STS Token: $FEDERATED_TOKEN" \
-      >> $(Build.ArtifactStagingDirectory)/wif-debug/jwt-claims.txt
+        echo "STS Token: $FEDERATED_TOKEN" >> $(Build.ArtifactStagingDirectory)/wif-debug/jwt-claims.txt
        
         # ── Step 2: Test SA impersonation separately ─────────────────
         if [ "$FEDERATED_TOKEN" != "FAILED" ]; then
@@ -65,20 +62,17 @@ steps:
             "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GCP_SERVICE_ACCOUNT):generateAccessToken%22 \
             -H "Authorization: Bearer $FEDERATED_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{"scope": ["https://www.googleapis.com/auth/cloud-platform"]}' \
-      > $(Build.ArtifactStagingDirectory)/wif-debug/impersonation-response.json
+            -d '{"scope": ["https://www.googleapis.com/auth/cloud-platform"]}' > $(Build.ArtifactStagingDirectory)/wif-debug/impersonation-response.json
        
         else
           echo "STS exchange FAILED — skipping impersonation test"
-          echo "STS exchange failed" \
-      >> $(Build.ArtifactStagingDirectory)/wif-debug/jwt-claims.txt
+          echo "STS exchange failed" >> $(Build.ArtifactStagingDirectory)/wif-debug/jwt-claims.txt
         fi
        
         # ── Step 3: Check current SA IAM bindings ───────────────────
         gcloud iam service-accounts get-iam-policy $(GCP_SERVICE_ACCOUNT) \
           --project=$(GCP_PROJECT_ID) \
-          --format=json \
-      > $(Build.ArtifactStagingDirectory)/wif-debug/sa-iam-policy.json 2>&1 || true
+          --format=json > $(Build.ArtifactStagingDirectory)/wif-debug/sa-iam-policy.json 2>&1 || true
   
 - task: PublishBuildArtifacts@1
   inputs:
