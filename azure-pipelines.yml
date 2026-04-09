@@ -32,4 +32,9 @@ steps:
       echo $PAYLOAD | base64 --decode 2>/dev/null || \
       echo "${PAYLOAD}==" | base64 --decode 2>/dev/null | python3 -m json.tool > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
 
-    
+- task: PublishBuildArtifacts@1
+  inputs:
+     PathtoPublish: '$(Build.ArtifactStagingDirectory)/wif-debug'
+     ArtifactName: 'wif-debug'
+     publishLocation: 'Container'
+   
