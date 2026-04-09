@@ -30,4 +30,6 @@ steps:
       # Pad base64 if needed and decode
       echo "=== Decoded JWT Payload ==="
       echo $PAYLOAD | base64 --decode 2>/dev/null || \
-      echo "${PAYLOAD}==" | base64 --decode 2>/dev/null | python3 -m json.tool
+      echo "${PAYLOAD}==" | base64 --decode 2>/dev/null | python3 -m json.tool > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
+
+    
