@@ -24,7 +24,8 @@ steps:
       echo $idToken > $(System.DefaultWorkingDirectory)/oidc-token.txt
 
       ls -lrt $(System.DefaultWorkingDirectory)/oidc-token.txt
-      cat $(System.DefaultWorkingDirectory)/oidc-token.txt
+      
+      echo "Create a dynmaic son configration file for WIF"
 
       # 2. Create the dynamic JSON configuration file for WIF
       gcloud iam workload-identity-pools create-cred-config \
@@ -33,16 +34,27 @@ steps:
         --output-file=$(System.DefaultWorkingDirectory)/gcp-credentials.json \
         --credential-source-file=$(System.DefaultWorkingDirectory)/oidc-token.txt
 
+      echo "Validate google API credential.json"
+
       # 3. Export credentials for the Google SDK to consume
+      ls -lrt $(System.DefaultWorkingDirectory)/gcp-credentials.json
+
       export GOOGLE_APPLICATION_CREDENTIALS=$(System.DefaultWorkingDirectory)/gcp-credentials.json
       echo $GOOGLE_APPLICATION_CREDENTIALS
       cat $(System.DefaultWorkingDirectory)/gcp-credentials.json
 
       # 4. Log into GCP (Using --quiet to prevent the terminal from freezing)
+      echo "Google Auth login"
+
       gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
+
+      echo "Google config set"
+
       gcloud config set project $(GCP_PROJECT_ID) --quiet
       
       echo "Authentication successful!"
       
       # 5. Test command to validate deployment capabilities
+      echo "Google storage list"
+      
       gcloud storage ls
