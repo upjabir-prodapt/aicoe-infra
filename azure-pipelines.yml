@@ -21,12 +21,13 @@ steps:
       echo "Starting passwordless authentication to GCP..."
 
       # 1. Save the ADO OIDC token to a temporary file
-      echo $idToken > $(System.DefaultWorkingDirectory)/oidc-token.txt
-
-      ls -lrt $(System.DefaultWorkingDirectory)/oidc-token.txt
+      echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+ 
+      # Decode JWT payload (middle segment)
+      JWT=$(cat $(Pipeline.Workspace)/.workload_identity.jwt)
+      PAYLOAD=$(echo $JWT | cut -d'.' -f2)
       
-     
-      #1. Verify the token file is non-empty and freshly written 
-      cat /home/vsts/work/1/s/oidc-token.txt | wc -c
-      # 2. Decode and check iss + aud claims 
-      cat /home/vsts/work/1/s/oidc-token.txt | cut -d'.' -f2 | base64 -d 2>/dev/null | python3 -m json.tool
+      # Pad base64 if needed and decode
+      echo "=== Decoded JWT Payload ==="
+      echo $PAYLOAD | base64 --decode 2>/dev/null || \
+      echo "${PAYLOAD}==" | base64 --decode 2>/dev/null | python3 -m json.tool
