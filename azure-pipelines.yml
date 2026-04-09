@@ -13,28 +13,38 @@ steps:
 - task: AzureCLI@2
   displayName: 'Passwordless WIF Authentication to GCP'
   inputs:
-    azureSubscription: $(ADO_SERVICE_CONNECTION_NAME) 
+    azureSubscription: $(ADO_SERVICE_CONNECTION_NAME)
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
-    addSpnToEnvironment: true # Crucial: injects the OIDC token into the $idToken variable
+    addSpnToEnvironment: true
     inlineScript: |
       echo "Starting passwordless authentication to GCP..."
-
+ 
       # 1. Save the ADO OIDC token to a temporary file
       echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
  
-      # Decode JWT payload (middle segment)
+      # 2. Create output directory FIRST (this was missing!)
+      mkdir -p $(Build.ArtifactStagingDirectory)/wif-debug
+ 
+      # 3. Decode JWT payload correctly
       JWT=$(cat $(Pipeline.Workspace)/.workload_identity.jwt)
       PAYLOAD=$(echo $JWT | cut -d'.' -f2)
-      
-      # Pad base64 if needed and decode
-      echo "=== Decoded JWT Payload ==="
-      echo $PAYLOAD | base64 --decode 2>/dev/null || \
-      echo "${PAYLOAD}==" | base64 --decode 2>/dev/null | python3 -m json.tool > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
-      ls -lrt $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
+ 
+      # 4. Pad base64 and pipe directly to file (no || logic)
+      echo "${PAYLOAD}==" \
+        | base64 --decode \
+        | python3 -m json.tool > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
+ 
+      # 5. Verify file was created
+      echo "=== File check ==="
+      ls -lrt $(Build.ArtifactStagingDirectory)/wif-debug/
+      echo "=== JWT Payload (from file) ==="
+      cat $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
+ 
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish WIF Debug Artifacts'
+  condition: always()
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/wif-debug'
     ArtifactName: 'wif-debug'
     publishLocation: 'Container'
-   
