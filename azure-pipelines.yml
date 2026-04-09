@@ -3,7 +3,7 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest' # Uses Microsoft's free hosted servers
 variables:
-  GCP_PROJECT_ID: '	aicoe-sharedwif'
+  GCP_PROJECT_ID: 'aicoe-sharedwif'
   GCP_PROJECT_NUMBER: '538669417284' # 12-digit number
   GCP_SERVICE_ACCOUNT: 'aicoe-shared-wip-sa-tf@aicoe-sharedwif.iam.gserviceaccount.com'
   ADO_SERVICE_CONNECTION_NAME: 'sc-ado-gcp-aicoe' # Exact name of your Service Connection
