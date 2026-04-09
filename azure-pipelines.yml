@@ -11,6 +11,7 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+      ls -lrt $(Pipeline.Workspace)/.workload_identity.jwt
        
       mkdir -p $(Build.ArtifactStagingDirectory)/wif-debug
       
