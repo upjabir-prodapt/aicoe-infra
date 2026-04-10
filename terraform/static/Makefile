@@ -1,4 +1,4 @@
-ENVNAME=sandox
+ENVNAME=
 PROJECT=aicoe
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state

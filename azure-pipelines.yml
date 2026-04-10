@@ -66,11 +66,13 @@ stages:
         # ── Step 2: Terraform installer ─────────────────────────────────────────────────
 
         - task: TerraformInstaller@1
+          displayName: Terraform installer
           inputs:
             terraformVersion: 'latest'
  
         # ── Step 2: WIF Token Exchange ────────────────────────────────────────
         - task: AzureCLI@3
+          displayName: Static-Plan
           inputs:
             connectionType: 'azureRM'
             azureSubscription: 'sc-ado-gcp-aicoe'
@@ -92,5 +94,12 @@ stages:
               }
               EOF
               cd $(TERRAFORM_ROOT)/static
-              make plan
+              make plan ENVNAME=$(TF_ENV)
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Static Plan'
+          condition: succeeded()
+          inputs:
+            PathtoPublish: '$(TF_ROOT)/static-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            ArtifactName: 'plan-static'
               
