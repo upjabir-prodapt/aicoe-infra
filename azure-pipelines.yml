@@ -26,9 +26,9 @@ variables:
   - name: GoogleCloud.WorkloadIdentity.ProjectNumber
     value: '297743845367'
   - name: GoogleCloud.WorkloadIdentity.Pool
-    value: 'aicoe-ado-wip'
+    value: 'aicoesandox-ado-wip'
   - name: GoogleCloud.WorkloadIdentity.Provider
-    value: 'aicoe-ado-wip-provider'
+    value: 'aicoesandox-ado-wip-provider'
   - name: GoogleCloud.WorkloadIdentity.ServiceAccount
     value: 'aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com'
  
