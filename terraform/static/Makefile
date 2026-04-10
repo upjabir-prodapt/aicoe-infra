@@ -34,7 +34,7 @@ plan: init
 landscape: init
 	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars | landscape
 
-apply: static_safety_check
+apply: static_safety_check init
 	$(TF_EXEC) apply $(TFPLAN_FILE) && rm $(TFPLAN_FILE)
 
 destroy: init
