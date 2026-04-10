@@ -108,7 +108,7 @@ stages:
   displayName: 'Static-Plan-Approve'
   dependsOn: Static_Plan
   jobs:
-  - deployment: Static-Approve
+  - deployment: Static_Approve
     displayName: 'Approve Static Apply'
     environment: $(TF_ENV)        # ← ADO Environment with approval gate
     strategy:
