@@ -1,0 +1,48 @@
+trigger:
+  branches:
+    include:
+    - main
+variables:
+- name: GCP_PROJECT_ID
+  value: 'aicoesandbox'
+- name: GCP_PROJECT_NUMBER
+  value: '297743845367'
+- name: GCP_SERVICE_ACCOUNT
+  value: 'aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com'
+- name: ADO_SERVICE_CONNECTION_NAME
+  value: 'sc-ado-gcp-aicoe'
+- name: WIF_POOL_NAME
+  value: 'aicoe-ado-wip'
+- name: WIF_PROVIDER_NAME
+  value: 'ado-gcp-wif'
+stages:
+- stage: __default
+  jobs:
+  - job: Job
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Passwordless WIF Authentication to GCP'
+      inputs:
+        azureSubscription: $(ADO_SERVICE_CONNECTION_NAME)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
+        inlineScript: |
+          echo "Starting passwordless authentication to GCP..."
+          # 1. Save the ADO OIDC token to a temporary file
+          echo $idToken > $(System.DefaultWorkingDirectory)/oidc-token.txt
+          # 2. Create the dynamic JSON configuration file for WIF
+          gcloud iam workload-identity-pools create-cred-config \
+            projects/$(GCP_PROJECT_NUMBER)/locations/global/workloadIdentityPools/$(WIF_POOL_NAME)/providers/$(WIF_PROVIDER_NAME) \
+            --service-account=$(GCP_SERVICE_ACCOUNT) \
+            --output-file=$(System.DefaultWorkingDirectory)/gcp-credentials.json \
+            --credential-source-file=$(System.DefaultWorkingDirectory)/oidc-token.txt
+          # 3. Export credentials for the Google SDK to consume
+          export GOOGLE_APPLICATION_CREDENTIALS=$(System.DefaultWorkingDirectory)/gcp-credentials.json
+          # 4. Log into GCP (Using --quiet to prevent the terminal from freezing)
+          gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
+          gcloud config set project $GCP_PROJECT_ID --quiet
+          gcloud config list
+          gcloud storage ls
