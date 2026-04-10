@@ -62,6 +62,12 @@ stages:
         # ── Step 1: Checkout ─────────────────────────────────────────────────
         - checkout: self
           displayName: 'Checkout source'
+        
+        # ── Step 2: Terraform installer ─────────────────────────────────────────────────
+
+        - task: TerraformInstaller@1
+          inputs:
+            terraformVersion: 'latest'
  
         # ── Step 2: WIF Token Exchange ────────────────────────────────────────
         - task: AzureCLI@3
