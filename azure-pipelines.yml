@@ -86,6 +86,9 @@ stages:
               }
               EOF
               pwd
-              cd $(TERRAFORM_ROOT)/static
-              pwd
-              make plan
+              ls -lrt
+              echo "$(Build.SourcesDirectory)"
+              ls -lrt $(Build.SourcesDirectory)
+              # cd $(TERRAFORM_ROOT)/static
+              # pwd
+              # make plan
