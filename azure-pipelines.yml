@@ -120,44 +120,20 @@ stages:
               echo "Reviewer approved at: $(date -u)"
             displayName: 'Approval Confirmed'
 
-  - stage: Static_Apply
+- stage: Static_Apply
+  displayName: 'Static-Apply'
+  dependsOn: Static_Approve
+  jobs:
+  - job: Static_Apply
     displayName: 'Static-Apply'
-    dependsOn: Static_Approve
-    jobs:
-    - job: Static_Apply
-      displayName: 'Static-Apply'
-      steps:
-  
-      - checkout: self
-  
-      - task: DownloadBuildArtifacts@0
-        displayName: 'Download Static Plan'
-        inputs:
-          artifactName: 'plan-static'
-          downloadPath: '$(TF_ROOT)'
+    steps:
 
-    # ── Step 2: WIF Token Exchange ────────────────────────────────────────
-      - task: AzureCLI@3
-        displayName: Static-Plan
-        inputs:
-          connectionType: 'azureRM'
-          azureSubscription: 'sc-ado-gcp-aicoe'
-          addSpnToEnvironment: true
-          scriptType: 'bash'
-          scriptLocation: 'inlineScript'
-          inlineScript: |
-            echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
-            cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
-            {
-              "type": "external_account",
-              "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
-              "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-              "token_url": "https://sts.googleapis.com/v1/token",
-              "credential_source": {
-                "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
-              },
-              "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
-            }
-            EOF
-            cd $(TF_ROOT)/static
-            make apply ENVNAME=$(TF_ENV)  
+    - checkout: self
+
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Static Plan'
+      inputs:
+        artifactName: 'plan-static'
+        downloadPath: '$(TF_ROOT)'
+
+    
