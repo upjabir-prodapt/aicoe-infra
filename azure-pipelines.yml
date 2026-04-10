@@ -164,6 +164,7 @@ stages:
             "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
           }
           EOF
+          mv $(TF_ROOT)/plan-static/static-*.plan $(TF_ROOT)
           cd $(TF_ROOT)/static
           make apply ENVNAME=$(TF_ENV)
 
