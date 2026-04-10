@@ -2,16 +2,16 @@ trigger:
   branches:
     include:
       - main
-  paths:
-    include:
-      - AICOE-Terraform/* 
-pr:
-  branches:
-    include:
-      - main
-  paths:
-    include:
-      - AICOE-Terraform/*
+#   paths:
+#     include:
+#       - AICOE-Terraform/* 
+# pr:
+#   branches:
+#     include:
+#       - main
+  # paths:
+  #   include:
+  #     - AICOE-Terraform/*
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -42,35 +42,59 @@ variables:
   - name: TERRAFORM_ROOT
     value: '$(Build.SourcesDirectory)/aicoe-terraform/terraform'
   - name: SKIP_INTERACTIVE_SAFETY_PROMPT
-    value: 'true'                       # Required for non-interactive CI pipeline
+    value: 'true' 
 
+#Stages                          
 stages:
-- stage: __default
+# ============================================================================
+# STAGE 1 — STATIC LAYER
+# ============================================================================
+- stage: Static_Plan
+  displayName: 'Static - Plan'
+  dependsOn: []
   jobs:
-  - job: Job
-    
-    steps:
-    - task: AzureCLI@2
-      displayName: 'Passwordless WIF Authentication to GCP'
-      inputs:
-        azureSubscription: $(ADO_SERVICE_CONNECTION_NAME)
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        addSpnToEnvironment: true
-        inlineScript: |
-          echo "Starting passwordless authentication to GCP..."
-          # 1. Save the ADO OIDC token to a temporary file
-          echo $idToken > $(System.DefaultWorkingDirectory)/oidc-token.txt
-          # 2. Create the dynamic JSON configuration file for WIF
-          gcloud iam workload-identity-pools create-cred-config \
-            projects/$(GCP_PROJECT_NUMBER)/locations/global/workloadIdentityPools/$(WIF_POOL_NAME)/providers/$(WIF_PROVIDER_NAME) \
-            --service-account=$(GCP_SERVICE_ACCOUNT) \
-            --output-file=$(System.DefaultWorkingDirectory)/gcp-credentials.json \
-            --credential-source-file=$(System.DefaultWorkingDirectory)/oidc-token.txt
-          # 3. Export credentials for the Google SDK to consume
-          export GOOGLE_APPLICATION_CREDENTIALS=$(System.DefaultWorkingDirectory)/gcp-credentials.json
-          # 4. Log into GCP (Using --quiet to prevent the terminal from freezing)
-          gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
-          gcloud config set project $GCP_PROJECT_ID --quiet
-          gcloud config list
-          gcloud storage ls
+    - job: Static_Plan_Job
+      displayName: 'Terraform Plan - static'
+      steps:
+ 
+        # ── Step 1: Checkout ─────────────────────────────────────────────────
+        - checkout: self
+          displayName: 'Checkout source'
+ 
+        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+        - task: AzureCLI@2
+          displayName: 'Exchange Azure WIF token for GCP credentials'
+          inputs:
+            connectedServiceNameARM: $(Azure.WorkloadIdentity.Connection)
+            addSpnToEnvironment: true
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+              echo "##[section]Writing WIF JWT token..."
+              echo "$idToken" > "$(Pipeline.Workspace)/.workload_identity.jwt"
+ 
+              echo "##[section]Writing GCP external credentials config..."
+              cat << EOF > "$(GOOGLE_APPLICATION_CREDENTIALS)"
+              {
+                "type": "external_account",
+                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+                "token_url": "https://sts.googleapis.com/v1/token",
+                "credential_source": {
+                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+                },
+                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken%22
+              }
+              EOF
+ 
+              echo "##[section]GCP credentials file written to: $(GOOGLE_APPLICATION_CREDENTIALS)"
+
+               #4. Log into GCP (Using --quiet to prevent the terminal from freezing)
+              gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
+              gcloud config set project $GCP_PROJECT_ID --quiet
+              gcloud config list
+              gcloud storage ls
+
+
+
