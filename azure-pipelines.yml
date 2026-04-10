@@ -52,7 +52,7 @@ stages:
 # STAGE 1 — STATIC LAYER
 # ============================================================================
 - stage: Static_Plan
-  displayName: 'Static - Plan'
+  displayName: 'Static-Plan'
   dependsOn: []
   jobs:
     - job: Static_Plan_Job
@@ -103,3 +103,61 @@ stages:
             PathtoPublish: '$(TF_ROOT)/static-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
             ArtifactName: 'plan-static'
               
+  # ── Stage 2: Static Approve ───────────────────────────────────
+- stage: Static_Approve
+  displayName: 'Static-Plan-Approve'
+  dependsOn: Static_Plan
+  jobs:
+  - deployment: Static-Approve
+    displayName: 'Approve Static Apply'
+    environment: $(TF_ENV)        # ← ADO Environment with approval gate
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Approval granted for Static layer"
+              echo "Reviewer approved at: $(date -u)"
+            displayName: 'Approval Confirmed'
+
+  - stage: Static_Apply
+    displayName: 'Static-Apply'
+    dependsOn: Static_Approve
+    jobs:
+    - job: Static_Apply
+      displayName: 'Static-Apply'
+      steps:
+  
+      - checkout: self
+  
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download Static Plan'
+        inputs:
+          artifactName: 'plan-static'
+          downloadPath: '$(TF_ROOT)'
+
+    # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+      - task: AzureCLI@3
+        displayName: Static-Plan
+        inputs:
+          connectionType: 'azureRM'
+          azureSubscription: 'sc-ado-gcp-aicoe'
+          addSpnToEnvironment: true
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+            cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+            {
+              "type": "external_account",
+              "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+              "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+              "token_url": "https://sts.googleapis.com/v1/token",
+              "credential_source": {
+                "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+              },
+              "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+            }
+            EOF
+            cd $(TF_ROOT)/static
+            make apply ENVNAME=$(TF_ENV)  
