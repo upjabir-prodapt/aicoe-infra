@@ -68,6 +68,7 @@ stages:
           inputs:
             connectionType: 'azureRM'
             azureSubscription: 'sc-ado-gcp-aicoe'
+            addSpnToEnvironment: true
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
