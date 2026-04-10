@@ -4,7 +4,7 @@ trigger:
     - main
 variables:
 - name: GCP_PROJECT_ID
-  value: 'aicoesandbox'
+  value: 'aicoesandox'
 - name: GCP_PROJECT_NUMBER
   value: '297743845367'
 - name: GCP_SERVICE_ACCOUNT
