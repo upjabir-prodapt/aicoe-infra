@@ -1,82 +1,48 @@
 trigger:
-- main
-pool:
-  vmImage: 'ubuntu-latest' # Uses Microsoft's free hosted servers
+  branches:
+    include:
+    - main
 variables:
-  GCP_PROJECT_ID: 'aicoe-sharedwif'
-  GCP_PROJECT_NUMBER: '538669417284' # 12-digit number
-  GCP_SERVICE_ACCOUNT: 'aicoe-shared-wip-sa-tf@aicoe-sharedwif.iam.gserviceaccount.com'
-  ADO_SERVICE_CONNECTION_NAME: 'sc-ado-gcp-aicoe' # Exact name of your Service Connection
-  WIF_POOL_NAME: 'aicoe-ado-wip'
-  WIF_PROVIDER_NAME: 'ado-gcp-wif'
-steps:
-
-- task: AzureCLI@3
-  inputs:
-    connectionType: 'azureRM'
-    azureSubscription: 'sc-ado-gcp-aicoe'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
-        mkdir -p $(Build.ArtifactStagingDirectory)/wif-debug
-       
-        # ── Decode JWT ──────────────────────────────────────────────
-        JWT=$(cat $(Pipeline.Workspace)/.workload_identity.jwt)
-        PAYLOAD=$(echo $JWT | cut -d'.' -f2)
-        echo "${PAYLOAD}==" | base64 --decode | python3 -m json.tool > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json
-       
-        ISS=$(cat $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['iss'])")
-        SUB=$(cat $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['sub'])")
-        AUD=$(cat $(Build.ArtifactStagingDirectory)/wif-debug/jwt-payload.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['aud'])")
-       
-        cat << EOF > $(Build.ArtifactStagingDirectory)/wif-debug/jwt-claims.txt
-        iss : $ISS
-        sub : $SUB
-        aud : $AUD
-        EOF
-       
-        # ── Step 1: Test raw STS token exchange ─────────────────────
-        echo "Testing STS exchange..."
-        curl -s -X POST "https://sts.googleapis.com/v1/token" \
-          -H "Content-Type: application/json" \
-          -d "{
-            \"audience\": \"//iam.googleapis.com/projects/$(GCP_PROJECT_NUMBER)/locations/global/workloadIdentityPools/$(WIF_POOL_NAME)/providers/$(WIF_PROVIDER_NAME)\",
-            \"grantType\": \"urn:ietf:params:oauth:grant-type:token-exchange\",
-            \"requestedTokenType\": \"urn:ietf:params:oauth:token-type:access_token\",
-            \"subjectTokenType\": \"urn:ietf:params:oauth:token-type:jwt\",
-            \"subjectToken\": \"$JWT\"
-          }" > $(Build.ArtifactStagingDirectory)/wif-debug/sts-response.json
-       
-        # Extract federated token
-        FEDERATED_TOKEN=$(cat $(Build.ArtifactStagingDirectory)/wif-debug/sts-response.json \
-          | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('access_token','FAILED'))")
-       
-        echo "STS Token: $FEDERATED_TOKEN" >> $(Build.ArtifactStagingDirectory)/wif-debug/jwt-claims.txt
-       
-        # ── Step 2: Test SA impersonation separately ─────────────────
-        if [ "$FEDERATED_TOKEN" != "FAILED" ]; then
-          echo "STS exchange succeeded. Testing SA impersonation..."
-       
-          curl -s -X POST \
-            "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GCP_SERVICE_ACCOUNT):generateAccessToken%22 \
-            -H "Authorization: Bearer $FEDERATED_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{"scope": ["https://www.googleapis.com/auth/cloud-platform"]}' > $(Build.ArtifactStagingDirectory)/wif-debug/impersonation-response.json
-       
-        else
-          echo "STS exchange FAILED — skipping impersonation test"
-          echo "STS exchange failed" >> $(Build.ArtifactStagingDirectory)/wif-debug/jwt-claims.txt
-        fi
-       
-        # ── Step 3: Check current SA IAM bindings ───────────────────
-        gcloud iam service-accounts get-iam-policy $(GCP_SERVICE_ACCOUNT) \
-          --project=$(GCP_PROJECT_ID) \
-          --format=json > $(Build.ArtifactStagingDirectory)/wif-debug/sa-iam-policy.json 2>&1 || true
-  
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'debug'
-    publishLocation: 'Container'
-    
+- name: GCP_PROJECT_ID
+  value: 'aicoe-sharedwif'
+- name: GCP_PROJECT_NUMBER
+  value: '538669417284'
+- name: GCP_SERVICE_ACCOUNT
+  value: 'aicoe-shared-wif-sa-tf@aicoe-sharedwif.iam.gserviceaccount.com'
+- name: ADO_SERVICE_CONNECTION_NAME
+  value: 'sc-ado-gcp-aicoe'
+- name: WIF_POOL_NAME
+  value: 'aicoe-ado-wip'
+- name: WIF_PROVIDER_NAME
+  value: 'ado-gcp-wif'
+stages:
+- stage: __default
+  jobs:
+  - job: Job
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Passwordless WIF Authentication to GCP'
+      inputs:
+        azureSubscription: $(ADO_SERVICE_CONNECTION_NAME)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
+        inlineScript: |
+          echo "Starting passwordless authentication to GCP..."
+          # 1. Save the ADO OIDC token to a temporary file
+          echo $idToken > $(System.DefaultWorkingDirectory)/oidc-token.txt
+          # 2. Create the dynamic JSON configuration file for WIF
+          gcloud iam workload-identity-pools create-cred-config \
+            projects/$(GCP_PROJECT_NUMBER)/locations/global/workloadIdentityPools/$(WIF_POOL_NAME)/providers/$(WIF_PROVIDER_NAME) \
+            --service-account=$(GCP_SERVICE_ACCOUNT) \
+            --output-file=$(System.DefaultWorkingDirectory)/gcp-credentials.json \
+            --credential-source-file=$(System.DefaultWorkingDirectory)/oidc-token.txt
+          # 3. Export credentials for the Google SDK to consume
+          export GOOGLE_APPLICATION_CREDENTIALS=$(System.DefaultWorkingDirectory)/gcp-credentials.json
+          # 4. Log into GCP (Using --quiet to prevent the terminal from freezing)
+          gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
+          gcloud config set project $(GCP_PROJECT_ID) --quiet
+          gcloud config list
+          gcloud storage ls
