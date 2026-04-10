@@ -21,6 +21,8 @@ variables:
     value: 'sc-ado-gcp-aicoe'
  
   # --- GCP WIF Configuration ---
+  - name: GCP_PROJECT_ID
+    value: 'aicoesandox'  
   - name: GoogleCloud.WorkloadIdentity.ProjectNumber
     value: '297743845367'
   - name: GoogleCloud.WorkloadIdentity.Pool
