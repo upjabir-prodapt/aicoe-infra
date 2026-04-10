@@ -173,7 +173,7 @@ stages:
 # ============================================================================
 - stage: Network_Plan
   displayName: 'Network-Plan'
-  dependsOn: []
+  dependsOn: Static_Apply
   jobs:
     - job: Network_Plan_Job
       displayName: 'Terraform Plan - Network'
