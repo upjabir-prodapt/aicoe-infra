@@ -41,7 +41,7 @@ variables:
     value: 'aicoe'
   - name: TF_REGION
     value: 'europe-west1'
-  - name: TERRAFORM_ROOT
+  - name: TF_ROOT
     value: '$(Build.SourcesDirectory)/terraform'
   - name: SKIP_INTERACTIVE_SAFETY_PROMPT
     value: 'true' 
@@ -93,7 +93,7 @@ stages:
                 "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
               }
               EOF
-              cd $(TERRAFORM_ROOT)/static
+              cd $(TF_ROOT)/static
               make plan ENVNAME=$(TF_ENV)
 
         - task: PublishBuildArtifacts@1
