@@ -62,20 +62,15 @@ stages:
           displayName: 'Checkout source'
  
         # ── Step 2: WIF Token Exchange ────────────────────────────────────────
-        - task: AzureCLI@2
-          displayName: 'Exchange Azure WIF token for GCP credentials'
+        - task: AzureCLI@3
           inputs:
-            connectedServiceNameARM: $(Azure.WorkloadIdentity.Connection)
-            addSpnToEnvironment: true
+            connectionType: 'azureRM'
+            azureSubscription: 'sc-ado-gcp-aicoe'
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              set -euo pipefail
-              echo "##[section]Writing WIF JWT token..."
-              echo "$idToken" > "$(Pipeline.Workspace)/.workload_identity.jwt"
- 
-              echo "##[section]Writing GCP external credentials config..."
-              cat << EOF > "$(GOOGLE_APPLICATION_CREDENTIALS)"
+              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
               {
                 "type": "external_account",
                 "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
@@ -84,17 +79,11 @@ stages:
                 "credential_source": {
                   "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
                 },
-                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken%22
+                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
               }
               EOF
- 
-              echo "##[section]GCP credentials file written to: $(GOOGLE_APPLICATION_CREDENTIALS)"
-
-               #4. Log into GCP (Using --quiet to prevent the terminal from freezing)
+              #4. Log into GCP (Using --quiet to prevent the terminal from freezing)
               gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
               gcloud config set project $GCP_PROJECT_ID --quiet
               gcloud config list
               gcloud storage ls
-
-
-
