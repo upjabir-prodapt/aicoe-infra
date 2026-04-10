@@ -92,6 +92,5 @@ stages:
               }
               EOF
               cd $(TERRAFORM_ROOT)/static
-              ls -lrt
-              terraform version
-              ls -lrt
+              make plan
+              
