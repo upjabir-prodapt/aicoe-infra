@@ -1,7 +1,7 @@
 resource "google_workbench_instance" "aicoe-vertex_ai_workbench" {
 
   name        = "${var.project}${var.envname}-notebook"
-  location    = "${var.region}-c"
+  location    = "${var.region}-d"
   project     = "${var.project}${var.envname}"
   instance_id = "${var.project}${var.envname}-notebook"
   
