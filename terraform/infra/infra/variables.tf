@@ -1,0 +1,7 @@
+variable "project" {}
+variable "envname" {}
+variable "region"  {}
+variable "data_disk_size_gb" {}
+variable "boot_disk_type" {}
+variable "gpu_type" {}
+variable "machine_type" {}

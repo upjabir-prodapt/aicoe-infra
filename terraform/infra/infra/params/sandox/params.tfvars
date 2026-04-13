@@ -1,0 +1,7 @@
+project = "aicoe"
+envname = "sandox"
+region  = "europe-west1"  
+data_disk_size_gb = "100"
+boot_disk_type = "150"
+gpu_type = "NVIDIA_L4"
+machine_type = "g2-standard-8"
