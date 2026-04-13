@@ -12,7 +12,7 @@ output "aicoe_network_id" {
 }
 
 output "aicoe_subnet_name" {
-  value = google_compute_subnetwork.aicoe_subnet.name
+  value = google_compute_subnetwork.aicoe_subnet.self_link
 }
 
 output "aicoe_subnet_cidr" {

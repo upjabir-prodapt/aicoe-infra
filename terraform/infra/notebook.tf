@@ -17,7 +17,7 @@ resource "google_workbench_instance" "aicoe-vertex_ai_workbench" {
   
 
   network_interfaces {  # Explicit network and subnet
-    network          = data.terraform_remote_state.network.outputs.aicoe_network_id
+    network          = data.terraform_remote_state.network.outputs.aicoe_network
     subnet           = data.terraform_remote_state.network.outputs.aicoe_subnet_name
   }
     # Boot disk
