@@ -75,7 +75,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_azure_devops" {
       description = "To allow inbound connection from Azure DevOps outbound IP ranges - Ingress"
       direction   = "INGRESS"
       priority    = 65534
-      destination_ranges = [
+      source_ranges = [
         # Azure DevOps outbound ranges (IPv4)
         "150.171.22.0/24",
         "150.171.23.0/24",
