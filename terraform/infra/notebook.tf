@@ -22,8 +22,8 @@ resource "google_notebooks_runtime" "aicoe_notebook_instance" {
         notebook-disable-nbconvert = "true"
         report-system-health       = "true"
       }
-      network          = data.terraform_remote_state.network.outputs.aicoe_network.id
-      subnet           = data.terraform_remote_state.network.outputs.aicoe_subnet.name
+      network          = data.terraform_remote_state.network.outputs.aicoe_network_id
+      subnet           = data.terraform_remote_state.network.outputs.aicoe_subnet_name
       internal_ip_only = true
       data_disk {
         initialize_params {
