@@ -30,7 +30,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
   direction               = "INGRESS"
   source_tags             = null
   source_service_accounts = null
-  target_tags             = "vertex-ai-workbench"
+  target_tags             = null
   target_service_accounts = null
   priority                = 65534
 
