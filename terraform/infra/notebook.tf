@@ -9,6 +9,11 @@ resource "google_workbench_instance" "vertex_ai_workbench" {
   gce_setup {
     machine_type         = var.machine_type
     disable_public_ip    = true
+
+    accelerator_configs {
+      type       = var.gpu_type              # e.g. "NVIDIA_L4"
+      core_count = 1
+    }
   
 
   network_interfaces {  # Explicit network and subnet
@@ -22,24 +27,14 @@ resource "google_workbench_instance" "vertex_ai_workbench" {
       
     }
          
-    data_disk {
-        initialize_params {
+    data_disks {
           disk_size_gb = var.data_disk_size_gb
           disk_type    = var.data_disk_type    # e.g. "PD_SSD"
         }
       }
 
-    # GPU accelerator
-    accelerator {
-      type       = var.gpu_type              # e.g. "NVIDIA_L4"
-      core_count = 1
-    }
-
-   
+      
   }
 
-  lifecycle {
-    prevent_destroy = false
-  }
- 
-}
+  
+
