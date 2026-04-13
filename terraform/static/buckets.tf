@@ -12,9 +12,7 @@ resource "google_storage_bucket" "aicoe_app_bucket" {
   versioning {
     enabled = true
   }
-  encryption {
-    default_kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
-  }
+  
   labels = {
     env    = var.envname
     system = "${var.project}${var.envname}"
