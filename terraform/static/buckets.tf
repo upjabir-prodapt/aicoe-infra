@@ -7,6 +7,7 @@ resource "google_storage_bucket" "aicoe_app_bucket" {
   location      = var.region
   project       = "${var.project}${var.envname}"
   storage_class = "STANDARD"
+  uniform_bucket_level_access = true
  
   versioning {
     enabled = true
@@ -29,6 +30,7 @@ resource "google_storage_bucket" "aicoe_vxai_bs_bucket" {
   location      = var.region
   project       = "${var.project}${var.envname}"
   storage_class = "STANDARD"
+  uniform_bucket_level_access = true
  
   versioning {
     enabled = true
