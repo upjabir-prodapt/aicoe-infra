@@ -1,44 +1,45 @@
-resource "google_notebooks_runtime" "aicoe_notebook_instance" {
-  name     = "${var.project}${var.envname}-notebook"
-  location = var.region
-  project  = "${var.project}${var.envname}"
+resource "google_workbench_instance" "vertex_ai_workbench" {
 
-  software_config {
-    post_startup_script = null
-    install_gpu_driver  = true
-  }
+  name        = "${var.project}${var.envname}-notebook"
+  location    = var.region
+  project     = "${var.project}${var.envname}"
+  instance_id = "${var.project}${var.envname}-notebook"
+  
 
-  virtual_machine {
-    virtual_machine_config {
-      machine_type = var.machine_type
-      labels = {
-            env    = var.envname
-            system = "${var.project}${var.envname}"
+  gce_setup {
+    machine_type         = var.machine_type
+    disable_public_ip    = true
+  
+
+  network_interfaces {  # Explicit network and subnet
+    network          = data.terraform_remote_state.network.outputs.aicoe_network_id
+    subnet           = data.terraform_remote_state.network.outputs.aicoe_subnet_name
   }
-      metadata = {
-        terraform                  = "true"
-        notebook-disable-root      = "true"
-        notebook-disable-downloads = "true"
-        notebook-disable-nbconvert = "true"
-        report-system-health       = "true"
-      }
-      network          = data.terraform_remote_state.network.outputs.aicoe_network_id
-      subnet           = data.terraform_remote_state.network.outputs.aicoe_subnet_name
-      internal_ip_only = true
-      data_disk {
+    # Boot disk
+    boot_disk {
+      disk_size_gb    = var.boot_disk_size_gb
+      disk_type       = var.boot_disk_type   # e.g. "PD_BALANCED"
+      
+    }
+         
+    data_disk {
         initialize_params {
           disk_size_gb = var.data_disk_size_gb
-          disk_type    = var.boot_disk_type
+          disk_type    = var.data_disk_type    # e.g. "PD_SSD"
         }
       }
-      accelerator_config {
-        type       = var.gpu_type
-        core_count = 1
-      }
+
+    # GPU accelerator
+    accelerator {
+      type       = var.gpu_type              # e.g. "NVIDIA_L4"
+      core_count = 1
     }
-  }
-   lifecycle {
-    prevent_destroy = false
+
+   
   }
 
+  lifecycle {
+    prevent_destroy = false
+  }
+ 
 }
