@@ -10,10 +10,7 @@ resource "google_workbench_instance" "aicoe-vertex_ai_workbench" {
     machine_type         = var.machine_type
     disable_public_ip    = true
 
-    accelerator_configs {
-      type       = var.gpu_type              # e.g. "NVIDIA_L4"
-      core_count = 1
-    }
+    
   
 
   network_interfaces {  # Explicit network and subnet
