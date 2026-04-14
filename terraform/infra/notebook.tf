@@ -10,30 +10,32 @@ resource "google_workbench_instance" "aicoe_vertex_ai_workbench" {
     machine_type         = var.machine_type
     disable_public_ip    = true
 
-    
-  
-
-  network_interfaces {  # Explicit network and subnet
+     network_interfaces {  
     network          = data.terraform_remote_state.network.outputs.aicoe_network
     subnet           = data.terraform_remote_state.network.outputs.aicoe_subnet_name
-  }
-    # Boot disk
+    }
+    
     boot_disk {
       disk_size_gb    = var.boot_disk_size_gb
-      disk_type       = var.boot_disk_type   # e.g. "PD_BALANCED"
+      disk_type       = var.boot_disk_type   
       
     }
          
     data_disks {
           disk_size_gb = var.data_disk_size_gb
-          disk_type    = var.data_disk_type    # e.g. "PD_SSD"
+          disk_type    = var.data_disk_type    
         }
-      }
+    }
     
-     labels = {
-        env    = var.envname
-        system = "${var.project}${var.envname}"
-      }
+    labels = {
+      env    = var.envname
+      system = "${var.project}${var.envname}"
+    }
+
+    timeouts {
+      create = "15m"
+      delete = "15m"
+    }
       
   }
 

@@ -1,8 +1,8 @@
 variable "project" {}
 variable "envname" {}
 variable "region"  {}
-variable "data_disk_size_gb" {}
+variable "data_disk_size_gb" { type = number }
 variable "data_disk_type" {}
 variable "machine_type" {}
-variable "boot_disk_size_gb" {}
+variable "boot_disk_size_gb" { type = number }
 variable "boot_disk_type" {}

@@ -1,8 +1,8 @@
 project = "aicoe"
 envname = "sandox"
 region  = "europe-west1"  
-data_disk_size_gb = "100"
+data_disk_size_gb = 100
 data_disk_type = "PD_BALANCED"
 machine_type = "e2-standard-4"
-boot_disk_size_gb = "150"
+boot_disk_size_gb = 150
 boot_disk_type = "PD_BALANCED"
