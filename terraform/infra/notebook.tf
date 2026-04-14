@@ -1,4 +1,4 @@
-resource "google_workbench_instance" "aicoe-vertex_ai_workbench" {
+resource "google_workbench_instance" "aicoe_vertex_ai_workbench" {
 
   name        = "${var.project}${var.envname}-notebook"
   location    = "${var.region}-b"
