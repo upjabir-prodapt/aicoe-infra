@@ -15,5 +15,6 @@ gcp_apis_required =[
     "logging.googleapis.com",                  # Cloud Logging - log ingestion, sinks, routing
     "monitoring.googleapis.com",               # Cloud Monitoring - metrics, dashboards, alerts
     "serviceusage.googleapis.com",             # Service Usage API - enable/disable APIs
+    "compute.googleapis.com",                  # Compute Engine API 
     
 ]
