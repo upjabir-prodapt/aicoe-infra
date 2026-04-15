@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # Firewall Rules - DENY ALL
 # -----------------------------------------------------------------------------
-/*
+
 resource "google_compute_firewall" "aicoe_egress_deny_all" {
     name                    = "egress-deny-all"
     network                 = google_compute_network.aicoe_network.id
@@ -21,7 +21,7 @@ resource "google_compute_firewall" "aicoe_egress_deny_all" {
         metadata = "INCLUDE_ALL_METADATA"
     }
 }
-*/
+
 # -----------------------------------------------------------------------------
 # Firewall Rules - IAP SSH
 # -----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
 # -----------------------------------------------------------------------------
 # Firewall Rules - ALLOW FASTLY PYPI
 # -----------------------------------------------------------------------------
-/*
+
 resource "google_compute_firewall" "aicoe_egress_allow_fastly_pypi" {
       name                    = "egress-allow-fastly-cdn-for-pypi"
       network                 = google_compute_network.aicoe_network.id
@@ -142,4 +142,4 @@ resource "google_compute_firewall" "aicoe_egress_allow_azure_devops" {
         metadata = "INCLUDE_ALL_METADATA"
       }
     }
-  */
+  
