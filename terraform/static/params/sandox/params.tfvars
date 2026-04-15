@@ -18,3 +18,4 @@ gcp_apis_required =[
     "compute.googleapis.com",                  # Compute Engine API 
     
 ]
+artifact_format = "DOCKER"
