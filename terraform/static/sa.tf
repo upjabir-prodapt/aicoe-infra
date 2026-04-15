@@ -1,5 +1,5 @@
 resource "google_service_account" "aicoe_app_wif_sa" {
-  account_id   = "${var.project}${var.region}-app-wif-sa"
+  account_id   = "${var.project}${var.envname}-app-wif-sa"
   display_name = "Service Account for Application WIF"
 }
 
@@ -25,8 +25,7 @@ resource "google_service_account_iam_binding" "aicoe_app_wif_sa_iam_binding" {
   for_each = toset([
     "roles/iam.workloadIdentityUser",
     "roles/iam.serviceAccountTokenCreator",
-    "roles/iam.aiplatform.user",
-
+    
   ])
   service_account_id = google_service_account.aicoe_app_wif_sa.name
   role = each.value
