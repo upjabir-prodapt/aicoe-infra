@@ -15,6 +15,20 @@ resource "google_workbench_instance" "aicoe_vertex_ai_workbench" {
     subnet           = data.terraform_remote_state.network.outputs.aicoe_subnet_name
     }
     
+    metadata = {
+        "enable-oslogin"               = "FALSE"
+        "serial-port-enable"           = "FALSE"
+        "notebook-disable-root"        = "true"
+        "notebook-disable-nbconvert"   = "true"
+        "notebook-disable-downloads"   = "false"
+        "notebook-disable-terminal"    = "false"
+    }
+
+    shielded_instance_config {
+      enable_vtpm = true
+      enable_secure_boot = true
+      enable_integrity_monitoring = true
+    }
     boot_disk {
       disk_size_gb    = var.boot_disk_size_gb
       disk_type       = var.boot_disk_type   
