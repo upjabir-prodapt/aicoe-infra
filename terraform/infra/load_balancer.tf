@@ -35,7 +35,7 @@ resource "google_compute_forwarding_rule" "aicoe_ilb_forwarding_rule" {
   region                = var.region
   network               = data.terraform_remote_state.network.outputs.aicoe_network
   subnetwork            = data.terraform_remote_state.network.outputs.aicoe_subnet_name
-  target                = google_compute_region_backend_service.aicoe_ilb_be.id
+  target                = google_compute_region_url_map.aicoe_ilb_url_map.id
   port_range            = 443
   ip_address            = data.terraform_remote_state.network.outputs.aicoe_staticip_ilb
   load_balancing_scheme = "INTERNAL_MANAGED"
