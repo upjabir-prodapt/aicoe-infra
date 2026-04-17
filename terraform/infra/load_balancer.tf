@@ -14,8 +14,6 @@ resource "google_compute_region_backend_service" "aicoe_ilb_be" {
  
 resource "google_compute_region_network_endpoint_group" "aicoe_serverless_neg" {
   name                  = "${var.project}${var.envname}-serverless-neg"
-  network               = data.terraform_remote_state.network.outputs.aicoe_network
-  subnetwork            = data.terraform_remote_state.network.outputs.aicoe_proxy_only_subnet_name
   network_endpoint_type = "SERVERLESS"
   region                = var.region
 
