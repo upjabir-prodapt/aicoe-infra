@@ -19,6 +19,10 @@ output "aicoe_proxy_only_subnet_name" {
   value = google_compute_subnetwork.aicoe_proxy_only_subnet.self_link
 }
 
+output "aicoe_staticip_ilb" {
+  value = google_compute_address.aicoe_staticip_ilb
+}
+
 output "aicoe_subnet_cidr" {
   value = var.aicoe_subnet_cidr_range
 }
