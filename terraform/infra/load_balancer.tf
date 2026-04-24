@@ -12,15 +12,6 @@ resource "google_compute_region_backend_service" "aicoe_ilb_translation_be" {
   }
 }
  
-# resource "google_compute_region_network_endpoint_group" "aicoe_serverless_neg" {
-#  name                  = "${var.project}${var.envname}-serverless-neg"
-#  network_endpoint_type = "SERVERLESS"
-#  region                = var.region
-
-#  cloud_run {
-#    service = var.cloud_run_service_name
-#  }
-# }
 
 resource "google_compute_region_network_endpoint_group" "aicoe_serverless_neg_translation" {
   name                  = "${var.project}${var.envname}-serverless-neg-translation"
