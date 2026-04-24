@@ -20,7 +20,7 @@ output "aicoe_proxy_only_subnet_name" {
 }
 
 output "aicoe_staticip_ilb" {
-  value = google_compute_address.aicoe_staticip_ilb.id
+  value = google_compute_address.aicoe_staticip_ilb.address
 }
 
 output "aicoe_subnet_cidr" {
