@@ -57,22 +57,31 @@ resource "google_compute_forwarding_rule" "aicoe_ilb_forwarding_rule" {
   
 }
 
-data "google_storage_bucket_object" "ssl_certificate" {
-  bucket = var.ssl_bucket_name
-  name   = var.ssl_certificate
+
+data "google_secret_manager_secret_version" "ssl_certificate" {
+  secret  = "${var.project}${var.envname}-ssl-certificate"
+  project = "${var.project}${var.envname}"
 }
 
-data "google_storage_bucket_object" "ssl_private_key" {
-  bucket = var.ssl_bucket_name
-  name   = var.ssl_private_key
+# Read private key from Secret Manager
+data "google_secret_manager_secret_version" "ssl_private_key" {
+  secret  = "${var.project}${var.envname}-ssl-private-key"
+  project = "${var.project}${var.envname}"
 }
 
+# SSL Certificate
 resource "google_compute_region_ssl_certificate" "aicoe_translation_ssl" {
-  name                  = "${var.project}${var.envname}-translation-ssl"
-  project               = "${var.project}${var.envname}"
-  region                = var.region
+  name    = "${var.project}${var.envname}-translation-ssl"
+  project = "${var.project}${var.envname}"
+  region  = var.region
 
-  certificate           = data.google_storage_bucket_object.ssl_certificate.content
-  private_key           = data.google_storage_bucket_object.ssl_private_key.content
+  certificate = data.google_secret_manager_secret_version.ssl_certificate.secret_data
+  private_key = data.google_secret_manager_secret_version.ssl_private_key.secret_data
+
+  lifecycle {
+    create_before_destroy = true
   }
+}
+
+
 
