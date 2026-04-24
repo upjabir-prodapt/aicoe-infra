@@ -13,6 +13,7 @@ resource "google_compute_region_backend_service" "aicoe_ilb_translation_be" {
 }
  
 
+
 resource "google_compute_region_network_endpoint_group" "aicoe_serverless_neg_translation" {
   name                  = "${var.project}${var.envname}-serverless-neg-translation"
   network_endpoint_type = "SERVERLESS"
@@ -56,21 +57,22 @@ resource "google_compute_forwarding_rule" "aicoe_ilb_forwarding_rule" {
   
 }
 
+data "google_storage_bucket_object" "ssl_certificate" {
+  bucket = var.ssl_bucket_name
+  name   = var.ssl_certificate
+}
+
+data "google_storage_bucket_object" "ssl_private_key" {
+  bucket = var.ssl_bucket_name
+  name   = var.ssl_private_key
+}
+
 resource "google_compute_region_ssl_certificate" "aicoe_translation_ssl" {
   name                  = "${var.project}${var.envname}-translation-ssl"
   project               = "${var.project}${var.envname}"
   region                = var.region
 
-  certificate           = data.google_storage_bucket_object_content.ssl_certificate.google_storage_bucket_object_content
-  private_key           = data.google_storage_bucket_object_content.ssl_private_key.google_storage_bucket_object_content
+  certificate           = data.google_storage_bucket_object.ssl_certificate.content
+  private_key           = data.google_storage_bucket_object.ssl_private_key.content
   }
 
-data "google_storage_bucket_object_content" "ssl_certificate" {
-  bucket = var.ssl_bucket_name
-  name   = var.ssl_certificate
-}
-
-data "google_storage_bucket_object_content" "ssl_private_key" {
-  bucket = var.ssl_bucket_name
-  name   = var.ssl_private_key
-}
