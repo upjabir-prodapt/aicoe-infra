@@ -1,48 +1,411 @@
 trigger:
   branches:
     include:
-    - main
+      - main
+#   paths:
+#     include:
+#       - AICOE-Terraform/* 
+# pr:
+#   branches:
+#     include:
+#       - main
+  # paths:
+  #   include:
+  #     - AICOE-Terraform/*
+pool:
+  vmImage: 'ubuntu-latest'
+
 variables:
-- name: GCP_PROJECT_ID
-  value: 'aicoesandbox'
-- name: GCP_PROJECT_NUMBER
-  value: '297743845367'
-- name: GCP_SERVICE_ACCOUNT
-  value: 'aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com'
-- name: ADO_SERVICE_CONNECTION_NAME
-  value: 'sc-ado-gcp-aicoe'
-- name: WIF_POOL_NAME
-  value: 'aicoe-ado-wip'
-- name: WIF_PROVIDER_NAME
-  value: 'ado-gcp-wif'
+  # --- Azure WIF Service Connection ---
+  - name: Azure.WorkloadIdentity.Connection
+    value: 'sc-ado-gcp-aicoe'
+ 
+  # --- GCP WIF Configuration ---
+  - name: GCP_PROJECT_ID
+    value: 'aicoedev'  
+  - name: GoogleCloud.WorkloadIdentity.ProjectNumber
+    value: '1034474201742'
+  - name: GoogleCloud.WorkloadIdentity.Pool
+    value: 'aicoedev-ado-wip'
+  - name: GoogleCloud.WorkloadIdentity.Provider
+    value: 'aicoedev-ado-wip-provider'
+  - name: GoogleCloud.WorkloadIdentity.ServiceAccount
+    value: 'aicoe-dev-wif-sa-tf@aicoedev.iam.gserviceaccount.com'
+ 
+  # --- Terraform Runtime Variables ---
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    value: '$(Pipeline.Workspace)/.workload_identity.wlconfig'
+  - name: TF_ENV
+    value: 'dev'                        # Override per environment: dev / staging / prod
+  - name: TF_PROJECT
+    value: 'aicoe'
+  - name: TF_REGION
+    value: 'europe-west1'
+  - name: TF_ROOT
+    value: '$(Build.SourcesDirectory)/terraform'
+  - name: SKIP_INTERACTIVE_SAFETY_PROMPT
+    value: 'true' 
+
+#Stages                          
 stages:
-- stage: __default
+# ============================================================================
+# STAGE 1 — STATIC LAYER
+# ============================================================================
+- stage: Static_Plan
+  displayName: 'Static-Plan'
+  dependsOn: []
   jobs:
-  - job: Job
-    pool:
-      vmImage: 'ubuntu-latest'
+    - job: Static_Plan_Job
+      displayName: 'Terraform Plan - static'
+      steps:
+ 
+        # ── Step 1: Checkout ─────────────────────────────────────────────────
+        - checkout: self
+          displayName: 'Checkout source'
+        
+        # ── Step 2: Terraform installer ─────────────────────────────────────────────────
+
+        - task: TerraformInstaller@1
+          displayName: Terraform installer
+          inputs:
+            terraformVersion: 'latest'
+ 
+        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+        - task: AzureCLI@3
+          displayName: Static-Plan
+          inputs:
+            connectionType: 'azureRM'
+            azureSubscription: 'sc-ado-gcp-aicoe'
+            addSpnToEnvironment: true
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+              {
+                "type": "external_account",
+                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+                "token_url": "https://sts.googleapis.com/v1/token",
+                "credential_source": {
+                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+                },
+                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+              }
+              EOF
+              cd $(TF_ROOT)/static
+              make plan ENVNAME=$(TF_ENV)
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Static Plan'
+          condition: succeeded()
+          inputs:
+            PathtoPublish: '$(TF_ROOT)/static-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            ArtifactName: 'plan-static'
+              
+  # ── Stage 2: Static Approve ───────────────────────────────────
+- stage: Static_Approve
+  displayName: 'Static-Plan-Approve'
+  dependsOn: Static_Plan
+  jobs:
+  - deployment: Static_Approve
+    displayName: 'Approve Static Apply'
+    environment: $(TF_ENV)        # ← ADO Environment with approval gate
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Approval granted for Static layer"
+              echo "Reviewer approved at: $(date -u)"
+            displayName: 'Approval Confirmed'
+
+- stage: Static_Apply
+  displayName: 'Static-Apply'
+  dependsOn: Static_Approve
+  jobs:
+  - job: Static_Apply
+    displayName: 'Static-Apply'
     steps:
-    - task: AzureCLI@2
-      displayName: 'Passwordless WIF Authentication to GCP'
+
+    - checkout: self
+
+    - task: TerraformInstaller@1
+      displayName: Terraform installer
       inputs:
-        azureSubscription: $(ADO_SERVICE_CONNECTION_NAME)
+        terraformVersion: 'latest'
+
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Static Plan'
+      inputs:
+        artifactName: 'plan-static'
+        downloadPath: '$(TF_ROOT)'
+
+# ── Step 2: WIF Token Exchange ────────────────────────────────────────
+    - task: AzureCLI@3
+      displayName: Static-Apply
+      inputs:
+        connectionType: 'azureRM'
+        azureSubscription: 'sc-ado-gcp-aicoe'
+        addSpnToEnvironment: true
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
-        addSpnToEnvironment: true
         inlineScript: |
-          echo "Starting passwordless authentication to GCP..."
-          # 1. Save the ADO OIDC token to a temporary file
-          echo $idToken > $(System.DefaultWorkingDirectory)/oidc-token.txt
-          # 2. Create the dynamic JSON configuration file for WIF
-          gcloud iam workload-identity-pools create-cred-config \
-            projects/$(GCP_PROJECT_NUMBER)/locations/global/workloadIdentityPools/$(WIF_POOL_NAME)/providers/$(WIF_PROVIDER_NAME) \
-            --service-account=$(GCP_SERVICE_ACCOUNT) \
-            --output-file=$(System.DefaultWorkingDirectory)/gcp-credentials.json \
-            --credential-source-file=$(System.DefaultWorkingDirectory)/oidc-token.txt
-          # 3. Export credentials for the Google SDK to consume
-          export GOOGLE_APPLICATION_CREDENTIALS=$(System.DefaultWorkingDirectory)/gcp-credentials.json
-          # 4. Log into GCP (Using --quiet to prevent the terminal from freezing)
-          gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
-          gcloud config set project $GCP_PROJECT_ID --quiet
-          gcloud config list
-          gcloud storage ls
+          echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+          cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+          {
+            "type": "external_account",
+            "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+            "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+            "token_url": "https://sts.googleapis.com/v1/token",
+            "credential_source": {
+              "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+            },
+            "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+          }
+          EOF
+          mv $(TF_ROOT)/plan-static/static-*.plan $(TF_ROOT)
+          cd $(TF_ROOT)/static
+          make apply ENVNAME=$(TF_ENV)
+
+# ============================================================================
+# STAGE 2 — Network LAYER
+# ============================================================================
+- stage: Network_Plan
+  displayName: 'Network-Plan'
+  dependsOn: Static_Apply
+  jobs:
+    - job: Network_Plan_Job
+      displayName: 'Terraform Plan - Network'
+      steps:
+ 
+        # ── Step 1: Checkout ─────────────────────────────────────────────────
+        - checkout: self
+          displayName: 'Checkout source'
+        
+        # ── Step 2: Terraform installer ─────────────────────────────────────────────────
+
+        - task: TerraformInstaller@1
+          displayName: Terraform installer
+          inputs:
+            terraformVersion: 'latest'
+ 
+        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+        - task: AzureCLI@3
+          displayName: Network-Plan
+          inputs:
+            connectionType: 'azureRM'
+            azureSubscription: 'sc-ado-gcp-aicoe'
+            addSpnToEnvironment: true
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+              {
+                "type": "external_account",
+                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+                "token_url": "https://sts.googleapis.com/v1/token",
+                "credential_source": {
+                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+                },
+                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+              }
+              EOF
+              cd $(TF_ROOT)/network
+              make plan ENVNAME=$(TF_ENV)
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Network Plan'
+          condition: succeeded()
+          inputs:
+            PathtoPublish: '$(TF_ROOT)/network-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            ArtifactName: 'plan-network'
+              
+  # ── Stage 2: Network Approve ───────────────────────────────────
+- stage: Network_Approve
+  displayName: 'Network-Plan-Approve'
+  dependsOn: Network_Plan
+  jobs:
+  - deployment: Network_Approve
+    displayName: 'Approve Network Apply'
+    environment: $(TF_ENV)        # ← ADO Environment with approval gate
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Approval granted for Network layer"
+              echo "Reviewer approved at: $(date -u)"
+            displayName: 'Approval Confirmed'
+
+- stage: Network_Apply
+  displayName: 'Network-Apply'
+  dependsOn: Network_Approve
+  jobs:
+  - job: Network_Apply
+    displayName: 'Network-Apply'
+    steps:
+
+    - checkout: self
+
+    - task: TerraformInstaller@1
+      displayName: Terraform installer
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Network Plan'
+      inputs:
+        artifactName: 'plan-network'
+        downloadPath: '$(TF_ROOT)'
+
+# ── Step 2: WIF Token Exchange ────────────────────────────────────────
+    - task: AzureCLI@3
+      displayName: Network-Apply
+      inputs:
+        connectionType: 'azureRM'
+        azureSubscription: 'sc-ado-gcp-aicoe'
+        addSpnToEnvironment: true
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+          cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+          {
+            "type": "external_account",
+            "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+            "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+            "token_url": "https://sts.googleapis.com/v1/token",
+            "credential_source": {
+              "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+            },
+            "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+          }
+          EOF
+          mv $(TF_ROOT)/plan-network/network-*.plan $(TF_ROOT)
+          cd $(TF_ROOT)/network
+          make apply ENVNAME=$(TF_ENV)
+
+# ============================================================================
+# STAGE 3 — Infra LAYER
+# ============================================================================
+- stage: Infra_Plan
+  displayName: 'Infra-Plan'
+  dependsOn: Network_Apply
+  jobs:
+    - job: Infra_Plan_Job
+      displayName: 'Terraform Plan - Infra'
+      steps:
+ 
+        # ── Step 1: Checkout ─────────────────────────────────────────────────
+        - checkout: self
+          displayName: 'Checkout source'
+        
+        # ── Step 2: Terraform installer ─────────────────────────────────────────────────
+
+        - task: TerraformInstaller@1
+          displayName: Terraform installer
+          inputs:
+            terraformVersion: 'latest'
+ 
+        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+        - task: AzureCLI@3
+          displayName: Infra-Plan
+          inputs:
+            connectionType: 'azureRM'
+            azureSubscription: 'sc-ado-gcp-aicoe'
+            addSpnToEnvironment: true
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+              {
+                "type": "external_account",
+                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+                "token_url": "https://sts.googleapis.com/v1/token",
+                "credential_source": {
+                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+                },
+                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+              }
+              EOF
+              cd $(TF_ROOT)/infra
+              make plan ENVNAME=$(TF_ENV)
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Infra Plan'
+          condition: succeeded()
+          inputs:
+            PathtoPublish: '$(TF_ROOT)/infra-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            ArtifactName: 'plan-infra'
+              
+  # ── Stage 2: Infra Approve ───────────────────────────────────
+- stage: Infra_Approve
+  displayName: 'Infra-Plan-Approve'
+  dependsOn: Infra_Plan
+  jobs:
+  - deployment: Infra_Approve
+    displayName: 'Approve Infra Apply'
+    environment: $(TF_ENV)        # ← ADO Environment with approval gate
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Approval granted for Infra layer"
+              echo "Reviewer approved at: $(date -u)"
+            displayName: 'Approval Confirmed'
+
+- stage: Infra_Apply
+  displayName: 'Infra-Apply'
+  dependsOn: Infra_Approve
+  jobs:
+  - job: Infra_Apply
+    displayName: 'Infra-Apply'
+    steps:
+
+    - checkout: self
+
+    - task: TerraformInstaller@1
+      displayName: Terraform installer
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Infra Plan'
+      inputs:
+        artifactName: 'plan-infra'
+        downloadPath: '$(TF_ROOT)'
+
+# ── Step 2: WIF Token Exchange ────────────────────────────────────────
+    - task: AzureCLI@3
+      displayName: Infra-Apply
+      inputs:
+        connectionType: 'azureRM'
+        azureSubscription: 'sc-ado-gcp-aicoe'
+        addSpnToEnvironment: true
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+          cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+          {
+            "type": "external_account",
+            "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+            "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+            "token_url": "https://sts.googleapis.com/v1/token",
+            "credential_source": {
+              "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+            },
+            "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+          }
+          EOF
+          mv $(TF_ROOT)/plan-infra/infra-*.plan $(TF_ROOT)
+          cd $(TF_ROOT)/infra
+          make apply ENVNAME=$(TF_ENV)
+
+  
