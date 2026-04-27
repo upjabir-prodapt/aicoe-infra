@@ -1,6 +1,0 @@
-project = "aicoe"
-envname = "dev"
-region  = "europe-west1"
-aicoe_subnet_cidr_range = "192.168.4.0/24"
-aicoe_proxy_subnet_cidr_range = "192.168.5.0/24"
-aicoe_static_ilb_ip = "192.168.4.6"
