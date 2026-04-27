@@ -1,41 +1,41 @@
-# ###########################################
-# ###   AICOE Vertex Application Bucket   ###
-# ###########################################
+###########################################
+###   AICOE Vertex Application Bucket   ###
+###########################################
  
-# resource "google_storage_bucket" "aicoe_app_bucket" {
-#   name          = "${var.project}${var.envname}-vx-app-001"
-#   location      = var.region
-#   project       = "${var.project}${var.envname}"
-#   storage_class = "STANDARD"
-#   uniform_bucket_level_access = true
+resource "google_storage_bucket" "aicoe_app_bucket" {
+  name          = "${var.project}${var.envname}-vx-app-001"
+  location      = var.region
+  project       = "${var.project}${var.envname}"
+  storage_class = "STANDARD"
+  uniform_bucket_level_access = true
  
-#   versioning {
-#     enabled = true
-#   }
+  versioning {
+    enabled = true
+  }
   
-#   labels = {
-#     env    = var.envname
-#     system = "${var.project}${var.envname}"
-#   }
-# }
+  labels = {
+    env    = var.envname
+    system = "${var.project}${var.envname}"
+  }
+}
 
-# ###########################################
-# ###   AICOE Vertex AI Bootstrap Bucket   ###
-# ###########################################
+###########################################
+###   AICOE Vertex AI Bootstrap Bucket   ###
+###########################################
  
-# resource "google_storage_bucket" "aicoe_vxai_bs_bucket" {
-#   name          = "${var.project}${var.envname}-vxai-bs"
-#   location      = var.region
-#   project       = "${var.project}${var.envname}"
-#   storage_class = "STANDARD"
-#   uniform_bucket_level_access = true
+resource "google_storage_bucket" "aicoe_vxai_bs_bucket" {
+  name          = "${var.project}${var.envname}-vxai-bs"
+  location      = var.region
+  project       = "${var.project}${var.envname}"
+  storage_class = "STANDARD"
+  uniform_bucket_level_access = true
  
-#   versioning {
-#     enabled = true
-#   }
+  versioning {
+    enabled = true
+  }
   
-#   labels = {
-#     env    = var.envname
-#     system = "${var.project}${var.envname}"
-#   }
-# }
+  labels = {
+    env    = var.envname
+    system = "${var.project}${var.envname}"
+  }
+}
