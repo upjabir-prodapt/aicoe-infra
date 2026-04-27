@@ -1,9 +1,11 @@
 resource "google_service_account" "aicoe_app_wif_sa" {
+  count  = var.envname == "sandox" ? 1 : 0
   account_id   = "${var.project}${var.envname}-app-wif-sa"
   display_name = "Service Account for Application WIF"
 }
 
 resource "google_project_iam_member" "aicoe_app_wif_sa_iam" {
+  count  = var.envname == "sandox" ? 1 : 0
   for_each = toset([
     "roles/aiplatform.user",
     "roles/storage.objectAdmin",
@@ -22,6 +24,7 @@ resource "google_project_iam_member" "aicoe_app_wif_sa_iam" {
 }
  
 resource "google_service_account_iam_binding" "aicoe_app_wif_sa_iam_binding" {
+  count  = var.envname == "sandox" ? 1 : 0
   for_each = toset([
     "roles/iam.workloadIdentityUser",
     "roles/iam.serviceAccountTokenCreator",

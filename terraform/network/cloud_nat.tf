@@ -3,6 +3,7 @@
 ###########################################
  
 resource "google_compute_router" "aicoe_router_cloudnat" {
+  count   = var.envname == "sandox" ? 1 : 0
   project = "${var.project}${var.envname}"
   name    = "${var.project}${var.envname}-router-cloudnat"
   network = google_compute_network.aicoe_network.self_link
@@ -14,6 +15,7 @@ resource "google_compute_router" "aicoe_router_cloudnat" {
 ###########################################
  
 resource "google_compute_router_nat" "aicoe_cloudnat" {
+  count                  = var.envname == "sandox" ? 1 : 0
   name                   = "${var.project}${var.envname}-cloudnat"
   router                 = google_compute_router.aicoe_router_cloudnat.name
   region                 = var.region

@@ -26,6 +26,7 @@ resource "google_compute_firewall" "aicoe_egress_deny_all" {
 # Firewall Rules - IAP SSH
 # -----------------------------------------------------------------------------
 resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
+  count  = var.envname == "sandox" ? 1 : 0
   name                    = "ingress-allow-iap-ssh"
   network                 = google_compute_network.aicoe_network.id
   description             = "FW rules required to ssh into instances via IAP - useful for diagnosing faulty notebooks/instances"
@@ -48,6 +49,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
 # -----------------------------------------------------------------------------
 
 resource "google_compute_firewall" "aicoe_egress_allow_fastly_pypi" {
+      count  = var.envname == "sandox" ? 1 : 0
       name                    = "egress-allow-fastly-cdn-for-pypi"
       network                 = google_compute_network.aicoe_network.id
       description             = "Allow egress from instances in this network to the Fastly CDN IP Ranges, which is used by PyPi"
@@ -72,6 +74,7 @@ resource "google_compute_firewall" "aicoe_egress_allow_fastly_pypi" {
 # Firewall Rules - INGRESS ALLOW AZURE DEVOPS
 # -----------------------------------------------------------------------------
 resource "google_compute_firewall" "aicoe_ingress_allow_azure_devops" {
+      count  = var.envname == "sandox" ? 1 : 0
       name        = "ingress-allow-tcp-azure-devops"
       network     = google_compute_network.aicoe_network.id
       description = "To allow inbound connection from Azure DevOps outbound IP ranges - Ingress"
@@ -110,6 +113,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_azure_devops" {
 # -----------------------------------------------------------------------------
     
 resource "google_compute_firewall" "aicoe_egress_allow_azure_devops" {
+      count  = var.envname == "sandox" ? 1 : 0
       name        = "egress-allow-tcp-azure-devops"
       network     = google_compute_network.aicoe_network.id
       description = "To allow outbound connection to Azure DevOps IP ranges - Egress"
