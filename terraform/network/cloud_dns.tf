@@ -10,7 +10,7 @@ resource "google_dns_managed_zone" "aicoe_googleapis_private" {
 
   private_visibility_config {
     networks {
-      network_url = google_compute_network.aicoe_network[0].id
+      network_url = google_compute_network.aicoe_network.id
     }
   }
 }
@@ -33,7 +33,7 @@ resource "google_dns_managed_zone" "aicoe_internal" {
 
   private_visibility_config {
     networks {
-      network_url = google_compute_network.aicoe_network[0].id
+      network_url = google_compute_network.aicoe_network.id
     }
   }
 }

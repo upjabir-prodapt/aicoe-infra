@@ -3,7 +3,7 @@ resource "google_compute_global_address" "aicoe_psc_address" {
   name          = "${var.project}${var.envname}-psc-google-apis-ip"
   address_type  = "INTERNAL"
   purpose       = "PRIVATE_SERVICE_CONNECT"
-  network       = google_compute_network.aicoe_network[0].id
+  network       = google_compute_network.aicoe_network.id
   address       = "192.168.2.3"
 }
 

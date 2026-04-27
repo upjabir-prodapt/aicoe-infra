@@ -6,7 +6,7 @@ resource "google_compute_router" "aicoe_router_cloudnat" {
   count   = var.envname == "sandox" ? 1 : 0
   project = "${var.project}${var.envname}"
   name    = "${var.project}${var.envname}-router-cloudnat"
-  network = google_compute_network.aicoe_network[0].self_link
+  network = google_compute_network.aicoe_network.self_link
   region  = var.region
 }
  
