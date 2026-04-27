@@ -28,7 +28,7 @@ resource "google_compute_firewall" "aicoe_egress_deny_all" {
 resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
   count  = var.envname == "sandox" ? 1 : 0
   name                    = "ingress-allow-iap-ssh"
-  network                 = google_compute_network.aicoe_network[0].id
+  network                 = google_compute_network.aicoe_network.id
   description             = "FW rules required to ssh into instances via IAP - useful for diagnosing faulty notebooks/instances"
   direction               = "INGRESS"
   source_tags             = null
@@ -51,7 +51,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
 resource "google_compute_firewall" "aicoe_egress_allow_fastly_pypi" {
       count  = var.envname == "sandox" ? 1 : 0
       name                    = "egress-allow-fastly-cdn-for-pypi"
-      network                 = google_compute_network.aicoe_network[0].id
+      network                 = google_compute_network.aicoe_network.id
       description             = "Allow egress from instances in this network to the Fastly CDN IP Ranges, which is used by PyPi"
       direction               = "EGRESS"
       priority                = 65534
@@ -76,7 +76,7 @@ resource "google_compute_firewall" "aicoe_egress_allow_fastly_pypi" {
 resource "google_compute_firewall" "aicoe_ingress_allow_azure_devops" {
       count  = var.envname == "sandox" ? 1 : 0
       name        = "ingress-allow-tcp-azure-devops"
-      network     = google_compute_network.aicoe_network[0].id
+      network     = google_compute_network.aicoe_network.id
       description = "To allow inbound connection from Azure DevOps outbound IP ranges - Ingress"
       direction   = "INGRESS"
       priority    = 65534
@@ -115,7 +115,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_azure_devops" {
 resource "google_compute_firewall" "aicoe_egress_allow_azure_devops" {
       count  = var.envname == "sandox" ? 1 : 0
       name        = "egress-allow-tcp-azure-devops"
-      network     = google_compute_network.aicoe_network[0].id
+      network     = google_compute_network.aicoe_network.id
       description = "To allow outbound connection to Azure DevOps IP ranges - Egress"
       direction   = "EGRESS"
       priority    = 65534
