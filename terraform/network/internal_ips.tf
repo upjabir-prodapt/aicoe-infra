@@ -1,7 +1,7 @@
 resource "google_compute_address" "aicoe_staticip_vxaiwb" {
   count  = var.envname == "sandox" ? 1 : 0
   name         = "${var.project}${var.envname}-vxaiwb"
-  subnetwork   = google_compute_subnetwork.aicoe_subnet.id
+  subnetwork   = google_compute_subnetwork.aicoe_subnet[0].id
   address_type = "INTERNAL"
   address      = var.aicoe_static_vxaiwb_ip
   region       = var.region
@@ -14,7 +14,7 @@ resource "google_compute_address" "aicoe_staticip_vxaiwb" {
 #################### IP address for LB #################################
 resource "google_compute_address" "aicoe_staticip_ilb" {
   name         = "${var.project}${var.envname}-ilb"
-  subnetwork   = google_compute_subnetwork.aicoe_subnet.id
+  subnetwork   = google_compute_subnetwork.aicoe_subnet[0].id
   address_type = "INTERNAL"
   address      = var.aicoe_static_ilb_ip
   region       = var.region

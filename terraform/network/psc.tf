@@ -3,7 +3,7 @@ resource "google_compute_global_address" "aicoe_psc_address" {
   name          = "${var.project}${var.envname}-psc-google-apis-ip"
   address_type  = "INTERNAL"
   purpose       = "PRIVATE_SERVICE_CONNECT"
-  network       = google_compute_network.aicoe_network.id
+  network       = google_compute_network.aicoe_network[0].id
   address       = "192.168.2.3"
 }
 
@@ -14,7 +14,7 @@ resource "google_compute_global_forwarding_rule" "aicoe_psc_google_apis" {
   count  = var.envname == "sandox" ? 1 : 0
   name                  = "${var.project}${var.envname}pscapis"
   network               = google_compute_network.aicoe_network.id
-  ip_address            = google_compute_global_address.aicoe_psc_address.id
+  ip_address            = google_compute_global_address.aicoe_psc_address[0].id
   target                = "all-apis"
   load_balancing_scheme = ""
 }

@@ -10,7 +10,7 @@ resource "google_dns_managed_zone" "aicoe_googleapis_private" {
 
   private_visibility_config {
     networks {
-      network_url = google_compute_network.aicoe_network.id
+      network_url = google_compute_network.aicoe_network[0].id
     }
   }
 }
@@ -21,7 +21,7 @@ resource "google_dns_record_set" "aicoe_wildcard_googleapis" {
   managed_zone = google_dns_managed_zone.aicoe_googleapis_private.name
   type         = "A"
   ttl          = 300
-  rrdatas      = [google_compute_global_address.aicoe_psc_address.address]
+  rrdatas      = [google_compute_global_address.aicoe_psc_address[0].address]
 }
 
 resource "google_dns_managed_zone" "aicoe_internal" {
@@ -33,7 +33,7 @@ resource "google_dns_managed_zone" "aicoe_internal" {
 
   private_visibility_config {
     networks {
-      network_url = google_compute_network.aicoe_network.id
+      network_url = google_compute_network.aicoe_network[0].id
     }
   }
 }
@@ -46,5 +46,5 @@ resource "google_dns_record_set" "aicoe_translation_dns" {
   managed_zone = google_dns_managed_zone.aicoe_internal.name
   type         = "A"
   ttl          = 300
-  rrdatas      = [google_compute_address.aicoe_staticip_ilb.address]
+  rrdatas      = [google_compute_address.aicoe_staticip_ilb[0].address]
 }
