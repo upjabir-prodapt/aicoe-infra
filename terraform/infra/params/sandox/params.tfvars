@@ -7,6 +7,3 @@ machine_type = "e2-standard-4"
 boot_disk_size_gb = 150
 boot_disk_type = "PD_BALANCED"
 cloud_run_service_name = "translation-api-service"
-# ssl_bucket_name = "aicoesandox-vxai-bs"
-# ssl_certificate = "certs/translation/aicoesandox-int.colt.net.pem"
-# ssl_private_key = "certs/translation/translation.aicoesandox-int.colt.net.key"

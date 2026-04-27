@@ -1,5 +1,6 @@
 resource "google_workbench_instance" "aicoe_vertex_ai_workbench" {
 
+  count       = var.envname == "sandox" ? 1 : 0
   name        = "${var.project}${var.envname}-notebook"
   location    = "${var.region}-b"
   project     = "${var.project}${var.envname}"
