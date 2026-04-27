@@ -18,7 +18,7 @@ resource "google_dns_managed_zone" "aicoe_googleapis_private" {
 resource "google_dns_record_set" "aicoe_wildcard_googleapis" {
   count  = var.envname == "sandox" ? 1 : 0
   name         = "*.googleapis.com."
-  managed_zone = google_dns_managed_zone.aicoe_googleapis_private.name
+  managed_zone = google_dns_managed_zone.aicoe_googleapis_private[count.index].name
   type         = "A"
   ttl          = 300
   rrdatas      = [google_compute_global_address.aicoe_psc_address[0].address]
@@ -43,8 +43,8 @@ resource "google_dns_record_set" "aicoe_translation_dns" {
   count  = var.envname == "sandox" ? 1 : 0
   name         = "translation.aicoesandox-int.colt.net."
   project      = "${var.project}${var.envname}"
-  managed_zone = google_dns_managed_zone.aicoe_internal.name
+  managed_zone = google_dns_managed_zone.aicoe_internal[count.index].name
   type         = "A"
   ttl          = 300
-  rrdatas      = [google_compute_address.aicoe_staticip_ilb[0].address]
+  rrdatas      = [google_compute_address.aicoe_staticip_ilb.address]
 }
