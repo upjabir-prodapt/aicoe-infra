@@ -44,3 +44,12 @@ resource "google_dns_record_set" "aicoe_translation_dns" {
   ttl          = 300
   rrdatas      = [google_compute_address.aicoe_staticip_ilb.address]
 }
+
+resource "google_dns_record_set" "aicoe_salesagent_dns" {
+  name         = "salesagent.aicoesandox-int.colt.net."
+  project      = "${var.project}${var.envname}"
+  managed_zone = google_dns_managed_zone.aicoe_internal.name
+  type         = "A"
+  ttl          = 300
+  rrdatas      = [google_compute_address.aicoe_staticip_ilb_salesagent.address]
+}
