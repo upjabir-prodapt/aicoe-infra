@@ -35,6 +35,6 @@ output "dns_zone_name" {
   value       = google_dns_managed_zone.aicoe_googleapis_private.name
 }
 
-output "aicoe_static_ilb_salesagent" {
+output "aicoe_staticip_ilb_salesagent" {
   value       = google_compute_address.aicoe_staticip_ilb_salesagent.address
 }
