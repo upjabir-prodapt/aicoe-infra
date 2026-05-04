@@ -32,9 +32,9 @@ resource "google_bigquery_table" "translation_jobs" {
 }
 
 # Cost attribution table
-resource "google_bigquery_table" "cost_attribution" {
+resource "google_bigquery_table" "translation_costs" {
   dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
-  table_id   = "cost_attribution"
+  table_id   = "translation_costs"
   project    = google_bigquery_dataset.aicoe_translation_dataset.project
 
   schema = jsonencode([
@@ -52,9 +52,9 @@ resource "google_bigquery_table" "cost_attribution" {
 }
 
 # DLP tokens table
-resource "google_bigquery_table" "dlp_tokens" {
+resource "google_bigquery_table" "dlp_mappings" {
   dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
-  table_id   = "dlp_tokens"
+  table_id   = "dlp_mappings"
   project    = google_bigquery_dataset.aicoe_translation_dataset.project
 
   schema = jsonencode([
