@@ -25,9 +25,9 @@ resource "google_dns_record_set" "aicoe_wildcard_googleapis" {
 }
 
 resource "google_dns_managed_zone" "aicoe_internal" {
-  count  = var.envname == "sandox" ? 1 : 0
+  # count  = var.envname == "sandox" ? 1 : 0
   name        = "${var.project}${var.envname}-internal"
-  dns_name    = "aicoesandox-int.colt.net."
+  dns_name    = "aicoedev-int.colt.net."
   description = "Private DNS zone for internal ILB"
   visibility  = "private"
 
@@ -40,11 +40,21 @@ resource "google_dns_managed_zone" "aicoe_internal" {
 
 
 resource "google_dns_record_set" "aicoe_translation_dns" {
-  count  = var.envname == "sandox" ? 1 : 0
-  name         = "translation.aicoesandox-int.colt.net."
+  # count  = var.envname == "sandox" ? 1 : 0
+  name         = "translation.aicoedev-int.colt.net."
   project      = "${var.project}${var.envname}"
-  managed_zone = google_dns_managed_zone.aicoe_internal[count.index].name
+  # managed_zone = google_dns_managed_zone.aicoe_internal[count.index].name
+  managed_zone = google_dns_managed_zone.aicoe_internal.name
   type         = "A"
   ttl          = 300
   rrdatas      = [google_compute_address.aicoe_staticip_ilb.address]
+}
+
+resource "google_dns_record_set" "aicoe_salesagent_dns" {
+  name         = "salesagent.aicoedev-int.colt.net."
+  project      = "${var.project}${var.envname}"
+  managed_zone = google_dns_managed_zone.aicoe_internal.name
+  type         = "A"
+  ttl          = 300
+  rrdatas      = [google_compute_address.aicoe_staticip_ilb_salesagent.address]
 }
