@@ -84,3 +84,59 @@ resource "google_bigquery_dataset" "aicoe_sales_agent_dataset" {
     }
 }
 
+# Cost attribution table for Sales agent
+resource "google_bigquery_table" "cost_attribution" {
+  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  table_id   = "cost_attribution"
+  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+
+  schema = jsonencode([
+    { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
+    { name = "model_version", type = "STRING", mode = "NULLABLE" },
+    { name = "temperature", type = "FLOAT", mode = "NULLABLE" },
+    { name = "prompt_template_version", type = "STRING", mode = "NULLABLE" },
+    { name = "input_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "output_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "total_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "latency_seconds", type = "FLOAT", mode = "NULLABLE" },
+    { name = "source_domains", type = "JSON", mode = "NULLABLE" },
+    { name = "cost_usd", type = "FLOAT", mode = "NULLABLE" },
+    { name = "created_at", type = "TIMESTAMP", mode = "NULLABLE" }
+  ])
+}
+
+# Research requests table
+resource "google_bigquery_table" "research_requests" {
+  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  table_id   = "research_requests"
+  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+
+  schema = jsonencode([
+    { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
+    { name = "company_name", type = "STRING", mode = "NULLABLE" },
+    { name = "status", type = "STRING", mode = "NULLABLE" },
+    { name = "created_at", type = "TIMESTAMP", mode = "NULLABLE" },
+    { name = "updated_at", type = "TIMESTAMP", mode = "NULLABLE" },
+    { name = "gcs_uri", type = "STRING", mode = "NULLABLE" },
+    { name = "error_message", type = "STRING", mode = "NULLABLE" },
+    { name = "metadata", type = "JSON", mode = "NULLABLE" },
+    { name = "progress", type = "INTEGER", mode = "NULLABLE" },
+    { name = "current_step", type = "STRING", mode = "NULLABLE" }
+
+  ])
+}
+
+#sales agent users table
+resource "google_bigquery_table" "users" {
+  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  table_id   = "users"
+  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+
+  schema = jsonencode([
+    { name = "email", type = "STRING", mode = "REQUIRED" },
+    { name = "business_unit", type = "STRING", mode = "NULLABLE" },
+    { name = "organization", type = "STRING", mode = "NULLABLE" },
+    { name = "created_at", type = "TIMESTAMP", mode = "NULLABLE" }
+  ])
+}
+
