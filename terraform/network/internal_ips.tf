@@ -35,3 +35,16 @@ resource "google_compute_address" "aicoe_staticip_ilb_salesagent" {
     system = "${var.project}${var.envname}"
   }
 }
+
+#################### IP address for Front End #################################
+resource "google_compute_address" "aicoe_staticip_ilb_frontend" {
+  name         = "${var.project}${var.envname}-ilb-frontend"
+  subnetwork   = google_compute_subnetwork.aicoe_subnet.id
+  address_type = "INTERNAL"
+  address      = var.aicoe_static_ilb_frontend_ip
+  region       = var.region
+  labels = {
+    env    = "${var.envname}"
+    system = "${var.project}${var.envname}"
+  }
+}
