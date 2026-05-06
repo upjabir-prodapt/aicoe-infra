@@ -86,9 +86,9 @@ resource "google_bigquery_dataset" "aicoe_sales_agent_dataset" {
 
 # Cost attribution table for Sales agent
 resource "google_bigquery_table" "cost_attribution" {
-  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
   table_id   = "cost_attribution"
-  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
 
   schema = jsonencode([
     { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
@@ -107,9 +107,9 @@ resource "google_bigquery_table" "cost_attribution" {
 
 # Research requests table
 resource "google_bigquery_table" "research_requests" {
-  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
   table_id   = "research_requests"
-  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
 
   schema = jsonencode([
     { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
@@ -128,9 +128,9 @@ resource "google_bigquery_table" "research_requests" {
 
 #sales agent users table
 resource "google_bigquery_table" "users" {
-  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
   table_id   = "users"
-  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
 
   schema = jsonencode([
     { name = "email", type = "STRING", mode = "REQUIRED" },
