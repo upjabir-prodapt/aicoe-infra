@@ -1,48 +1,90 @@
 trigger:
   branches:
     include:
-    - main
+      - sandbox
+#   paths:
+#     include:
+#       - AICOE-Terraform/* 
+# pr:
+#   branches:
+#     include:
+#       - main
+  # paths:
+  #   include:
+  #     - AICOE-Terraform/*
+pool:
+  vmImage: 'ubuntu-latest'
+
 variables:
-- name: GCP_PROJECT_ID
-  value: 'aicoesandbox'
-- name: GCP_PROJECT_NUMBER
-  value: '297743845367'
-- name: GCP_SERVICE_ACCOUNT
-  value: 'aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com'
-- name: ADO_SERVICE_CONNECTION_NAME
-  value: 'sc-ado-gcp-aicoe'
-- name: WIF_POOL_NAME
-  value: 'aicoe-ado-wip'
-- name: WIF_PROVIDER_NAME
-  value: 'ado-gcp-wif'
+  # --- Azure WIF Service Connection ---
+  - name: Azure.WorkloadIdentity.Connection
+    value: 'sc-ado-gcp-aicoe'
+ 
+  # --- GCP WIF Configuration ---
+  - name: GCP_PROJECT_ID
+    value: 'aicoesandox'  
+  - name: GoogleCloud.WorkloadIdentity.ProjectNumber
+    value: '297743845367'
+  - name: GoogleCloud.WorkloadIdentity.Pool
+    value: 'ado-test'
+  - name: GoogleCloud.WorkloadIdentity.Provider
+    value: 'ado-test-wif'
+  - name: GoogleCloud.WorkloadIdentity.ServiceAccount
+    value: 'aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com'
+ 
+  # --- Terraform Runtime Variables ---
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    value: '$(Pipeline.Workspace)/.workload_identity.wlconfig'
+  - name: TF_ENV
+    value: 'sandox'                        # Override per environment: dev / staging / prod
+  - name: TF_PROJECT
+    value: 'aicoe'
+  - name: TF_REGION
+    value: 'europe-west1'
+  - name: TF_ROOT
+    value: '$(Build.SourcesDirectory)/terraform'
+  - name: SKIP_INTERACTIVE_SAFETY_PROMPT
+    value: 'true' 
+
+#Stages                          
 stages:
-- stage: __default
+# ============================================================================
+# STAGE 1 — STATIC LAYER
+# ============================================================================
+- stage: Static_Plan
+  displayName: 'Static-Plan'
+  dependsOn: []
   jobs:
-  - job: Job
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: AzureCLI@2
-      displayName: 'Passwordless WIF Authentication to GCP'
-      inputs:
-        azureSubscription: $(ADO_SERVICE_CONNECTION_NAME)
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        addSpnToEnvironment: true
-        inlineScript: |
-          echo "Starting passwordless authentication to GCP..."
-          # 1. Save the ADO OIDC token to a temporary file
-          echo $idToken > $(System.DefaultWorkingDirectory)/oidc-token.txt
-          # 2. Create the dynamic JSON configuration file for WIF
-          gcloud iam workload-identity-pools create-cred-config \
-            projects/$(GCP_PROJECT_NUMBER)/locations/global/workloadIdentityPools/$(WIF_POOL_NAME)/providers/$(WIF_PROVIDER_NAME) \
-            --service-account=$(GCP_SERVICE_ACCOUNT) \
-            --output-file=$(System.DefaultWorkingDirectory)/gcp-credentials.json \
-            --credential-source-file=$(System.DefaultWorkingDirectory)/oidc-token.txt
-          # 3. Export credentials for the Google SDK to consume
-          export GOOGLE_APPLICATION_CREDENTIALS=$(System.DefaultWorkingDirectory)/gcp-credentials.json
-          # 4. Log into GCP (Using --quiet to prevent the terminal from freezing)
-          gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
-          gcloud config set project $GCP_PROJECT_ID --quiet
-          gcloud config list
-          gcloud storage ls
+    - job: Static_Plan_Job
+      displayName: 'Terraform Plan - static'
+      steps:
+ 
+        
+ 
+        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+        - task: AzureCLI@3
+          displayName: Static-Plan
+          inputs:
+            connectionType: 'azureRM'
+            azureSubscription: 'sc-ado-gcp-aicoe'
+            addSpnToEnvironment: true
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+              {
+                "type": "external_account",
+                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+                "token_url": "https://sts.googleapis.com/v1/token",
+                "credential_source": {
+                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+                },
+                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+              }
+              EOF
+              gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
+              gcloud config set project $GCP_PROJECT_ID --quiet
+              gcloud config list
+              gcloud storage ls
