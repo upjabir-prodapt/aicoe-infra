@@ -30,7 +30,7 @@ resource "google_vertex_ai_index_endpoint" "vector_search" {
   display_name = "${var.project}${var.envname}_vertexai_endpoint"
   description = "Endpoint for Vertex AI Index"
 
-  network = data.terraform_remote_state.network.outputs.aicoe_network
+  network = data.terraform_remote_state.network.outputs.aicoe_network_id
 
   depends_on = [  
     google_vertex_ai_index.vector_search
