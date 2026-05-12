@@ -2,25 +2,25 @@
 # Firewall Rules - DENY ALL
 # -----------------------------------------------------------------------------
 
-resource "google_compute_firewall" "aicoe_egress_deny_all" {
-    name                    = "egress-deny-all"
-    network                 = google_compute_network.aicoe_network.id
-    description             = "Blanket default deny rule for egress"
-    direction               = "EGRESS"
-    priority                = 65535
-    destination_ranges      = ["0.0.0.0/0"]
-    source_tags             = null
-    source_service_accounts = null
-    target_tags             = null
-    target_service_accounts = null
-    deny  {
-        protocol = "all"
-        ports    = null # All ports
-    }
-    log_config  {
-        metadata = "INCLUDE_ALL_METADATA"
-    }
-}
+# resource "google_compute_firewall" "aicoe_egress_deny_all" {
+#     name                    = "egress-deny-all"
+#     network                 = google_compute_network.aicoe_network.id
+#     description             = "Blanket default deny rule for egress"
+#     direction               = "EGRESS"
+#     priority                = 65535
+#     destination_ranges      = ["0.0.0.0/0"]
+#     source_tags             = null
+#     source_service_accounts = null
+#     target_tags             = null
+#     target_service_accounts = null
+#     deny  {
+#         protocol = "all"
+#         ports    = null # All ports
+#     }
+#     log_config  {
+#         metadata = "INCLUDE_ALL_METADATA"
+#     }
+# }
 
 # -----------------------------------------------------------------------------
 # Firewall Rules - IAP SSH
