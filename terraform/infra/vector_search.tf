@@ -23,14 +23,18 @@ resource "google_vertex_ai_index" "vector_search" {
 }
 
 #Vertex AI Index Endpoint
-#Vertex AI Index
+data "google_project" "project" {
+    project_id = "${var.project}${var.envname}"
+}
+
 resource "google_vertex_ai_index_endpoint" "vector_search" {
   region = var.region
   project = "${var.project}${var.envname}"
   display_name = "${var.project}${var.envname}_vertexai_endpoint"
   description = "Endpoint for Vertex AI Index"
 
-  network = data.terraform_remote_state.network.outputs.aicoe_network_id
+#   network = data.terraform_remote_state.network.outputs.aicoe_network
+    network = "projects/${data.google_poject.project.number}/global/networks/${var.project}${var.envname}-vpc)"
 
   depends_on = [  
     google_vertex_ai_index.vector_search
