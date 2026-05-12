@@ -28,11 +28,11 @@ output "aicoe_subnet_cidr" {
 }
 
 output "psc_endpoint_ip" {
-  value       = try(google_compute_global_address.aicoe_psc_address[0].address, null)
+  value       = google_compute_global_address.aicoe_psc_address.address
 }
 
 output "dns_zone_name" {
-  value       = try(google_dns_managed_zone.aicoe_googleapis_private[0].name, null)
+  value       = google_dns_managed_zone.aicoe_googleapis_private.name
 }
 
 output "aicoe_staticip_ilb_salesagent" {
