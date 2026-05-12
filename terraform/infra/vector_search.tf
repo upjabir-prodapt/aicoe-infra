@@ -1,3 +1,4 @@
+#Vertex AI Index
 resource "google_vertex_ai_index" "vector_search" {
   region = var.region
   project = "${var.project}${var.envname}"
@@ -19,4 +20,19 @@ resource "google_vertex_ai_index" "vector_search" {
   }
   index_update_method = "BATCH_UPDATE"
 
+}
+
+#Vertex AI Index Endpoint
+#Vertex AI Index
+resource "google_vertex_ai_index_endpoint" "vector_search" {
+  region = var.region
+  project = "${var.project}${var.envname}"
+  display_name = "${var.project}${var.envname}_vertexai_endpoint"
+  description = "Endpoint for Vertex AI Index"
+
+  network = data.terraform_remote_state.network.outputs.aicoe_network
+
+  depends_on = [  
+    google_vertex_ai_index.vector_search
+   ]
 }
