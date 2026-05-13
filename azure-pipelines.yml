@@ -18,19 +18,19 @@ pool:
 variables:
   # --- Azure WIF Service Connection ---
   - name: Azure.WorkloadIdentity.Connection
-    value: 'sc-ado-gcp-aicoe'
+    value: 'sc-ado-gcp-aicoeprod'
  
   # --- GCP WIF Configuration ---
   - name: GCP_PROJECT_ID
-    value: 'aicoesandox'  
+    value: 'aicoeprod'  
   - name: GoogleCloud.WorkloadIdentity.ProjectNumber
-    value: '297743845367'
+    value: '559232860851'
   - name: GoogleCloud.WorkloadIdentity.Pool
-    value: 'aicoesandox-ado-wip3'
+    value: 'aicoeprod-ado-wip'
   - name: GoogleCloud.WorkloadIdentity.Provider
-    value: 'aicoesandox-ado-provider3'
+    value: 'aicoeprod-ado-wip-provider'
   - name: GoogleCloud.WorkloadIdentity.ServiceAccount
-    value: 'aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com'
+    value: 'aicoe-prod-wif-sa-tf@aicoeprod.iam.gserviceaccount.com'
  
   # --- Terraform Runtime Variables ---
   - name: GOOGLE_APPLICATION_CREDENTIALS
