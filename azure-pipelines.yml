@@ -58,38 +58,6 @@ stages:
     - job: Static_Plan_Job
       displayName: 'Terraform Plan - static'
       steps:
-      
-        - task: AzureCLI@3
-          displayName: '🔍 Debug JWT and Config'
-          inputs:
-            connectionType: 'azureRM'
-            azureSubscription: $(Azure.WorkloadIdentity.Connection)
-            addSpnToEnvironment: true
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              echo "=== Pipeline Config ==="
-              echo "Pool:     $(GoogleCloud.WorkloadIdentity.Pool)"
-              echo "Provider: $(GoogleCloud.WorkloadIdentity.Provider)"
-              echo "ProjectN: $(GoogleCloud.WorkloadIdentity.ProjectNumber)"
-              echo "SA:       $(GoogleCloud.WorkloadIdentity.ServiceAccount)"
-     
-              echo ""
-              echo "=== JWT Token ==="
-              echo $idToken | cut -d'.' -f2 | base64 -d 2>/dev/null | \
-                python3 -c "
-                import json, sys
-                data = json.load(sys.stdin)
-                print(f'iss = {data.get(\"iss\")}')
-                print(f'aud = {data.get(\"aud\")}')
-                print(f'sub = {data.get(\"sub\")}')
-                "
-     
-              echo ""
-              echo "=== Expected WIF Audience ==="
-              echo "audience field in credential file should be:"
-              echo "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)"
-        
  
         # ── Step 2: WIF Token Exchange ────────────────────────────────────────
         - task: AzureCLI@3
