@@ -36,7 +36,7 @@ variables:
   - name: GOOGLE_APPLICATION_CREDENTIALS
     value: '$(Pipeline.Workspace)/.workload_identity.wlconfig'
   - name: TF_ENV
-    value: 'sandox'                        # Override per environment: dev / staging / prod
+    value: 'prod'                        # Override per environment: dev / staging / prod
   - name: TF_PROJECT
     value: 'aicoe'
   - name: TF_REGION
