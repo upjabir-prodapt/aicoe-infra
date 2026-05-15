@@ -62,3 +62,27 @@ resource "google_dns_record_set" "aicoe_aihub" {
   ttl          = 300
   rrdatas      = [google_compute_address.aicoe_staticip_ilb_frontend.address]
 }
+
+# -----------------------------------------------------------------------------
+# Private DNS Zone for Google User content to enable Deny-all firewall
+# -----------------------------------------------------------------------------
+resource "google_dns_managed_zone" "aicoe_googleusercontent_private" {
+  name        = "${var.project}${var.envname}-googleusercontent-private"
+  dns_name    = "googleusercontent.com."
+  description = "Private DNS zone for Google user content.com - Routes workbench kernel and proxy traffic via PSC. Required for JupyterLab to work with deny-all egress enabled."
+  visibility  = "private"
+
+  private_visibility_config {
+    networks {
+      network_url = google_compute_network.aicoe_network.id
+    }
+  }
+}
+
+resource "google_dns_record_set" "aicoe_wildcard_googleusercontent" {
+  name         = "*.googleusercontent.com."
+  managed_zone = google_dns_managed_zone.aicoe_googleusercontent_private.name
+  type         = "A"
+  ttl          = 300
+  rrdatas      = [google_compute_global_address.aicoe_psc_address.address]
+}
