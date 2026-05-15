@@ -13,7 +13,7 @@ resource "google_compute_address" "aicoe_staticip_vxaiwb" {
 
 ################### IP address for Translation LB #################################
 resource "google_compute_address" "aicoe_staticip_ilb" {
-  name         = "${var.project}${var.envname}-ilb"
+  name         = "${var.project}${var.envname}-ilb-translation"
   subnetwork   = google_compute_subnetwork.aicoe_subnet.id
   address_type = "INTERNAL"
   address      = var.aicoe_static_ilb_ip
