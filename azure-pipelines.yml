@@ -64,7 +64,7 @@ stages:
           displayName: Static-Plan
           inputs:
             connectionType: 'azureRM'
-            azureSubscription: 'sc-ado-gcp-aicoeprod'
+            azureSubscription: $(Azure.WorkloadIdentity.Connection)
             addSpnToEnvironment: true
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
