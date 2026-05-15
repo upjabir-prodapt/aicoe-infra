@@ -1,0 +1,5 @@
+project = "aicoe"
+envname = "dev"
+region  = "europe-west1"  
+cloud_run_service_name = "translation-api-service"
+cloud_run_service_name2 = "sales-research-application"
