@@ -75,7 +75,7 @@ stages:
           displayName: Static-Plan
           inputs:
             connectionType: 'azureRM'
-            azureSubscription: 'sc-ado-gcp-aicoe'
+            azureSubscription: $(Azure.WorkloadIdentity.Connection)
             addSpnToEnvironment: true
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
@@ -146,7 +146,7 @@ stages:
       displayName: Static-Apply
       inputs:
         connectionType: 'azureRM'
-        azureSubscription: 'sc-ado-gcp-aicoe'
+        azureSubscription: $(Azure.WorkloadIdentity.Connection)
         addSpnToEnvironment: true
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
@@ -195,7 +195,7 @@ stages:
           displayName: Network-Plan
           inputs:
             connectionType: 'azureRM'
-            azureSubscription: 'sc-ado-gcp-aicoe'
+            azureSubscription: $(Azure.WorkloadIdentity.Connection)
             addSpnToEnvironment: true
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
@@ -266,7 +266,7 @@ stages:
       displayName: Network-Apply
       inputs:
         connectionType: 'azureRM'
-        azureSubscription: 'sc-ado-gcp-aicoe'
+        azureSubscription: $(Azure.WorkloadIdentity.Connection)
         addSpnToEnvironment: true
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
@@ -315,7 +315,7 @@ stages:
           displayName: Infra-Plan
           inputs:
             connectionType: 'azureRM'
-            azureSubscription: 'sc-ado-gcp-aicoe'
+            azureSubscription: $(Azure.WorkloadIdentity.Connection)
             addSpnToEnvironment: true
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
@@ -386,7 +386,7 @@ stages:
       displayName: Infra-Apply
       inputs:
         connectionType: 'azureRM'
-        azureSubscription: 'sc-ado-gcp-aicoe'
+        azureSubscription: $(Azure.WorkloadIdentity.Connection)
         addSpnToEnvironment: true
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
