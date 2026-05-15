@@ -85,4 +85,4 @@ stages:
               gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
               gcloud config set project $GCP_PROJECT_ID --quiet
               gcloud config list
-              
+              gcloud storage ls
