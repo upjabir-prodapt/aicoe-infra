@@ -8,6 +8,8 @@ resource "google_kms_key_ring" "aicoe_app_bucket_key_ring" {
   name     = "${var.project}${var.envname}-app-bucket-key-ring"
   location = var.region
   project  = "${var.project}${var.envname}"
+
+  depends_on = [ google_project_service.service ]
 }
  
 # Key
@@ -28,6 +30,7 @@ resource "google_kms_crypto_key" "aicoe_app_bucket_key" {
   version_template {
     algorithm = "GOOGLE_SYMMETRIC_ENCRYPTION"
   }
+  depends_on = [ google_project_service.service ]
 }
 
 ###########################################

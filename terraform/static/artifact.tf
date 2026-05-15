@@ -11,5 +11,6 @@ format        = var.artifact_format
   }
 docker_config  {
   immutable_tags = true
-}
+} 
+depends_on = [ google_project_service.service ]
 }
