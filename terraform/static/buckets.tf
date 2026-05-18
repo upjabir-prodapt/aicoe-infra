@@ -3,7 +3,6 @@
 ###########################################
  
 resource "google_storage_bucket" "aicoe_app_bucket" {
-  count    = var.envname == "sandox" ? 1 : 0
   name          = "${var.project}${var.envname}-vx-app-001"
   location      = var.region
   project       = "${var.project}${var.envname}"
@@ -29,7 +28,6 @@ resource "google_storage_bucket" "aicoe_app_bucket" {
 ###########################################
  
 resource "google_storage_bucket" "aicoe_vxai_bs_bucket" {
-  count    = var.envname == "sandox" ? 1 : 0
   name          = "${var.project}${var.envname}-vxai-bs"
   location      = var.region
   project       = "${var.project}${var.envname}"
