@@ -44,7 +44,7 @@ resource "google_dns_record_set" "aicoe_translation_dns" {
   managed_zone = google_dns_managed_zone.aicoe_internal[0].name
   type         = "A"
   ttl          = 300
-  rrdatas      = [google_compute_address.aicoe_staticip_ilb[0].address]
+  rrdatas      = [google_compute_address.aicoe_staticip_ilb.address]
 }
 
 resource "google_dns_record_set" "aicoe_salesagent_dns" {
@@ -54,5 +54,5 @@ resource "google_dns_record_set" "aicoe_salesagent_dns" {
   managed_zone = google_dns_managed_zone.aicoe_internal[0].name
   type         = "A"
   ttl          = 300
-  rrdatas      = [google_compute_address.aicoe_staticip_ilb_salesagent[0].address]
+  rrdatas      = [google_compute_address.aicoe_staticip_ilb_salesagent.address]
 }
