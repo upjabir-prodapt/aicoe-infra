@@ -37,7 +37,6 @@ resource "google_kms_crypto_key" "aicoe_app_bucket_key" {
 #Keyring
  
 resource "google_kms_key_ring" "aicoe_vxai_wkb_key_ring" {
-  count    = var.envname == "sandox" ? 1 : 0
   name     = "${var.project}${var.envname}-vxai-wkb-key-ring"
   location = var.region
   project  = "${var.project}${var.envname}"
@@ -46,9 +45,8 @@ resource "google_kms_key_ring" "aicoe_vxai_wkb_key_ring" {
 # Key
  
 resource "google_kms_crypto_key" "aicoe_vxai_wkb_key" {
-  count    = var.envname == "sandox" ? 1 : 0
   name            = "${var.project}${var.envname}-vxai-wkb-key"
-  key_ring        = google_kms_key_ring.aicoe_vxai_wkb_key_ring[0].id
+  key_ring        = google_kms_key_ring.aicoe_vxai_wkb_key_ring.id
   rotation_period = "1000000s"
  
   lifecycle {
