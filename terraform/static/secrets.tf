@@ -7,7 +7,11 @@ resource "google_secret_manager_secret" "translation_service_secret" {
   project = "${var.project}${var.envname}"
 
   replication {
-    auto {}
+    user_managed {
+        replicas {
+            location = var.region
+        }
+    }
   }
 
   labels = {
