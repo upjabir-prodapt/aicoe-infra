@@ -66,6 +66,10 @@ resource "google_storage_bucket" "aicoe_trans_app_bucket" {
   encryption {
            default_kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
         }
+
+  lifecycle {
+    ignore_changes = [ encryption ]
+  }
   
   labels = {
     env    = var.envname
@@ -91,7 +95,10 @@ resource "google_storage_bucket" "aicoe_sales_app_bucket" {
   encryption {
            default_kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
         }
-  
+  lifecycle {
+    ignore_changes = [ encryption ]
+  }
+
   labels = {
     env    = var.envname
     system = "${var.project}${var.envname}"
