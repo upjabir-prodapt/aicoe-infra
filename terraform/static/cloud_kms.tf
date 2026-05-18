@@ -48,7 +48,7 @@ resource "google_kms_key_ring" "aicoe_vxai_wkb_key_ring" {
 resource "google_kms_crypto_key" "aicoe_vxai_wkb_key" {
   count    = var.envname == "sandox" ? 1 : 0
   name            = "${var.project}${var.envname}-vxai-wkb-key"
-  key_ring        = google_kms_key_ring.aicoe_vxai_wkb_key_ring.id
+  key_ring        = google_kms_key_ring.aicoe_vxai_wkb_key_ring[0].id
   rotation_period = "1000000s"
  
   lifecycle {
