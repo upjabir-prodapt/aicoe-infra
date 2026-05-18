@@ -2,7 +2,7 @@
 ### Secret Manager for Sales agent ###########
 ###########################################
 
-resource "google_secret_manager_secret" "secret" {
+resource "google_secret_manager_secret" "translation_service_secret" {
   secret_id = "translation-service-env"
   project = "${var.project}${var.envname}"
 
@@ -20,7 +20,7 @@ resource "google_secret_manager_secret" "secret" {
 ### Secret Manager for Sales agent ###########
 ###########################################
  
-resource "google_secret_manager_secret" "secret" {
+resource "google_secret_manager_secret" "sales_agent_service_secret" {
   secret_id = "sales-agent-service-env"
   project = "${var.project}${var.envname}"
 
