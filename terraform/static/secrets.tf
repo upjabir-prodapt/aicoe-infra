@@ -16,6 +16,10 @@ resource "google_secret_manager_secret" "translation_service_secret" {
     }
   }
 }
+labels = {
+    environment = var.envname
+    managed_by = "terraform"
+}
 }
 
 ###########################################
@@ -36,4 +40,8 @@ resource "google_secret_manager_secret" "sales_agent_service_secret" {
        }
     }
   }
+   labels = {
+     environment = var.envname
+     managed_by = "terraform"
+ }
 }
