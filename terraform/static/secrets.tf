@@ -10,14 +10,12 @@ resource "google_secret_manager_secret" "translation_service_secret" {
     user_managed {
         replicas {
             location = var.region
-        }
+            customer_managed_encryption {
+            kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
+            }
     }
   }
-
-  labels = {
-    environment = "${var.envname}"
-    managed_by = "terraform"
-  }
+}
 }
 
 ###########################################
@@ -30,14 +28,12 @@ resource "google_secret_manager_secret" "sales_agent_service_secret" {
 
   replication {
     user_managed {
-        replicas {
+       replicas {
             location = var.region
-        }
+            customer_managed_encryption {
+            kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
+            }
+       }
     }
-  }
-
-  labels = {
-    environment = "${var.envname}"
-    managed_by = "terraform"
   }
 }
