@@ -11,7 +11,7 @@ resource "google_project_iam_member" "aicoe_app_sa_iam" {
     "roles/bigquery.jobUser",
     "roles/run.admin" ,
     "roles/cloudtrace.agent" ,
-    "roles/iap.webAppUser" ,
+    "roles/iap.httpsResourceAccessor" ,
     "roles/secretmanager.secretAccessor" ,
 
 
