@@ -1,7 +1,7 @@
 project = "aicoe"
 envname = "dev"
 region  = "europe-west1"
-aicoe_subnet_cidr_range = "10.110.73.16/28"
+aicoe_subnet_cidr_range = "10.110.73.0/24"
 aicoe_proxy_subnet_cidr_range = "192.168.5.0/24"
 aicoe_static_ilb_ip = "10.110.73.19"
 aicoe_static_ilb_salesagent_ip = "10.110.73.18"
