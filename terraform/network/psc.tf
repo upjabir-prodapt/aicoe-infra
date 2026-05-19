@@ -31,6 +31,8 @@ resource "google_compute_address" "aicoe_psc_vector_index_ip" {
   purpose       = "GCE_ENDPOINT"
   network       = google_compute_network.aicoe_network.id
   address       = "192.168.1.5"
+  region        = var.region
+  project = "${var.project}${var.envname}"
 }
 
 ### Forwarding rule for Vector Search PSC ###
@@ -41,7 +43,9 @@ import {
 resource "google_compute_forwarding_rule" "aicoe_psc_vector_index_fr" {
   name                  = "${var.project}${var.envname}-psc-vector-index-fr"
   network               = google_compute_network.aicoe_network.id
-  ip_address            = google_compute_address.aicoe_psc_vector_index_ip.id
-  target                = "SERVICE_ATTACHMENT_URI"
+  region                = var.region
+  project               = "${var.project}${var.envname}"
+  ip_address            = google_compute_address.aicoe_psc_vector_index_ip.self_link
+  target                = var.SERVICE_ATTACHMENT_URI
   load_balancing_scheme = ""
 }

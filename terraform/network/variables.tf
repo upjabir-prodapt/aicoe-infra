@@ -7,3 +7,4 @@ variable "aicoe_static_vxaiwb_ip" {}
 variable "aicoe_static_ilb_ip" {}
 variable "aicoe_static_ilb_salesagent_ip" {}
 variable "aicoe_static_ilb_frontend_ip" {}
+variable "SERVICE_ATTACHMENT_URI" {}
