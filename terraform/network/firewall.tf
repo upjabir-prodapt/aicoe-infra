@@ -181,7 +181,6 @@ import {
 resource "google_compute_firewall" "aicoe_allow_vector_index_egress" {
     name                    = "allow-vector-index-egress"
     network                 = google_compute_network.aicoe_network.id
-    description             = "Blanket default deny rule for egress"
     direction               = "EGRESS"
     priority                = 65534
     destination_ranges      = ["192.168.1.5/32"]
@@ -189,7 +188,7 @@ resource "google_compute_firewall" "aicoe_allow_vector_index_egress" {
     source_service_accounts = null
     target_tags             = null
     target_service_accounts = null
-    deny  {
+    allow  {
         protocol = "tcp"
         ports    = ["443"]
     }
