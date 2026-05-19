@@ -1,36 +1,23 @@
-# resource "google_service_account" "aicoe_app_wif_sa" {
-#   account_id   = "${var.project}${var.envname}-app-wif-sa"
-#   display_name = "Service Account for Application WIF"
-# }
+resource "google_service_account" "aicoe_app_sa" {
+  account_id   = "${var.project}${var.envname}-app-sa"
+  display_name = "Service Account for Application"
+}
 
-# resource "google_project_iam_member" "aicoe_app_wif_sa_iam" {
-#   for_each = toset([
-#     "roles/aiplatform.user",
-#     "roles/storage.objectAdmin",
-#     "roles/bigquery.dataEditor",
-#     "roles/logging.logWriter",
-#     "roles/monitoring.metricWriter",
-#     "roles/serviceusage.serviceUsageConsumer",
-#     "roles/iam.workloadIdentityUser",
-#     "roles/iam.serviceAccountTokenCreator",
-#     "roles/iam.serviceAccountUser",
+resource "google_project_iam_member" "aicoe_app_sa_iam" {
+  for_each = toset([
+    "roles/aiplatform.user",
+    "roles/storage.admin",
+    "roles/bigquery.dataEditor",
+    "roles/bigquery.jobUser",
+    "roles/run.admin" ,
+    "roles/cloudtrace.agent" ,
+    "roles/iap.httpsResourceAccessor" ,
+    "roles/secretmanager.secretAccessor" ,
 
-#   ])
-#   project = "${var.project}${var.envname}"
-#   role    = each.value
-#   member  = "serviceAccount:${google_service_account.aicoe_app_wif_sa.email}"
-# }
+
+  ])
+  project = "${var.project}${var.envname}"
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.aicoe_app_sa.email}"
+}
  
-# resource "google_service_account_iam_binding" "aicoe_app_wif_sa_iam_binding" {
-#   for_each = toset([
-#     "roles/iam.workloadIdentityUser",
-#     "roles/iam.serviceAccountTokenCreator",
-    
-#   ])
-#   service_account_id = google_service_account.aicoe_app_wif_sa.name
-#   role = each.value
-#    members = [
-#     "principalSet://iam.googleapis.com/projects/297743845367/locations/global/workloadIdentityPools/aicoesandox-ado-wip/*"
-#   ]
-# }
-
