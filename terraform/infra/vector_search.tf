@@ -17,7 +17,7 @@ resource "google_vertex_ai_index" "aicoe_vector_search_index" {
         algorithm_config{
             tree_ah_config{
                 leaf_node_embedding_count = 1000
-                leaf_nodes_to_search_percent = 7
+                leaf_nodes_to_search_percent = 0
             }
         }
     }
@@ -50,7 +50,7 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
 
 #Deployed Vector Search Index
 import {
-  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexEndpoints/4078260151235117056/deployedIndexes/aicoesandox_salesagent_index"
+  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexEndpoints/4078260151235117056/deployedIndex/aicoesandox_salesagent_index"
   to = google_vertex_ai_index_endpoint_deployed_index.aicoe_vector_deployed_index
 }
 resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed_index" {
