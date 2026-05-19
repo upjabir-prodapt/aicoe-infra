@@ -21,10 +21,6 @@ resource "google_compute_global_forwarding_rule" "aicoe_psc_google_apis" {
 ###########################################
 ### PSC for Vector Search Index ###########
 ###########################################
-import {
-  id = "projects/${var.project}${var.envname}/regions/${var.region}/addresses/aicoesandox-psc-vector-index-ip"
-  to = google_compute_address.aicoe_psc_vector_index_ip
-}
 resource "google_compute_address" "aicoe_psc_vector_index_ip" {
   name          = "${var.project}${var.envname}-psc-vector-index-ip"
   address_type  = "INTERNAL"
@@ -36,10 +32,6 @@ resource "google_compute_address" "aicoe_psc_vector_index_ip" {
 }
 
 ### Forwarding rule for Vector Search PSC ###
-import {
-  id = "projects/${var.project}${var.envname}/regions/${var.region}/forwardingRules/aicoesandox-psc-vector-index-fr"
-  to = google_compute_forwarding_rule.aicoe_psc_vector_index_fr
-}
 resource "google_compute_forwarding_rule" "aicoe_psc_vector_index_fr" {
   name                  = "${var.project}${var.envname}-psc-vector-index-fr"
   network               = google_compute_network.aicoe_network.id

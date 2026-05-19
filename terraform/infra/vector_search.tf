@@ -44,7 +44,7 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
     network = "projects/${data.google_project.project.number}/global/networks/${var.project}${var.envname}-vpc"
 
   depends_on = [  
-    google_vertex_ai_index.vector_search
+    google_vertex_ai_index.aicoe_vector_search_index
    ]
 }
 
