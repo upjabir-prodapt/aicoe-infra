@@ -170,3 +170,30 @@ resource "google_compute_firewall" "aicoe_ingress_allow_https" {
         metadata = "INCLUDE_ALL_METADATA"
       }
     }
+
+# -----------------------------------------------------------------------------
+# Firewall Rules - Vector Search
+# -----------------------------------------------------------------------------
+import {
+  id = "projects/${var.project}${var.envname}/global/firewalls/allow-vector-index-egress"
+  to = google_compute_firewall.aicoe_allow_vector_index_egress
+}
+resource "google_compute_firewall" "aicoe_allow_vector_index_egress" {
+    name                    = "allow-vector-index-egress"
+    network                 = google_compute_network.aicoe_network.id
+    description             = "Blanket default deny rule for egress"
+    direction               = "EGRESS"
+    priority                = 65534
+    destination_ranges      = ["192.168.1.5/32"]
+    source_tags             = null
+    source_service_accounts = null
+    target_tags             = null
+    target_service_accounts = null
+    deny  {
+        protocol = "tcp"
+        ports    = ["443"]
+    }
+    log_config  {
+        metadata = "INCLUDE_ALL_METADATA"
+    }
+}

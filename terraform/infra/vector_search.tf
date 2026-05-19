@@ -1,8 +1,12 @@
 #Vertex AI Index
-resource "google_vertex_ai_index" "vector_search" {
+import {
+  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexes/2132951402815684608"
+  to = google_vertex_ai_index.aicoe_vector_search_index
+}
+resource "google_vertex_ai_index" "aicoe_vector_search_index" {
   region = var.region
   project = "${var.project}${var.envname}"
-  display_name = "${var.project}${var.envname}_vertexai_index"
+  display_name = "${var.project}${var.envname}_vertex_index"
 
   metadata {
     config{
@@ -12,7 +16,7 @@ resource "google_vertex_ai_index" "vector_search" {
 
         algorithm_config{
             tree_ah_config{
-                leaf_node_embedding_count = 500
+                leaf_node_embedding_count = 1000
                 leaf_nodes_to_search_percent = 7
             }
         }
@@ -23,14 +27,17 @@ resource "google_vertex_ai_index" "vector_search" {
 }
 
 #Vertex AI Index Endpoint
+import {
+  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexEndpoints/4078260151235117056"
+  to = google_vertex_ai_index_endpoint.aicoe_vector_index_endpoint
+}
 data "google_project" "project" {
     project_id = "${var.project}${var.envname}"
 }
-
-resource "google_vertex_ai_index_endpoint" "vector_search" {
+resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
   region = var.region
   project = "${var.project}${var.envname}"
-  display_name = "${var.project}${var.envname}_vertexai_endpoint"
+  display_name = "${var.project}${var.envname}_vertex_index_endpoint"
   description = "Endpoint for Vertex AI Index"
 
 #   network = data.terraform_remote_state.network.outputs.aicoe_network
@@ -39,4 +46,25 @@ resource "google_vertex_ai_index_endpoint" "vector_search" {
   depends_on = [  
     google_vertex_ai_index.vector_search
    ]
+}
+
+#Deployed Vector Search Index
+import {
+  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexEndpoints/4078260151235117056/deployedIndexes/aicoesandox_salesagent_index"
+  to = google_vertex_ai_index_endpoint_deployed_index.aicoe_vector_deployed_index
+}
+resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed_index" {
+  index_endpoint = google_vertex_ai_index_endpoint.aicoe_vector_index_endpoint.id
+  index = google_vertex_ai_index.aicoe_vector_search_index.id
+  deployed_index_id = "aicoesandox_salesagent_index"
+  display_name = "AICOE salesagent Deployed Index"
+  
+  dedicated_resources {
+    min_replica_count = 1
+    max_replica_count = 1
+
+    machine_spec {
+      machine_type = "e2-standard-16"
+    }
+  }
 }
