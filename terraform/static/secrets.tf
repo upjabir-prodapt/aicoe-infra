@@ -24,11 +24,7 @@ labels = {
 ###########################################
 ### Secret Manager for Sales agent ###########
 ###########################################
-import{
-    to = google_secret_manager_secret.sales_agent_service_secret
-    id = "projects/${var.project}${var.envname}/secrets/sales-agent-service-env"
-}
- 
+
 resource "google_secret_manager_secret" "sales_agent_service_secret" {
   secret_id = "sales-agent-service-env"
   project = "${var.project}${var.envname}"
@@ -49,11 +45,7 @@ resource "google_secret_manager_secret" "sales_agent_service_secret" {
  }
 }
 
-import{
-    to = google_secret_manager_secret.aicoedev_translation_ssl_private_key
-    id = "projects/${var.project}${var.envname}/secrets/aicoedev-translation-ssl-private-key"
-}
- 
+
 resource "google_secret_manager_secret" "aicoedev_translation_ssl_private_key" {
   secret_id = "aicoedev-translation-ssl-private-key"
   project = "${var.project}${var.envname}"
@@ -74,10 +66,6 @@ resource "google_secret_manager_secret" "aicoedev_translation_ssl_private_key" {
  }
 }
 
-import{
-    to = google_secret_manager_secret.aicoedev_translation_ssl_certificate
-    id = "projects/${var.project}${var.envname}/secrets/aicoedev-translation-ssl-certificate"
-}
  
 resource "google_secret_manager_secret" "aicoedev_translation_ssl_certificate" {
   secret_id = "aicoedev-translation-ssl-certificate"
@@ -99,11 +87,6 @@ resource "google_secret_manager_secret" "aicoedev_translation_ssl_certificate" {
  }
 }
 
-
-import{
-    to = google_secret_manager_secret.aicoedev_translation_csr
-    id = "projects/${var.project}${var.envname}/secrets/aicoedev-translation-csr"
-}
  
 resource "google_secret_manager_secret" "aicoedev_translation_csr" {
   secret_id = "aicoedev-translation-csr"
@@ -125,11 +108,7 @@ resource "google_secret_manager_secret" "aicoedev_translation_csr" {
  }
 }
 
-import{
-    to = google_secret_manager_secret.aicoedev_salesagent_ssl_private_key
-    id = "projects/${var.project}${var.envname}/secrets/aicoedev-salesagent-ssl-private-key"
-}
- 
+
 resource "google_secret_manager_secret" "aicoedev_salesagent_ssl_private_key" {
   secret_id = "aicoedev-salesagent-ssl-private-key"
   project = "${var.project}${var.envname}"
@@ -150,11 +129,6 @@ resource "google_secret_manager_secret" "aicoedev_salesagent_ssl_private_key" {
  }
 }
 
-
-import{
-    to = google_secret_manager_secret.aicoedev_salesagent_ssl_certificate
-    id = "projects/${var.project}${var.envname}/secrets/aicoedev-salesagent-ssl-certificate"
-}
  
 resource "google_secret_manager_secret" "aicoedev_salesagent_ssl_certificate" {
   secret_id = "aicoedev-salesagent-ssl-certificate"
@@ -176,10 +150,6 @@ resource "google_secret_manager_secret" "aicoedev_salesagent_ssl_certificate" {
  }
 }
 
-import{
-    to = google_secret_manager_secret.aicoedev_salesagent_csr
-    id = "projects/${var.project}${var.envname}/secrets/aicoedev-salesagent-csr"
-}
  
 resource "google_secret_manager_secret" "aicoedev_salesagent_csr" {
   secret_id = "aicoedev-salesagent-csr"
