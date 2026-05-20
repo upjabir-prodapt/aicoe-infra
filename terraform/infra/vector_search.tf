@@ -1,8 +1,4 @@
 #Vertex AI Index
-import {
-  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexes/2132951402815684608"
-  to = google_vertex_ai_index.aicoe_vector_search_index
-}
 resource "google_vertex_ai_index" "aicoe_vector_search_index" {
   region = var.region
   project = "${var.project}${var.envname}"
@@ -25,27 +21,18 @@ resource "google_vertex_ai_index" "aicoe_vector_search_index" {
   index_update_method = "BATCH_UPDATE"
    lifecycle {
     prevent_destroy = true
-    ignore_changes = [ metadata ]
+    # ignore_changes = [ metadata ]
   }
 
 }
 
 #Vertex AI Index Endpoint
-import {
-  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexEndpoints/4078260151235117056"
-  to = google_vertex_ai_index_endpoint.aicoe_vector_index_endpoint
-}
-# data "google_project" "project" {
-#     project_id = "${var.project}${var.envname}"
-# }
 resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
   region = var.region
   project = "${var.project}${var.envname}"
   display_name = "${var.project}${var.envname}-salesagent-endpoint"
   description = "PSC-enabled index endpoint"
 
-#   network = data.terraform_remote_state.network.outputs.aicoe_network
-   # network = "projects/${data.google_project.project.number}/global/networks/${var.project}${var.envname}-vpc"
   private_service_connect_config {
     enable_private_service_connect = true
   }
@@ -58,10 +45,6 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
 }
 
 #Deployed Vector Search Index
-import {
-  id = "projects/${var.project}${var.envname}/locations/${var.region}/indexEndpoints/4078260151235117056/deployedIndex/aicoesandox_salesagent_index"
-  to = google_vertex_ai_index_endpoint_deployed_index.aicoe_vector_deployed_index
-}
 resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed_index" {
   index_endpoint = google_vertex_ai_index_endpoint.aicoe_vector_index_endpoint.id
   index = google_vertex_ai_index.aicoe_vector_search_index.id
@@ -75,6 +58,5 @@ resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed
   
   lifecycle {
     prevent_destroy = true
-    ignore_changes = [ automatic_resources, display_name ]
   }
 }
