@@ -6,7 +6,7 @@ import {
 resource "google_vertex_ai_index" "aicoe_vector_search_index" {
   region = var.region
   project = "${var.project}${var.envname}"
-  display_name = "${var.project}${var.envname}_vertex_index"
+  display_name = "${var.project}${var.envname}_salesagent_index"
 
   metadata {
     config{
@@ -17,7 +17,7 @@ resource "google_vertex_ai_index" "aicoe_vector_search_index" {
         algorithm_config{
             tree_ah_config{
                 leaf_node_embedding_count = 1000
-                leaf_nodes_to_search_percent = 0
+                leaf_nodes_to_search_percent = 5
             }
         }
     }
@@ -41,8 +41,8 @@ import {
 resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
   region = var.region
   project = "${var.project}${var.envname}"
-  display_name = "${var.project}${var.envname}_vertex_index_endpoint"
-  description = "Endpoint for Vertex AI Index"
+  display_name = "${var.project}${var.envname}-salesagent-endpoint"
+  description = "PSC-enabled index endpoint"
 
 #   network = data.terraform_remote_state.network.outputs.aicoe_network
    # network = "projects/${data.google_project.project.number}/global/networks/${var.project}${var.envname}-vpc"
@@ -52,7 +52,6 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
   }
    lifecycle {
     prevent_destroy = true
-    ignore_changes = [ display_name ]
   }
   depends_on = [  
     google_vertex_ai_index.aicoe_vector_search_index
@@ -70,16 +69,13 @@ resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed
   deployed_index_id = "aicoesandox_salesagent_index"
   display_name = "AICOE salesagent Deployed Index"
   
-  dedicated_resources {
+  automatic_resources {
     min_replica_count = 1
     max_replica_count = 1
-    machine_spec {
-      machine_type = "e2-standard-16"
-    }
     }
   
   lifecycle {
     prevent_destroy = true
-    ignore_changes = [ dedicated_resources, display_name ]
+    ignore_changes = [ automatic_resources, display_name ]
   }
 }
