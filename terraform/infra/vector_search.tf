@@ -23,6 +23,10 @@ resource "google_vertex_ai_index" "aicoe_vector_search_index" {
     }
   }
   index_update_method = "BATCH_UPDATE"
+   lifecycle {
+    prevent_destroy = true
+    ignore_changes = [ metadata ]
+  }
 
 }
 
@@ -31,9 +35,9 @@ import {
   id = "projects/${var.project}${var.envname}/locations/${var.region}/indexEndpoints/4078260151235117056"
   to = google_vertex_ai_index_endpoint.aicoe_vector_index_endpoint
 }
-data "google_project" "project" {
-    project_id = "${var.project}${var.envname}"
-}
+# data "google_project" "project" {
+#     project_id = "${var.project}${var.envname}"
+# }
 resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
   region = var.region
   project = "${var.project}${var.envname}"
@@ -41,8 +45,15 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
   description = "Endpoint for Vertex AI Index"
 
 #   network = data.terraform_remote_state.network.outputs.aicoe_network
-    network = "projects/${data.google_project.project.number}/global/networks/${var.project}${var.envname}-vpc"
-
+   # network = "projects/${data.google_project.project.number}/global/networks/${var.project}${var.envname}-vpc"
+  private_service_connect_config {
+    enable_private_service_connect = true
+    project_allowlist = ["${var.project}${var.envname}"]
+  }
+   lifecycle {
+    prevent_destroy = true
+    ignore_changes = [ display_name ]
+  }
   depends_on = [  
     google_vertex_ai_index.aicoe_vector_search_index
    ]
@@ -62,9 +73,13 @@ resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed
   dedicated_resources {
     min_replica_count = 1
     max_replica_count = 1
-
     machine_spec {
       machine_type = "e2-standard-16"
     }
+    }
+  
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [ dedicated_resources, display_name ]
   }
 }
