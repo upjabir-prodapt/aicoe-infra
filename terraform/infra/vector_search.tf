@@ -48,7 +48,6 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
    # network = "projects/${data.google_project.project.number}/global/networks/${var.project}${var.envname}-vpc"
   private_service_connect_config {
     enable_private_service_connect = true
-    project_allowlist = ["${var.project}${var.envname}"]
   }
    lifecycle {
     prevent_destroy = true
