@@ -48,7 +48,7 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
 resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed_index" {
   index_endpoint = google_vertex_ai_index_endpoint.aicoe_vector_index_endpoint.id
   index = google_vertex_ai_index.aicoe_vector_search_index.id
-  deployed_index_id = "aicoesandox_salesagent_index"
+  deployed_index_id = "aicoesandox_vector_index"
   display_name = "AICOE salesagent Deployed Index"
   
   automatic_resources {
@@ -56,7 +56,7 @@ resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed
     max_replica_count = 1
     }
   
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
