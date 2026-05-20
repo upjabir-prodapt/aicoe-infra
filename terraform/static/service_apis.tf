@@ -7,4 +7,7 @@ resource "google_project_service" "service" {
   project            = "${var.project}${var.envname}"
   service            = element(var.gcp_apis_required, count.index)
   disable_on_destroy = false
+   lifecycle {
+    ignore_changes = [ deletion_policy ]
+  }
 }
