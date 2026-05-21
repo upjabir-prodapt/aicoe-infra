@@ -13,7 +13,7 @@ resource "google_vertex_ai_index" "aicoe_vector_search_index" {
         algorithm_config{
             tree_ah_config{
                 leaf_node_embedding_count = 1000
-                leaf_nodes_to_search_percent = 5
+                leaf_nodes_to_search_percent = 0
             }
         }
     }
