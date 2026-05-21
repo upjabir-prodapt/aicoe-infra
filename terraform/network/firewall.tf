@@ -186,7 +186,8 @@ resource "google_compute_firewall" "aicoe_allow_vector_index_egress" {
     target_service_accounts = null
     allow  {
         protocol = "tcp"
-        ports    = ["443"]
+        # 10000 used by gRFC server inside Vector Search Index
+        ports    = ["443", "10000"]
     }
     log_config  {
         metadata = "INCLUDE_ALL_METADATA"
