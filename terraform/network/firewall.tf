@@ -193,3 +193,27 @@ resource "google_compute_firewall" "aicoe_allow_vector_index_egress" {
         metadata = "INCLUDE_ALL_METADATA"
     }
 }
+
+
+# -----------------------------------------------------------------------------
+# Firewall Rules - Allow Egress for Internal ILB
+# -----------------------------------------------------------------------------
+resource "google_compute_firewall" "aicoe_allow_internal_ilb" {
+    name                    = "egress-allow-internal-ilb"
+    network                 = google_compute_network.aicoe_network.id
+    direction               = "EGRESS"
+    priority                = 65534
+    destination_ranges      = ["192.168.1.0/24"]
+    source_tags             = null
+    source_service_accounts = null
+    target_tags             = null
+    target_service_accounts = null
+    allow  {
+        protocol = "tcp"
+        # 10000 used by gRFC server inside Vector Search Index
+        ports    = ["443"]
+    }
+    log_config  {
+        metadata = "INCLUDE_ALL_METADATA"
+    }
+}
