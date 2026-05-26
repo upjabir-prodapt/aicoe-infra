@@ -1,4 +1,4 @@
-project = "Svcmgmtops"
+project = "svcmgmtops"
 envname = "sandbox"
 region = "europe-west1"
 gcp_apis_required =[

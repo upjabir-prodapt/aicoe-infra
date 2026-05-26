@@ -22,7 +22,7 @@ variables:
  
   # --- GCP WIF Configuration ---
   - name: GCP_PROJECT_ID
-    value: 'Svcmgmtops-sandbox'  
+    value: 'svcmgmtops-sandbox'  
   - name: GoogleCloud.WorkloadIdentity.ProjectNumber
     value: '892497331362'
   - name: GoogleCloud.WorkloadIdentity.Pool
@@ -38,7 +38,7 @@ variables:
   - name: TF_ENV
     value: 'sandbox'                        # Override per environment: dev / staging / prod
   - name: TF_PROJECT
-    value: 'Svcmgmtops'
+    value: 'svcmgmtops'
   - name: TF_REGION
     value: 'europe-west1'
   - name: TF_ROOT
