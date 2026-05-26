@@ -1,9 +1,9 @@
 ENVNAME=
-PROJECT=aicoe
+PROJECT=Svcmgmtops
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
+TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-infra
-TFPLAN_FILE=../infra-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
+TFPLAN_FILE=../infra-$(PROJECT)-$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 # CREDS_FILE=../$(PROJECT)$(ENVNAME).json
@@ -26,7 +26,7 @@ init: network_safety_check clean get
  		-backend-config 'prefix=$(TFSTATE_DIR)'
     # For Hashicorp hosted state
 	#$(TF_EXEC) init \
-	#	-backend-config 'workspace{name=$(PROJECT)$(ENVNAME)}'
+	#	-backend-config 'workspace{name=$(PROJECT)-$(ENVNAME)}'
 
 plan: init
 	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars
@@ -61,7 +61,7 @@ else
 ifeq ($(ENVNAME), prod)
 	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	@echo -n "\nLIVE SELECTED - ARE YOU SURE YOU WANT TO CONTINUE?"
-	@echo -n "\n[type '$(PROJECT)$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
+	@echo -n "\n[type '$(PROJECT)-$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)-$(ENVNAME) ]
 else
 	@echo "non-live selected, continuing without safety check prompt."
 endif
