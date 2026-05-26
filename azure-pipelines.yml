@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main
+      - svcmgmtops-sandbox
 #   paths:
 #     include:
 #       - AICOE-Terraform/* 
