@@ -100,7 +100,7 @@ stages:
           displayName: 'Publish Static Plan'
           condition: succeeded()
           inputs:
-            PathtoPublish: '$(TF_ROOT)/static-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            PathtoPublish: '$(TF_ROOT)/static-$(TF_PROJECT)-$(TF_ENV)-$(TF_REGION)-tf.plan'
             ArtifactName: 'plan-static'
               
   # ── Stage 2: Static Approve ───────────────────────────────────
@@ -171,129 +171,129 @@ stages:
 # ============================================================================
 # STAGE 2 — Network LAYER
 # ============================================================================
-- stage: Network_Plan
-  displayName: 'Network-Plan'
-  dependsOn: Static_Apply
-  jobs:
-    - job: Network_Plan_Job
-      displayName: 'Terraform Plan - Network'
-      steps:
+# - stage: Network_Plan
+#   displayName: 'Network-Plan'
+#   dependsOn: Static_Apply
+#   jobs:
+#     - job: Network_Plan_Job
+#       displayName: 'Terraform Plan - Network'
+#       steps:
  
-        # ── Step 1: Checkout ─────────────────────────────────────────────────
-        - checkout: self
-          displayName: 'Checkout source'
+#         # ── Step 1: Checkout ─────────────────────────────────────────────────
+#         - checkout: self
+#           displayName: 'Checkout source'
         
-        # ── Step 2: Terraform installer ─────────────────────────────────────────────────
+#         # ── Step 2: Terraform installer ─────────────────────────────────────────────────
 
-        - task: TerraformInstaller@1
-          displayName: Terraform installer
-          inputs:
-            terraformVersion: 'latest'
+#         - task: TerraformInstaller@1
+#           displayName: Terraform installer
+#           inputs:
+#             terraformVersion: 'latest'
  
-        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
-        - task: AzureCLI@3
-          displayName: Network-Plan
-          inputs:
-            connectionType: 'azureRM'
-            azureSubscription: 'sc-ado-gcp-aicoe'
-            addSpnToEnvironment: true
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
-              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
-              {
-                "type": "external_account",
-                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
-                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-                "token_url": "https://sts.googleapis.com/v1/token",
-                "credential_source": {
-                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
-                },
-                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
-              }
-              EOF
-              cd $(TF_ROOT)/network
-              make plan ENVNAME=$(TF_ENV)
+#         # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+#         - task: AzureCLI@3
+#           displayName: Network-Plan
+#           inputs:
+#             connectionType: 'azureRM'
+#             azureSubscription: 'sc-ado-gcp-aicoe'
+#             addSpnToEnvironment: true
+#             scriptType: 'bash'
+#             scriptLocation: 'inlineScript'
+#             inlineScript: |
+#               echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+#               cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+#               {
+#                 "type": "external_account",
+#                 "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+#                 "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+#                 "token_url": "https://sts.googleapis.com/v1/token",
+#                 "credential_source": {
+#                   "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+#                 },
+#                 "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+#               }
+#               EOF
+#               cd $(TF_ROOT)/network
+#               make plan ENVNAME=$(TF_ENV)
 
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Network Plan'
-          condition: succeeded()
-          inputs:
-            PathtoPublish: '$(TF_ROOT)/network-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
-            ArtifactName: 'plan-network'
+#         - task: PublishBuildArtifacts@1
+#           displayName: 'Publish Network Plan'
+#           condition: succeeded()
+#           inputs:
+#             PathtoPublish: '$(TF_ROOT)/network-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+#             ArtifactName: 'plan-network'
               
-  # ── Stage 2: Network Approve ───────────────────────────────────
-- stage: Network_Approve
-  displayName: 'Network-Plan-Approve'
-  dependsOn: Network_Plan
-  jobs:
-  - deployment: Network_Approve
-    displayName: 'Approve Network Apply'
-    environment: $(TF_ENV)        # ← ADO Environment with approval gate
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - script: |
-              echo "Approval granted for Network layer"
-              echo "Reviewer approved at: $(date -u)"
-            displayName: 'Approval Confirmed'
+#   # ── Stage 2: Network Approve ───────────────────────────────────
+# - stage: Network_Approve
+#   displayName: 'Network-Plan-Approve'
+#   dependsOn: Network_Plan
+#   jobs:
+#   - deployment: Network_Approve
+#     displayName: 'Approve Network Apply'
+#     environment: $(TF_ENV)        # ← ADO Environment with approval gate
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - script: |
+#               echo "Approval granted for Network layer"
+#               echo "Reviewer approved at: $(date -u)"
+#             displayName: 'Approval Confirmed'
 
-- stage: Network_Apply
-  displayName: 'Network-Apply'
-  dependsOn: Network_Approve
-  jobs:
-  - job: Network_Apply
-    displayName: 'Network-Apply'
-    steps:
+# - stage: Network_Apply
+#   displayName: 'Network-Apply'
+#   dependsOn: Network_Approve
+#   jobs:
+#   - job: Network_Apply
+#     displayName: 'Network-Apply'
+#     steps:
 
-    - checkout: self
+#     - checkout: self
 
-    - task: TerraformInstaller@1
-      displayName: Terraform installer
-      inputs:
-        terraformVersion: 'latest'
+#     - task: TerraformInstaller@1
+#       displayName: Terraform installer
+#       inputs:
+#         terraformVersion: 'latest'
 
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Network Plan'
-      inputs:
-        artifactName: 'plan-network'
-        downloadPath: '$(TF_ROOT)'
+#     - task: DownloadBuildArtifacts@0
+#       displayName: 'Download Network Plan'
+#       inputs:
+#         artifactName: 'plan-network'
+#         downloadPath: '$(TF_ROOT)'
 
-# ── Step 2: WIF Token Exchange ────────────────────────────────────────
-    - task: AzureCLI@3
-      displayName: Network-Apply
-      inputs:
-        connectionType: 'azureRM'
-        azureSubscription: 'sc-ado-gcp-aicoe'
-        addSpnToEnvironment: true
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
-          cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
-          {
-            "type": "external_account",
-            "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
-            "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-            "token_url": "https://sts.googleapis.com/v1/token",
-            "credential_source": {
-              "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
-            },
-            "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
-          }
-          EOF
-          mv $(TF_ROOT)/plan-network/network-*.plan $(TF_ROOT)
-          cd $(TF_ROOT)/network
-          make apply ENVNAME=$(TF_ENV)
+# # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+#     - task: AzureCLI@3
+#       displayName: Network-Apply
+#       inputs:
+#         connectionType: 'azureRM'
+#         azureSubscription: 'sc-ado-gcp-aicoe'
+#         addSpnToEnvironment: true
+#         scriptType: 'bash'
+#         scriptLocation: 'inlineScript'
+#         inlineScript: |
+#           echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+#           cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+#           {
+#             "type": "external_account",
+#             "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+#             "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+#             "token_url": "https://sts.googleapis.com/v1/token",
+#             "credential_source": {
+#               "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+#             },
+#             "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+#           }
+#           EOF
+#           mv $(TF_ROOT)/plan-network/network-*.plan $(TF_ROOT)
+#           cd $(TF_ROOT)/network
+#           make apply ENVNAME=$(TF_ENV)
 
 # ============================================================================
 # STAGE 3 — Infra LAYER
 # ============================================================================
 - stage: Infra_Plan
   displayName: 'Infra-Plan'
-  dependsOn: Network_Apply
+  dependsOn: Static_Apply
   jobs:
     - job: Infra_Plan_Job
       displayName: 'Terraform Plan - Infra'
@@ -340,7 +340,7 @@ stages:
           displayName: 'Publish Infra Plan'
           condition: succeeded()
           inputs:
-            PathtoPublish: '$(TF_ROOT)/infra-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            PathtoPublish: '$(TF_ROOT)/infra-$(TF_PROJECT)-$(TF_ENV)-$(TF_REGION)-tf.plan'
             ArtifactName: 'plan-infra'
               
   # ── Stage 2: Infra Approve ───────────────────────────────────
