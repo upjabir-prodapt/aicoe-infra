@@ -26,9 +26,9 @@ variables:
   - name: GoogleCloud.WorkloadIdentity.ProjectNumber
     value: '892497331362'
   - name: GoogleCloud.WorkloadIdentity.Pool
-    value: 'Svcmgmtops-sandbox-ado-wip'
+    value: 'svcmgmtops-sandbox-ado-wip'
   - name: GoogleCloud.WorkloadIdentity.Provider
-    value: 'Svcmgmtops-sbx-ado-wip-provider'
+    value: 'svcmgmtops-sbx-ado-wip-provider'
   - name: GoogleCloud.WorkloadIdentity.ServiceAccount
     value: 'svcmgmtops-sandbox-wif-sa-tf@svcmgmtops-sandbox.iam.gserviceaccount.com'
  
