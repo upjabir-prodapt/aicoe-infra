@@ -5,7 +5,7 @@
 data "terraform_remote_state" "static" {
   backend = "gcs"
   config = {
-    bucket = "${var.project}${var.envname}-bucket-tf-state"
+    bucket = "${var.project}-${var.envname}-bucket-tf-state"
     prefix = "tfstate-static"
   }
 }
@@ -14,10 +14,10 @@ data "terraform_remote_state" "static" {
 ### Network Layer Remote TF State file   ###
 ###########################################
 
-data "terraform_remote_state" "network" {
-  backend = "gcs"
-  config = {
-    bucket = "${var.project}${var.envname}-bucket-tf-state"
-    prefix = "tfstate-network"
-  }
-}
+# data "terraform_remote_state" "network" {
+#   backend = "gcs"
+#   config = {
+#     bucket = "${var.project}${var.envname}-bucket-tf-state"
+#     prefix = "tfstate-network"
+#   }
+# }
