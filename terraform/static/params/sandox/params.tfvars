@@ -16,6 +16,7 @@ gcp_apis_required =[
     "monitoring.googleapis.com",               # Cloud Monitoring - metrics, dashboards, alerts
     "serviceusage.googleapis.com",             # Service Usage API - enable/disable APIs
     "compute.googleapis.com",                  # Compute Engine API 
+    "bigquerydatatransfer.googleapis.com"      # Bigquery Data Transfer API - Export billing data to BQ
     
 ]
 artifact_format = "docker"
