@@ -1,5 +1,5 @@
 project = "aicoe"
 envname = "prod"
 region  = "europe-west1"  
-# cloud_run_service_name = "translation-api-service"
-# cloud_run_service_name2 = "sales-research-application"
+cloud_run_service_name = "translation-api-service"
+cloud_run_service_name2 = "sales-research-application"
