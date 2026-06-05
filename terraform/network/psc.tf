@@ -44,7 +44,7 @@ resource "google_compute_forwarding_rule" "aicoe_psc_vector_index_fr" {
   target      = local.vector_search_service_attachment
   load_balancing_scheme = ""
 
-  depends_on = [
-    google_vertex_ai_index_endpoint_deployed_index.aicoe_vector_deployed_index,
-  ]
+  # depends_on = [
+  #   google_vertex_ai_index_endpoint_deployed_index.aicoe_vector_deployed_index,
+  # ]
 }
