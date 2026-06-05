@@ -30,12 +30,9 @@ resource "google_compute_address" "aicoe_psc_vector_index_ip" {
   region        = var.region
   project = "${var.project}${var.envname}"
 }
-
+#data.terraform_remote_state.network.outputs.aicoe_network
 locals {
-  vector_search_service_attachment = try(
-    "https://www.googleapis.com/compute/v1/${google_vertex_ai_index_endpoint_deployed_index.aicoe_vector_deployed_index.private_endpoints[0].service_attachment}",
-    null,
-  )
+  vector_search_service_attachment = data.terraform_remote_state.infra.outputs.vector_search_service_attachment
 }
 
 resource "google_compute_forwarding_rule" "aicoe_psc_vector_index_fr" {

@@ -38,3 +38,10 @@ output "dns_zone_name" {
 output "aicoe_staticip_ilb_salesagent" {
   value       = google_compute_address.aicoe_staticip_ilb_salesagent.address
 }
+
+output "vector_search_service_attachment" {
+  value       = try(
+    "https://www.googleapis.com/compute/v1/${google_vertex_ai_index_endpoint_deployed_index.aicoe_vector_deployed_index.private_endpoints[0].service_attachment}",
+    null
+    )
+}
