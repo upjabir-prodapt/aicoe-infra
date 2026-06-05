@@ -23,6 +23,34 @@ resource "google_compute_firewall" "aicoe_egress_deny_all" {
 }
 
 # -----------------------------------------------------------------------------
+# Allow HTTPS port 443 for ILB
+# -----------------------------------------------------------------------------
+
+resource "google_compute_firewall" "aicoe_ingress_allow_https" {
+      name        = "ingress-allow-https-ilb"
+      network     = google_compute_network.aicoe_network.id
+      description = "Allow HTTPS traffic for Internal Load Balancer - Ingress"
+      direction   = "INGRESS"
+      priority    = 65534
+      source_ranges = [
+       "130.211.0.0/22",          #Google cloud load balancer IPs
+       "35.191.0.0/16",           #Google cloud health checker IPs
+       "10.110.74.0/24"
+      ]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow {
+        protocol = "tcp"
+        ports    = ["443"]
+      }
+      log_config  {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
+    }
+
+# -----------------------------------------------------------------------------
 # Firewall Rules - IAP SSH
 # -----------------------------------------------------------------------------
 resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
