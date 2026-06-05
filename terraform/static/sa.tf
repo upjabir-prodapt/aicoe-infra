@@ -5,6 +5,7 @@ resource "google_service_account" "aicoe_app_sa" {
 
 resource "google_project_iam_member" "aicoe_app_sa_iam" {
   for_each = toset([
+    "roles/aiplatform.admin",
     "roles/aiplatform.user",
     "roles/storage.admin",
     "roles/bigquery.dataEditor",

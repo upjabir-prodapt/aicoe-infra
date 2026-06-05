@@ -172,6 +172,27 @@ resource "google_compute_firewall" "aicoe_ingress_allow_https" {
     }
 
 # -----------------------------------------------------------------------------
+# Firewall Rules - Google APIs PSC (Vertex management + embeddings APIs)
+# -----------------------------------------------------------------------------
+resource "google_compute_firewall" "aicoe_egress_allow_google_apis_psc" {
+  name               = "egress-allow-google-apis-psc"
+  network            = google_compute_network.aicoe_network.id
+  description        = "Allow egress to Google APIs Private Service Connect endpoint"
+  direction          = "EGRESS"
+  priority           = 65534
+  destination_ranges = ["${google_compute_global_address.aicoe_psc_address.address}/32"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]
+  }
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}
+
+# -----------------------------------------------------------------------------
 # Firewall Rules - Vector Search
 # -----------------------------------------------------------------------------
 resource "google_compute_firewall" "aicoe_allow_vector_index_egress" {
