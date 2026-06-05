@@ -26,7 +26,6 @@ resource "google_compute_firewall" "aicoe_egress_deny_all" {
 # Firewall Rules - IAP SSH
 # -----------------------------------------------------------------------------
 resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
-  count  = var.envname == "sandox" ? 1 : 0
   name                    = "ingress-allow-iap-ssh"
   network                 = google_compute_network.aicoe_network.id
   description             = "FW rules required to ssh into instances via IAP - useful for diagnosing faulty notebooks/instances"
@@ -158,7 +157,60 @@ resource "google_compute_firewall" "aicoe_ingress_allow_https" {
        "192.168.1.0/24",
        "192.168.3.0/24",
        "130.211.0.0/22",
-       "35.191.0.0/16"
+       "35.191.0.0/16",
+       "10.110.73.0/24"
+      ]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow {
+        protocol = "tcp"
+        ports    = ["443" ,"8000"]
+      }
+      
+      
+      log_config  {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
+    }
+
+#Allow Colt On-prem IP
+resource "google_compute_firewall" "aicoe_egress_allow_onprem_ip" {
+      name        = "allow-onprem-ip"
+      network     = google_compute_network.aicoe_network.id
+      description = "Allow traffic from Colt On-prem IP"
+      direction   = "EGRESS"
+      priority    = 65534
+      source_ranges = [
+       "10.100.254.206", 
+       "10.100.209.0/29", 
+       "10.100.4.66"
+      ]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow {
+        protocol = "other"
+        ports    = ["icmp"]
+      }
+      
+      
+      log_config  {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
+    }
+
+#Allow Zscaler IP
+resource "google_compute_firewall" "aicoe_ingress_allow_zscaler_ip" {
+      name        = "allow-zscalerapp"
+      network     = google_compute_network.aicoe_network.id
+      description = "Allow traffic for Zscaler IP"
+      direction   = "INGRESS"
+      priority    = 65534
+      source_ranges = [
+       "10.100.209.0/29"
       ]
       source_tags             = null
       source_service_accounts = null
@@ -174,3 +226,4 @@ resource "google_compute_firewall" "aicoe_ingress_allow_https" {
         metadata = "INCLUDE_ALL_METADATA"
       }
     }
+
