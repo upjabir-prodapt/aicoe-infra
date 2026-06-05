@@ -32,7 +32,7 @@ resource "google_compute_address" "aicoe_psc_vector_index_ip" {
 }
 
 locals {
-  vector_search_service_attachment = data.terraform_remote_state.infra.outputs.vector_search_service_attachment
+  vector_search_service_attachment = try(data.terraform_remote_state.infra.outputs.vector_search_service_attachment, null)
 }
 
 resource "google_compute_forwarding_rule" "aicoe_psc_vector_index_fr" {
