@@ -200,8 +200,7 @@ resource "google_compute_firewall" "aicoe_egress_allow_onprem_ip" {
       target_tags             = null
       target_service_accounts = null
       allow {
-        protocol = "other"
-        ports    = ["icmp"]
+        protocol = "icmp"
       }
       
       
