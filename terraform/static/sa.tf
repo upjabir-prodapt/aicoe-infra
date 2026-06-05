@@ -14,7 +14,7 @@ resource "google_project_iam_member" "aicoe_app_sa_iam" {
     "roles/cloudtrace.agent" ,
     "roles/iap.httpsResourceAccessor" ,
     "roles/secretmanager.secretAccessor" ,
-    
+
   ])
   project = "${var.project}${var.envname}"
   role    = each.value
@@ -27,6 +27,12 @@ resource "google_project_iam_member" "aicoe_app_sa_iam" {
 
 data "google_project" "current" {
   project_id = "${var.project}${var.envname}"
+}
+
+resource "google_project_service_identity" "vertex_ai" {
+  provider = google-beta
+  project = "${var.project}${var.envname}"
+  service = "aiplatform.googleapis.com"
 }
 
 locals {
