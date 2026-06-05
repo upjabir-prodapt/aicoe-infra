@@ -149,7 +149,6 @@ resource "google_compute_firewall" "aicoe_egress_allow_azure_devops" {
   
 #Allow HTTPS port 443 for ILB
 resource "google_compute_firewall" "aicoe_ingress_allow_https" {
-      count   = var.envname == "sandox" ? 1 : 0
       name        = "ingress-allow-https-ilb"
       network     = google_compute_network.aicoe_network.id
       description = "Allow HTTPS traffic for Internal Load Balancer - Ingress"
