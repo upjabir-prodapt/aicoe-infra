@@ -26,7 +26,7 @@ resource "google_compute_address" "aicoe_psc_vector_index_ip" {
   address_type  = "INTERNAL"
   purpose       = "GCE_ENDPOINT"
   subnetwork    = google_compute_subnetwork.aicoe_subnet.id
-  address       = "192.168.1.5"
+  address       = "10.110.73.5"
   region        = var.region
   project = "${var.project}${var.envname}"
 }
