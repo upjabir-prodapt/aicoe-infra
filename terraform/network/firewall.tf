@@ -27,7 +27,7 @@ resource "google_compute_firewall" "aicoe_egress_deny_all" {
 # -----------------------------------------------------------------------------
 import {
   to = google_compute_firewall.aicoe_ingress_allow_iap
-  id = "projects/aicoedev/europe-west1/firewalls/ingress-allow-iap-ssh"
+  id = "projects/aicoedev/global/firewalls/ingress-allow-iap-ssh"
 }
 resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
   name                    = "ingress-allow-iap-ssh"
@@ -182,7 +182,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_https" {
 #Allow Colt On-prem IP
 import {
   to = google_compute_firewall.aicoe_egress_allow_onprem_ip
-  id = "projects/aicoedev/europe-west1/firewalls/allow-onprem-ip"
+  id = "projects/aicoedev/global/firewalls/allow-onprem-ip"
 }
 resource "google_compute_firewall" "aicoe_egress_allow_onprem_ip" {
       name        = "allow-onprem-ip"
@@ -213,7 +213,7 @@ resource "google_compute_firewall" "aicoe_egress_allow_onprem_ip" {
 #Allow Zscaler IP
 import {
   to = google_compute_firewall.aicoe_ingress_allow_zscaler_ip
-  id = "projects/aicoedev/europe-west1/firewalls/allow-zscalerapp"
+  id = "projects/aicoedev/global/firewalls/allow-zscalerapp"
 }
 resource "google_compute_firewall" "aicoe_ingress_allow_zscaler_ip" {
       name        = "allow-zscalerapp"
