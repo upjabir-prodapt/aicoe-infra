@@ -30,7 +30,7 @@ resource "google_compute_address" "aicoe_psc_vector_index_ip" {
   region        = var.region
   project = "${var.project}${var.envname}"
 }
-#data.terraform_remote_state.network.outputs.aicoe_network
+
 locals {
   vector_search_service_attachment = data.terraform_remote_state.infra.outputs.vector_search_service_attachment
 }
