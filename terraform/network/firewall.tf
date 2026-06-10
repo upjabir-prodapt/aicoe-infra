@@ -247,7 +247,7 @@ resource "google_compute_firewall" "aicoe_egress_allow_google_apis_psc" {
   description        = "Allow egress to Google APIs Private Service Connect endpoint"
   direction          = "EGRESS"
   priority           = 65534
-  destination_ranges = ["10.110.73.4/32", "10.110.73.5/32"]
+  destination_ranges = ["10.110.73.6/32", "10.110.73.5/32"]
 
   allow {
     protocol = "tcp"
