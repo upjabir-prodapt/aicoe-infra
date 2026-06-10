@@ -21,15 +21,15 @@ resource "google_compute_global_forwarding_rule" "aicoe_psc_google_apis" {
 # -----------------------------------------------------------------------------
 # PSC Forwarding rule for Vector search
 # -----------------------------------------------------------------------------
-# resource "google_compute_address" "aicoe_psc_vector_index_ip" {
-#   name          = "${var.project}${var.envname}-psc-vector-index-ip"
-#   address_type  = "INTERNAL"
-#   purpose       = "GCE_ENDPOINT"
-#   subnetwork    = google_compute_subnetwork.aicoe_subnet.id
-#   address       = "192.168.1.5"
-#   region        = var.region
-#   project = "${var.project}${var.envname}"
-# }
+resource "google_compute_address" "aicoe_psc_vector_index_ip" {
+  name          = "${var.project}${var.envname}-psc-vector-index-ip"
+  address_type  = "INTERNAL"
+  purpose       = "GCE_ENDPOINT"
+  subnetwork    = google_compute_subnetwork.aicoe_subnet.id
+  address       = "192.168.1.5"
+  region        = var.region
+  project = "${var.project}${var.envname}"
+}
 
 # locals {
 #   vector_search_service_attachment = try(data.terraform_remote_state.infra.outputs.vector_search_service_attachment, null)

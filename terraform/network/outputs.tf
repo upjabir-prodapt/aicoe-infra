@@ -39,12 +39,12 @@ output "aicoe_staticip_ilb_salesagent" {
   value       = google_compute_address.aicoe_staticip_ilb_salesagent.address
 }
 
-# output "vector_search_psc_ip" {
-#   value       = google_compute_address.aicoe_psc_vector_index_ip.address
-#   description = "Internal IP for Private Service Connect access to the vector index endpoint"
-# }
+output "vector_search_psc_ip" {
+  value       = google_compute_address.aicoe_psc_vector_index_ip.address
+  description = "Internal IP for Private Service Connect access to the vector index endpoint"
+}
 
-# output "vector_search_psc_ip_self_link" {
-#   value       = google_compute_address.aicoe_psc_vector_index_ip.self_link
-#   description = "Self link for the vector search PSC reserved IP (used by forwarding rules)"
-# }
+output "vector_search_psc_ip_self_link" {
+  value       = google_compute_address.aicoe_psc_vector_index_ip.self_link
+  description = "Self link for the vector search PSC reserved IP (used by forwarding rules)"
+}
