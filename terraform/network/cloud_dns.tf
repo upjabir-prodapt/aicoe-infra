@@ -14,13 +14,13 @@ resource "google_dns_managed_zone" "aicoe_googleapis_private" {
   }
 }
 
-# resource "google_dns_record_set" "aicoe_wildcard_googleapis" {
-#   name         = "*.googleapis.com."
-#   managed_zone = google_dns_managed_zone.aicoe_googleapis_private.name
-#   type         = "A"
-#   ttl          = 300
-#   rrdatas      = [google_compute_global_address.aicoe_psc_address.address]
-# }
+resource "google_dns_record_set" "aicoe_wildcard_googleapis" {
+  name         = "*.googleapis.com."
+  managed_zone = google_dns_managed_zone.aicoe_googleapis_private.name
+  type         = "A"
+  ttl          = 300
+  rrdatas      = [google_compute_global_address.aicoe_psc_address.address]
+}
 
 resource "google_dns_managed_zone" "aicoe_internal" {
   name        = "${var.project}${var.envname}-internal"
