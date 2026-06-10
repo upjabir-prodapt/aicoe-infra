@@ -124,8 +124,8 @@ resource "google_bigquery_table" "cost_attribution" {
 
 # Research requests table
 import {
-  to = google_bigquery_table.research_request
-  id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/research_request"
+  to = google_bigquery_table.research_requests
+  id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/research_requests"
 }
 resource "google_bigquery_table" "research_requests" {
   dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
