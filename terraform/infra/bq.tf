@@ -29,6 +29,41 @@ resource "google_bigquery_dataset" "aicoe_sales_agent_dataset" {
     }
 }
 
+# #sales agent telemetry table
+# import {
+#   to = google_bigquery_table.agent_telemetry
+#   id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/agent_telemetry"
+# }
+resource "google_bigquery_table" "agent_telemetry" {
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
+  table_id   = "agent_telemetry"
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+  deletion_protection = true
+
+  time_partitioning {
+    type = "DAY"
+    field = "created_at"
+    require_partition_filter = false
+  }
+
+  schema = jsonencode([
+    { name = "record_id", type = "STRING", mode = "REQUIRED" },
+    { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
+    { name = "agent_name", type = "STRING", mode = "REQUIRED" },
+    { name = "agent_type", type = "STRING", mode = "NULLABLE" },
+    { name = "latency_ms", type = "INTEGER", mode = "NULLABLE" },
+    { name = "tokens_input", type = "INTEGER", mode = "NULLABLE" },
+    { name = "tokens_output", type = "INTEGER", mode = "NULLABLE" },
+    { name = "model_used", type = "STRING", mode = "NULLABLE" },
+    { name = "cost_usd", type = "FLOAT", mode = "NULLABLE" },
+    { name = "success", type = "BOOLEAN", mode = "NULLABLE" }, 
+    { name = "error_message", type = "STRING", mode = "NULLABLE" },
+    { name = "created_at", type = "TIMESTAMP", mode = "REQUIRED" },
+  ])
+}
+
+
+
 
 ###########################Contract Management Dataset#############################
 resource "google_bigquery_dataset" "contract_management_dataset" {
