@@ -89,7 +89,12 @@ resource "google_bigquery_table" "cost_attribution" {
   dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
   table_id   = "cost_attribution"
   project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+  require_partition_filter = false
 
+  time_partitioning {
+    type = "DAY"
+    field = "created_at"
+  }
   schema = jsonencode([
     { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
     { name = "username", type = "STRING", mode = "NULLABLE" },
@@ -112,7 +117,12 @@ resource "google_bigquery_table" "research_requests" {
   dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
   table_id   = "research_requests"
   project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+  require_partition_filter = false
 
+  time_partitioning {
+    type = "DAY"
+    field = "created_at"
+  }
   schema = jsonencode([
     { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
     { name = "company_name", type = "STRING", mode = "NULLABLE" },
@@ -133,7 +143,7 @@ resource "google_bigquery_table" "agent_telemetry" {
   dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
   table_id   = "agent_telemetry"
   project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
-
+  
   schema = jsonencode([
     { name = "record_id", type = "STRING", mode = "REQUIRED" },
     { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
