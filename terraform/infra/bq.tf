@@ -24,6 +24,8 @@ resource "google_bigquery_table" "translation_jobs" {
     type = "DAY"
     field = "submitted_at"
   }
+  clustering = ["status","job_id"]
+
   
   schema = jsonencode([
     { name = "job_id", type = "STRING", mode = "REQUIRED" },
