@@ -198,6 +198,7 @@ resource "google_bigquery_table" "cost_attribution" {
     { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
     { name = "username", type = "STRING", mode = "NULLABLE" },
     { name = "email", type = "STRING", mode = "NULLABLE" },
+    { name = "business_unit", type = "STRING", mode = "NULLABLE" },
     { name = "model_version", type = "STRING", mode = "NULLABLE" },
     { name = "temperature", type = "FLOAT", mode = "NULLABLE" },
     { name = "prompt_template_version", type = "STRING", mode = "NULLABLE" },
@@ -205,7 +206,6 @@ resource "google_bigquery_table" "cost_attribution" {
     { name = "output_tokens", type = "INTEGER", mode = "NULLABLE" },
     { name = "total_tokens", type = "INTEGER", mode = "NULLABLE" },
     { name = "latency_seconds", type = "FLOAT", mode = "NULLABLE" },
-    { name = "source_domains", type = "JSON", mode = "NULLABLE" },
     { name = "cost_usd", type = "FLOAT", mode = "NULLABLE" },
     { name = "created_at", type = "TIMESTAMP", mode = "REQUIRED" }
   ])
