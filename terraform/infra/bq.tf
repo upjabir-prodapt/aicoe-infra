@@ -11,6 +11,73 @@ resource "google_bigquery_dataset" "aicoe_translation_dataset" {
       system = "${var.project}${var.envname}"
     }
 }
+# Translation jobs table
+import {
+  to = google_bigquery_table.translation_jobs
+  id = "projects/aicoesandox/datasets/aicoesandox_translation_dataset/tables/translation_jobs"
+}
+resource "google_bigquery_table" "translation_jobs" {
+  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  table_id   = "translation_jobs"
+  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+
+  schema = jsonencode([
+    { name = "job_id", type = "STRING", mode = "REQUIRED" },
+    { name = "status", type = "STRING", mode = "REQUIRED" },
+    { name = "source_document", type = "STRING", mode = "NULLABLE" },
+    { name = "translation_config", type = "STRING", mode = "NULLABLE" },
+    { name = "cost_attribution", type = "STRING", mode = "NULLABLE" },
+    { name = "result", type = "STRING", mode = "NULLABLE" },
+    { name = "error_message", type = "STRING", mode = "NULLABLE" },
+    { name = "source_hash", type = "STRING", mode = "NULLABLE" },
+    { name = "submitted_at", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "completed_at", type = "TIMESTAMP", mode = "NULLABLE" }
+  ])
+}
+
+# Cost attribution table
+import {
+  to = google_bigquery_table.translation_costs
+  id = "projects/aicoesandox/datasets/aicoesandox_translation_dataset/tables/translation_costs"
+}
+resource "google_bigquery_table" "translation_costs" {
+  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  table_id   = "translation_costs"
+  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+
+  schema = jsonencode([
+    { name = "job_id", type = "STRING", mode = "REQUIRED" },
+    { name = "user_id", type = "STRING", mode = "NULLABLE" },
+    { name = "business_unit", type = "STRING", mode = "NULLABLE" },
+    { name = "organization", type = "STRING", mode = "NULLABLE" },
+    { name = "model_id", type = "STRING", mode = "NULLABLE" },
+    { name = "intent", type = "STRING", mode = "NULLABLE" },
+    { name = "input_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "output_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "cost_usd", type = "FLOAT", mode = "NULLABLE" },
+    { name = "timestamp", type = "TIMESTAMP", mode = "NULLABLE" }
+  ])
+}
+
+# DLP tokens table
+import {
+  to = google_bigquery_table.dlp_mappings
+  id = "projects/aicoesandox/datasets/aicoesandox_translation_dataset/tables/dlp_mappings"
+}
+resource "google_bigquery_table" "dlp_mappings" {
+  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  table_id   = "dlp_mappings"
+  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+
+  schema = jsonencode([
+    { name = "job_id", type = "STRING", mode = "REQUIRED" },
+    { name = "chunk_index", type = "INTEGER", mode = "REQUIRED" },
+    { name = "token", type = "STRING", mode = "REQUIRED" },
+    { name = "original_value", type = "STRING", mode = "REQUIRED" },
+    { name = "info_type", type = "STRING", mode = "NULLABLE" },
+    { name = "masked_at", type = "TIMESTAMP", mode = "NULLABLE" }
+  ])
+}
 
 ###########################Sales Agent Dataset#############################
 
@@ -28,6 +95,112 @@ resource "google_bigquery_dataset" "aicoe_sales_agent_dataset" {
     }
 }
 
+# Cost attribution table for Sales agent
+import {
+  to = google_bigquery_table.cost_attribution
+  id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/cost_attribution"
+}
+resource "google_bigquery_table" "cost_attribution" {
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
+  table_id   = "cost_attribution"
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+
+  schema = jsonencode([
+    { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
+    { name = "username", type = "STRING", mode = "NULLABLE" },
+    { name = "email", type = "STRING", mode = "NULLABLE" },
+    { name = "model_version", type = "STRING", mode = "NULLABLE" },
+    { name = "temperature", type = "FLOAT", mode = "NULLABLE" },
+    { name = "prompt_template_version", type = "STRING", mode = "NULLABLE" },
+    { name = "input_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "output_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "total_tokens", type = "INTEGER", mode = "NULLABLE" },
+    { name = "latency_seconds", type = "FLOAT", mode = "NULLABLE" },
+    { name = "source_domains", type = "JSON", mode = "NULLABLE" },
+    { name = "cost_usd", type = "FLOAT", mode = "NULLABLE" },
+    { name = "created_at", type = "TIMESTAMP", mode = "REQUIRED" }
+  ])
+}
+
+# Research requests table
+import {
+  to = google_bigquery_table.research_request
+  id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/research_request"
+}
+resource "google_bigquery_table" "research_requests" {
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
+  table_id   = "research_requests"
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+
+  schema = jsonencode([
+    { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
+    { name = "company_name", type = "STRING", mode = "REQUIRED" },
+    { name = "status", type = "STRING", mode = "REQUIRED" },
+    { name = "created_at", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "updated_at", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "gcs_uri", type = "STRING", mode = "NULLABLE" },
+    { name = "error_message", type = "STRING", mode = "NULLABLE" },
+    { name = "metadata", type = "JSON", mode = "NULLABLE" },
+    { name = "progress", type = "INTEGER", mode = "NULLABLE" },
+    { name = "current_step", type = "STRING", mode = "NULLABLE" }
+
+  ])
+}
+
+
+#sales agent telemetry table
+import {
+  to = google_bigquery_table.agent_telemetry
+  id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/agent_telemetry"
+}
+resource "google_bigquery_table" "agent_telemetry" {
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
+  table_id   = "agent_telemetry"
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+
+  schema = jsonencode([
+    { name = "record_id", type = "STRING", mode = "REQUIRED" },
+    { name = "job_execution_id", type = "STRING", mode = "REQUIRED" },
+    { name = "agent_name", type = "STRING", mode = "REQUIRED" },
+    { name = "agent_type", type = "STRING", mode = "NULLABLE" },
+    { name = "latency_ms", type = "INTEGER", mode = "NULLABLE" },
+    { name = "tokens_input", type = "INTEGER", mode = "NULLABLE" },
+    { name = "tokens_output", type = "INTEGER", mode = "NULLABLE" },
+    { name = "model_used", type = "STRING", mode = "NULLABLE" },
+    { name = "cost_usd", type = "FLOAT", mode = "NULLABLE" },
+    { name = "success", type = "BOOLEAN", mode = "NULLABLE" }, 
+    { name = "error_message", type = "STRING", mode = "NULLABLE" },
+    { name = "created_at", type = "TIMESTAMP", mode = "REQUIRED" },
+  ])
+}
+
+#sales catalog build jobs table
+import {
+  to = google_bigquery_table.catalog_build_jobs
+  id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/catalog_build_jobs"
+}
+resource "google_bigquery_table" "catalog_build_jobs" {
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
+  table_id   = "catalog_build_jobs"
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+
+  schema = jsonencode([
+    { name = "job_id", type = "STRING", mode = "REQUIRED" },
+    { name = "operation", type = "STRING", mode = "REQUIRED" },
+    { name = "status", type = "STRING", mode = "REQUIRED" },
+    { name = "progress", type = "INTEGER", mode = "NULLABLE" },
+    { name = "current_step", type = "STRING", mode = "NULLABLE" },
+    { name = "version_id", type = "STRING", mode = "NULLABLE" },
+    { name = "error_message", type = "STRING", mode = "NULLABLE" },
+    { name = "user_email", type = "STRING", mode = "NULLABLE" },
+    { name = "created_at", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "updated_at", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "metadata", type = "JSON", mode = "NULLABLE" }
+  ])
+}
+
+
+###########################Contract Management Dataset#############################
 resource "google_bigquery_dataset" "contract_management_dataset" {
   dataset_id = "${var.project}${var.envname}_contract_management"
   project    = "${var.project}${var.envname}"
@@ -39,20 +212,6 @@ resource "google_bigquery_dataset" "contract_management_dataset" {
     env    = var.envname
     system = "${var.project}${var.envname}"
   }
-}
-
-resource "google_bigquery_dataset" "aicoe_billing_dataset" {
-  dataset_id               = "${var.project}${var.envname}_billing_dataset"
-  location                 = var.region
-  project                  = "${var.project}${var.envname}"
-
-  # Optional safety flag: defaults to false if not set
-  delete_contents_on_destroy = true
-
-  labels = {
-      env    = var.envname
-      system = "${var.project}${var.envname}"
-    }
 }
  
 resource "google_bigquery_table" "chatfeedback" {
@@ -165,6 +324,21 @@ resource "google_bigquery_table" "extracted_field" {
     { name = "reviewed_by", type = "STRING", mode = "NULLABLE" },
     { name = "review_timestamp", type = "TIMESTAMP", mode = "NULLABLE" }
   ])
+}
+
+###########################Billing Dataset#############################
+resource "google_bigquery_dataset" "aicoe_billing_dataset" {
+  dataset_id               = "${var.project}${var.envname}_billing_dataset"
+  location                 = var.region
+  project                  = "${var.project}${var.envname}"
+
+  # Optional safety flag: defaults to false if not set
+  delete_contents_on_destroy = true
+
+  labels = {
+      env    = var.envname
+      system = "${var.project}${var.envname}"
+    }
 }
  
 
