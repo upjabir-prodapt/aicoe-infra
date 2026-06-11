@@ -1,10 +1,8 @@
-project = "aicoe"
+project = "prj-data-omfocuslane-vai"
 envname = "dev"
 region = "europe-west1"
 gcp_apis_required =[
-
-    "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training
-    "notebooks.googleapis.com",                # Vertex AI Workbench - managed notebook instances    
+    "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training  
     "bigquery.googleapis.com",                 # BigQuery API - datasets, tables, jobs
     "bigquerystorage.googleapis.com",          # BigQuery Storage API - fast read/write (used by Workbench)    
     "run.googleapis.com",                      # Cloud Run API - deploy and manage containers
@@ -16,6 +14,9 @@ gcp_apis_required =[
     "monitoring.googleapis.com",               # Cloud Monitoring - metrics, dashboards, alerts
     "serviceusage.googleapis.com",             # Service Usage API - enable/disable APIs
     "compute.googleapis.com",                  # Compute Engine API 
+    "cloudbuild.googleapis.com",               #Cloud Build API
+    "firestore.googleapis.com",                #Firestore API
+    "cloudscheduler.googleapis.com",           #Cloud Scheduler API
     
 ]
 artifact_format = "docker" 

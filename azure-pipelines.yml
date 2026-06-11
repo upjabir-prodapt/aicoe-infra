@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - dev
+      - omfocuslane-dev
 #   paths:
 #     include:
 #       - AICOE-Terraform/* 
@@ -16,7 +16,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: aicoedev-terraform
+  - group: om-focus-lane-dev-terraform
   - name: GOOGLE_APPLICATION_CREDENTIALS
     value: '$(Pipeline.Workspace)/.workload_identity.wlconfig'
   - name: TF_ROOT
@@ -76,7 +76,7 @@ stages:
           displayName: 'Publish Static Plan'
           condition: succeeded()
           inputs:
-            PathtoPublish: '$(TF_ROOT)/static-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            PathtoPublish: '$(TF_ROOT)/static-$(TF_PROJECT)-$(TF_ENV)-$(TF_REGION)-tf.plan'
             ArtifactName: 'plan-static'
               
   # ── Stage 2: Static Approve ───────────────────────────────────
@@ -196,7 +196,7 @@ stages:
           displayName: 'Publish Network Plan'
           condition: succeeded()
           inputs:
-            PathtoPublish: '$(TF_ROOT)/network-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            PathtoPublish: '$(TF_ROOT)/network-$(TF_PROJECT)-$(TF_ENV)-$(TF_REGION)-tf.plan'
             ArtifactName: 'plan-network'
               
   # ── Stage 2: Network Approve ───────────────────────────────────
@@ -316,7 +316,7 @@ stages:
           displayName: 'Publish Infra Plan'
           condition: succeeded()
           inputs:
-            PathtoPublish: '$(TF_ROOT)/infra-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+            PathtoPublish: '$(TF_ROOT)/infra-$(TF_PROJECT)-$(TF_ENV)-$(TF_REGION)-tf.plan'
             ArtifactName: 'plan-infra'
               
   # ── Stage 2: Infra Approve ───────────────────────────────────

@@ -2,6 +2,6 @@
 ###      AICOE VPC Network             ###
 ###########################################
 resource "google_compute_network" "aicoe_network" {
-  name                    = "${var.project}${var.envname}-vpc"
+  name                    = "${var.project}-${var.envname}-vpc"
   auto_create_subnetworks = false
 }

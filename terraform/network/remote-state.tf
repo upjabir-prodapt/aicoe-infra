@@ -5,7 +5,7 @@
 data "terraform_remote_state" "static" {
   backend = "gcs"
   config = {
-    bucket = "${var.project}${var.envname}-bucket-tf-state"
+    bucket = "${var.project}-${var.envname}-bucket-tf-state"
     prefix = "tfstate-static"
   }
 }
@@ -17,7 +17,7 @@ data "terraform_remote_state" "static" {
 data "terraform_remote_state" "infra" {
   backend = "gcs"
   config = {
-    bucket = "${var.project}${var.envname}-bucket-tf-state"
+    bucket = "${var.project}-${var.envname}-bucket-tf-state"
     prefix = "tfstate-infra"
   }
 }
