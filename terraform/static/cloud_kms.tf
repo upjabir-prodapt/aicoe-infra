@@ -7,7 +7,7 @@
 resource "google_kms_key_ring" "aicoe_app_bucket_key_ring" {
   name     = "${var.project}-${var.envname}-app-bucket-key-ring"
   location = var.region
-  project  = "${var.project}-${var.envname}"
+  project  = "${var.project}"
 }
  
 # Key
@@ -22,7 +22,7 @@ resource "google_kms_crypto_key" "aicoe_app_bucket_key" {
   }
   labels = {
     env             = "${var.envname}"
-    system          = "${var.project}-${var.envname}"
+    system          = "${var.project}"
   }
  
   version_template {

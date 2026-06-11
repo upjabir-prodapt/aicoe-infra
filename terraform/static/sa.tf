@@ -1,5 +1,5 @@
 resource "google_service_account" "aicoe_app_sa" {
-  account_id   = "${var.project}-${var.envname}"
+  account_id   = "${var.project}-${var.envname}-app-sa"
   display_name = "Service Account for Application WIF"
 }
 
@@ -16,7 +16,7 @@ resource "google_project_iam_member" "aicoe_app_sa_iam" {
     "roles/secretmanager.secretAccessor" ,
 
   ])
-  project = "${var.project}-${var.envname}"
+  project = "${var.project}"
   role    = each.value
   member  = "serviceAccount:${google_service_account.aicoe_app_sa.email}"
 }

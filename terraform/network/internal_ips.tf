@@ -7,6 +7,6 @@ resource "google_compute_address" "aicoe_staticip_ilb" {
   region       = var.region
   labels = {
     env    = "${var.envname}"
-    system = "${var.project}-${var.envname}"
+    system = "${var.project}"
   }
 }

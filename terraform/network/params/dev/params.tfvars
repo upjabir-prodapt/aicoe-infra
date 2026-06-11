@@ -1,4 +1,4 @@
-project = "prj-data-omfocuslane-vai"
+project = "om-focus-lane"
 envname = "dev"
 region  = "europe-west1"
 aicoe_subnet_cidr_range = "10.110.73.0/24"

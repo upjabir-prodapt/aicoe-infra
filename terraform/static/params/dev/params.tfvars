@@ -1,4 +1,4 @@
-project = "prj-data-omfocuslane-vai"
+project = "om-focus-lane"
 envname = "dev"
 region = "europe-west1"
 gcp_apis_required =[
