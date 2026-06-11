@@ -1,5 +1,5 @@
 resource "google_service_account" "aicoe_app_sa" {
-  account_id   = "${var.project}-${var.envname}-app-sa"
+  account_id   = "${var.project}-${var.envname}"
   display_name = "Service Account for Application WIF"
 }
 
