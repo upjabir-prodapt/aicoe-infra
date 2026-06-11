@@ -55,7 +55,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_https" {
       source_ranges = [
        "130.211.0.0/22",
        "35.191.0.0/16",
-       "10.110.73.20"
+       "10.110.73.30"
       ]
       source_tags             = null
       source_service_accounts = null
