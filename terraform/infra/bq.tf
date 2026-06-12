@@ -95,11 +95,6 @@ resource "google_bigquery_dataset" "aicoe_sales_agent_dataset" {
     }
 }
 
-# #sales agent telemetry table
-# import {
-#   to = google_bigquery_table.agent_telemetry
-#   id = "projects/aicoesandox/datasets/aicoesandox_sales_agent_dataset/tables/agent_telemetry"
-# }
 resource "google_bigquery_table" "agent_telemetry" {
   dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
   table_id   = "agent_telemetry"
@@ -213,6 +208,19 @@ resource "google_bigquery_table" "cost_attribution" {
   ])
 }
 
+# Users Feedback Table
+resource "google_bigquery_table" "users_feedback" {
+  dataset_id = google_bigquery_dataset.aicoe_sales_agent_dataset.dataset_id
+  table_id   = "users_feedback"
+  project    = google_bigquery_dataset.aicoe_sales_agent_dataset.project
+  deletion_protection = true
+  
+  schema = jsonencode([
+    { name = "job_id", type = "STRING", mode = "REQUIRED" },
+    { name = "user_email", type = "STRING", mode = "REQUIRED" },
+    { name = "feedback", type = "STRING", mode = "NULLABLE" },
+  ])
+}
 
 
 
