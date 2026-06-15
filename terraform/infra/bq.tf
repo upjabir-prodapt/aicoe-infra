@@ -67,6 +67,23 @@ resource "google_bigquery_table" "dlp_mappings" {
   ])
 }
 
+# # Translation Review table
+resource "google_bigquery_table" "translation_reviews" {
+  dataset_id = google_bigquery_dataset.aicoe_translation_dataset.dataset_id
+  table_id   = "translation_reviews"
+  project    = google_bigquery_dataset.aicoe_translation_dataset.project
+  deletion_protection = true
+
+  schema = jsonencode([
+    {"name": "review_id", "type": "STRING", "mode": "REQUIRED"},
+    {"name": "job_id", "type": "STRING", "mode": "REQUIRED"},
+    {"name": "rating", "type": "INT64", "mode": "REQUIRED"},
+    {"name": "comment", "type": "STRING", "mode": "NULLABLE"},
+    {"name": "reviewer_email", "type": "STRING", "mode": "REQUIRED"},
+    {"name": "created_at", "type": "TIMESTAMP", "mode": "REQUIRED"},
+    {"name": "updated_at", "type": "TIMESTAMP", "mode": "REQUIRED"}
+  ])
+}
 
 ###########################Sales Agent Dataset#############################
 
