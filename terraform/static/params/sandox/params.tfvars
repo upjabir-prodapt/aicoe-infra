@@ -1,5 +1,6 @@
-project = "aicoe"
-envname = "sandox"
+project = "ai-research"
+envname = "sandbox"
+project_num = "499209"
 region = "europe-west1"
 gcp_apis_required =[
 

@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main
+      - ai-research-sandbox
 #   paths:
 #     include:
 #       - AICOE-Terraform/* 
@@ -22,23 +22,23 @@ variables:
  
   # --- GCP WIF Configuration ---
   - name: GCP_PROJECT_ID
-    value: 'aicoesandox'  
+    value: 'ai-research-sandbox-499209'  
   - name: GoogleCloud.WorkloadIdentity.ProjectNumber
-    value: '297743845367'
+    value: '1074004789564'
   - name: GoogleCloud.WorkloadIdentity.Pool
-    value: 'aicoesandox-ado-wip'
+    value: 'ai-research-sandbox-ado-wip'
   - name: GoogleCloud.WorkloadIdentity.Provider
-    value: 'aicoesandox-ado-wip-provider'
+    value: 'ai-research-sbx-ado-wip-provider'
   - name: GoogleCloud.WorkloadIdentity.ServiceAccount
-    value: 'aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com'
+    value: 'ai-research-sbx-wif-sa-tf@ai-research-sandbox-499209.iam.gserviceaccount.com'
  
   # --- Terraform Runtime Variables ---
   - name: GOOGLE_APPLICATION_CREDENTIALS
     value: '$(Pipeline.Workspace)/.workload_identity.wlconfig'
   - name: TF_ENV
-    value: 'sandox'                        # Override per environment: dev / staging / prod
+    value: 'sandbox'                        # Override per environment: dev / staging / prod
   - name: TF_PROJECT
-    value: 'aicoe'
+    value: 'ai-research'
   - name: TF_REGION
     value: 'europe-west1'
   - name: TF_ROOT
