@@ -6,6 +6,7 @@ gcp_apis_required =[
 
     "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training
     "storage.googleapis.com",                  # Cloud storae API
+    "cloudkms.googleapis.com",                 # Cloud KMS API
     
 ]
 artifact_format = "docker"
