@@ -95,6 +95,29 @@ resource "google_secret_manager_secret" "translation_csr" {
 }
 
 ###########################################
+### Secret Manager for AI Hub CSR ###########
+###########################################
+resource "google_secret_manager_secret" "aihub_csr" {
+  secret_id = "${var.project}${var.envname}-aihub-csr"
+  project = "${var.project}${var.envname}"
+
+  replication {
+    user_managed {
+       replicas {
+            location = var.region
+            customer_managed_encryption {
+            kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
+            }
+       }
+    }
+  }
+   labels = {
+     environment = var.envname
+     managed_by = "terraform"
+ }
+}
+
+###########################################
 ### Secret Manager for Sales ILB ###########
 ###########################################
 
@@ -124,6 +147,30 @@ labels = {
  
 resource "google_secret_manager_secret" "translation_ssl_cer" {
   secret_id = "${var.project}${var.envname}-translation-ssl-certificate"
+  project = "${var.project}${var.envname}"
+
+  replication {
+    user_managed {
+       replicas {
+            location = var.region
+            customer_managed_encryption {
+            kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
+            }
+       }
+    }
+  }
+   labels = {
+     environment = var.envname
+     managed_by = "terraform"
+ }
+}
+
+###########################################
+### Secret Manager for AI Hub SSL ###########
+###########################################
+ 
+resource "google_secret_manager_secret" "aihub_ssl_cer" {
+  secret_id = "${var.project}${var.envname}-aihub-ssl-certificate"
   project = "${var.project}${var.envname}"
 
   replication {
@@ -189,4 +236,28 @@ resource "google_secret_manager_secret" "translation_ssl_key" {
      managed_by = "terraform"
  }
 }
+
+###########################################
+### Secret Manager for AI hub SSL ###########
+###########################################
+resource "google_secret_manager_secret" "aihub_ssl_private_key" {
+  secret_id = "${var.project}${var.envname}-aihub-ssl-private-key"
+  project = "${var.project}${var.envname}"
+
+  replication {
+    user_managed {
+       replicas {
+            location = var.region
+            customer_managed_encryption {
+            kms_key_name = google_kms_crypto_key.aicoe_app_bucket_key.id
+            }
+       }
+    }
+  }
+   labels = {
+     environment = var.envname
+     managed_by = "terraform"
+ }
+}
+
 
