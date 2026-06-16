@@ -168,3 +168,90 @@ resource "google_compute_region_ssl_certificate" "aicoe_salesagent_ssl" {
 }
 
 
+################## AI Hub ILB ##################
+# Backend service
+resource "google_compute_region_backend_service" "aicoe_ilb_aihub_be" {
+  name   = "${var.project}${var.envname}-ilb-aihub-be"
+  region = var.region
+  project = "${var.project}${var.envname}" 
+  load_balancing_scheme = "INTERNAL_MANAGED"
+  protocol = "HTTPS"
+
+  backend {
+    group = google_compute_region_network_endpoint_group.aicoe_serverless_neg_aihub.id
+    balancing_mode = "UTILIZATION"
+  }
+}
+ 
+
+resource "google_compute_region_network_endpoint_group" "aicoe_serverless_neg_aihub" {
+  name                  = "${var.project}${var.envname}-serverless-neg-aihub"
+  network_endpoint_type = "SERVERLESS"
+  region                = var.region
+
+  cloud_run {
+    service = var.cloud_run_service_name3
+  }
+}
+
+resource "google_compute_region_url_map" "aicoe_ilb_aihub_url_map" {
+  name    = "${var.project}${var.envname}-ilb-aihub-url-map"
+  project = "${var.project}${var.envname}"
+  region  = var.region
+  default_service = google_compute_region_backend_service.aicoe_ilb_aihub_be.id
+}
+
+resource "google_compute_region_target_https_proxy" "aicoe_ilb_aihub_https_proxy" {
+  name    = "${var.project}${var.envname}-ilb-aihub-https-proxy"
+  project = "${var.project}${var.envname}"
+  region  = var.region
+  url_map = google_compute_region_url_map.aicoe_ilb_aihub_url_map.id
+  ssl_certificates = [google_compute_region_ssl_certificate.aicoe_aihub_ssl.id]
+}
+ 
+resource "google_compute_forwarding_rule" "aicoe_ilb_aihub_forwarding_rule" {
+  name                  = "${var.project}${var.envname}-ilb-aihub-fe"
+  project               = "${var.project}${var.envname}"
+  region                = var.region
+  network               = data.terraform_remote_state.network.outputs.aicoe_network
+  subnetwork            = data.terraform_remote_state.network.outputs.aicoe_subnet_name
+  target                = google_compute_region_target_https_proxy.aicoe_ilb_aihub_https_proxy.id
+  port_range            = 443
+  ip_address            = data.terraform_remote_state.network.outputs.aicoe_staticip_ilb_aihub
+  load_balancing_scheme = "INTERNAL_MANAGED"
+  allow_global_access   = false
+  labels = {
+      env    = var.envname
+      system = "${var.project}${var.envname}"
+    }
+  
+}
+
+
+data "google_secret_manager_secret_version" "aihub_ssl_cert" {
+  secret  = "${var.project}${var.envname}-aihub-ssl-certificate"
+  project = "${var.project}${var.envname}"
+}
+
+# Read private key from Secret Manager
+data "google_secret_manager_secret_version" "aihub_private_key" {
+  secret  = "${var.project}${var.envname}-aihub-ssl-private-key"
+  project = "${var.project}${var.envname}"
+}
+
+# SSL Certificate
+resource "google_compute_region_ssl_certificate" "aicoe_aihub_ssl" {
+  name    = "${var.project}${var.envname}-aihub-ssl"
+  project = "${var.project}${var.envname}"
+  region  = var.region
+
+  certificate = data.google_secret_manager_secret_version.aihub_ssl_cert.secret_data
+  private_key = data.google_secret_manager_secret_version.aihub_private_key.secret_data
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+
