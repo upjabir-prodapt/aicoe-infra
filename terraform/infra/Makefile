@@ -1,5 +1,5 @@
 ENVNAME=
-PROJECT=prj-data-omfocuslane-vai
+PROJECT=om-focus-lane
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-infra

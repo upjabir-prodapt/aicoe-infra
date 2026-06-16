@@ -17,6 +17,7 @@ gcp_apis_required =[
     "cloudbuild.googleapis.com",               #Cloud Build API
     "firestore.googleapis.com",                #Firestore API
     "cloudscheduler.googleapis.com",           #Cloud Scheduler API
+    "firestore.googleapis.com",                #Firestore Google API
     
 ]
 artifact_format = "docker" 

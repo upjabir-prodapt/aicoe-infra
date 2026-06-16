@@ -1,4 +1,3 @@
-project = "prj-data-omfocuslane-vai"
+project = "om-focus-lane"
 envname = "dev"
-region  = "europe-west1"  
-cloud_run_service_name = "translation-api-service"
+region  = "europe-west1"
