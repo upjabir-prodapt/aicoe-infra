@@ -38,3 +38,7 @@ output "dns_zone_name" {
 output "aicoe_staticip_ilb_salesagent" {
   value       = google_compute_address.aicoe_staticip_ilb_salesagent.address
 }
+
+output "aicoe_staticip_ilb_aihub" {
+  value       = google_compute_address.aicoe_staticip_ilb_aihub.address
+}
