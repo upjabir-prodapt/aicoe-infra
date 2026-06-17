@@ -8,4 +8,4 @@ variable "aicoe_static_vxaiwb_ip" {
     default = null
 }
 variable "aicoe_static_ilb_salesagent_ip" {}
-
+variable "aicoe_static_ilb_aihub_ip" {}
