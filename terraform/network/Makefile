@@ -1,5 +1,5 @@
 ENVNAME=
-PROJECT=aicoe
+PROJECT=vegadev-499613
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-network
