@@ -4,7 +4,6 @@ provider "google" {
 
   default_labels = {
     environment = var.envname
-    team = "ai-coe"
     managed_by = "terraform"
   }
 }
