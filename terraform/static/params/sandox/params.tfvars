@@ -1,6 +1,7 @@
 project = "aicoe"
 envname = "sandox"
 region = "europe-west1"
+project_number = "297743845367"
 gcp_apis_required =[
 
     "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training

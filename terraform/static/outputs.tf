@@ -19,3 +19,8 @@ output "vertex_ai_service_agent_email" {
   value       = "service-${data.google_project.current.number}@gcp-sa-aiplatform.iam.gserviceaccount.com"
   description = "Google-managed Vertex AI service agent that ingests embeddings from GCS"
 }
+
+output "env_tag_value_id" {
+  value       = google_tags_tag_value.env.id
+  description = "Tags to attach to all services"
+}
