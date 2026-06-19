@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - dev
+      - vegadev
 #   paths:
 #     include:
 #       - AICOE-Terraform/* 
@@ -16,7 +16,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: aicoedev-terraform
+  - group: vegadev-terraform
   - name: GOOGLE_APPLICATION_CREDENTIALS
     value: '$(Pipeline.Workspace)/.workload_identity.wlconfig'
   - name: TF_ROOT
@@ -264,124 +264,124 @@ stages:
           cd $(TF_ROOT)/network
           make apply ENVNAME=$(TF_ENV)
 
-# ============================================================================
-# STAGE 3 — Infra LAYER
-# ============================================================================
-- stage: Infra_Plan
-  displayName: 'Infra-Plan'
-  dependsOn: Network_Apply
-  jobs:
-    - job: Infra_Plan_Job
-      displayName: 'Terraform Plan - Infra'
-      steps:
- 
-        # ── Step 1: Checkout ─────────────────────────────────────────────────
-        - checkout: self
-          displayName: 'Checkout source'
-        
-        # ── Step 2: Terraform installer ─────────────────────────────────────────────────
-
-        - task: TerraformInstaller@1
-          displayName: Terraform installer
-          inputs:
-            terraformVersion: 'latest'
- 
-        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
-        - task: AzureCLI@3
-          displayName: Infra-Plan
-          inputs:
-            connectionType: 'azureRM'
-            azureSubscription: $(Azure.WorkloadIdentity.Connection)
-            addSpnToEnvironment: true
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
-              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
-              {
-                "type": "external_account",
-                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
-                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-                "token_url": "https://sts.googleapis.com/v1/token",
-                "credential_source": {
-                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
-                },
-                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
-              }
-              EOF
-              cd $(TF_ROOT)/infra
-              make plan ENVNAME=$(TF_ENV)
-
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Infra Plan'
-          condition: succeeded()
-          inputs:
-            PathtoPublish: '$(TF_ROOT)/infra-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
-            ArtifactName: 'plan-infra'
-              
-  # ── Stage 2: Infra Approve ───────────────────────────────────
-- stage: Infra_Approve
-  displayName: 'Infra-Plan-Approve'
-  dependsOn: Infra_Plan
-  jobs:
-  - deployment: Infra_Approve
-    displayName: 'Approve Infra Apply'
-    environment: $(TF_ENV)        # ← ADO Environment with approval gate
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - script: |
-              echo "Approval granted for Infra layer"
-              echo "Reviewer approved at: $(date -u)"
-            displayName: 'Approval Confirmed'
-
-- stage: Infra_Apply
-  displayName: 'Infra-Apply'
-  dependsOn: Infra_Approve
-  jobs:
-  - job: Infra_Apply
-    displayName: 'Infra-Apply'
-    steps:
-
-    - checkout: self
-
-    - task: TerraformInstaller@1
-      displayName: Terraform installer
-      inputs:
-        terraformVersion: 'latest'
-
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Infra Plan'
-      inputs:
-        artifactName: 'plan-infra'
-        downloadPath: '$(TF_ROOT)'
-
-# ── Step 2: WIF Token Exchange ────────────────────────────────────────
-    - task: AzureCLI@3
-      displayName: Infra-Apply
-      inputs:
-        connectionType: 'azureRM'
-        azureSubscription: $(Azure.WorkloadIdentity.Connection)
-        addSpnToEnvironment: true
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
-          cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
-          {
-            "type": "external_account",
-            "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
-            "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-            "token_url": "https://sts.googleapis.com/v1/token",
-            "credential_source": {
-              "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
-            },
-            "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
-          }
-          EOF
-          mv $(TF_ROOT)/plan-infra/infra-*.plan $(TF_ROOT)
-          cd $(TF_ROOT)/infra
-          make apply ENVNAME=$(TF_ENV)
-
-  
+## ============================================================================
+## STAGE 3 — Infra LAYER
+## ============================================================================
+#- stage: Infra_Plan
+#  displayName: 'Infra-Plan'
+#  dependsOn: Network_Apply
+#  jobs:
+#    - job: Infra_Plan_Job
+#      displayName: 'Terraform Plan - Infra'
+#      steps:
+# 
+#        # ── Step 1: Checkout ─────────────────────────────────────────────────
+#        - checkout: self
+#          displayName: 'Checkout source'
+#        
+#        # ── Step 2: Terraform installer ─────────────────────────────────────────────────
+#
+#        - task: TerraformInstaller@1
+#          displayName: Terraform installer
+#          inputs:
+#            terraformVersion: 'latest'
+# 
+#        # ── Step 2: WIF Token Exchange ────────────────────────────────────────
+#        - task: AzureCLI@3
+#          displayName: Infra-Plan
+#          inputs:
+#            connectionType: 'azureRM'
+#            azureSubscription: $(Azure.WorkloadIdentity.Connection)
+#            addSpnToEnvironment: true
+#            scriptType: 'bash'
+#            scriptLocation: 'inlineScript'
+#            inlineScript: |
+#              echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+#              cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+#              {
+#                "type": "external_account",
+#                "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+#                "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+#                "token_url": "https://sts.googleapis.com/v1/token",
+#                "credential_source": {
+#                  "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+#                },
+#                "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+#              }
+#              EOF
+#              cd $(TF_ROOT)/infra
+#              make plan ENVNAME=$(TF_ENV)
+#
+#        - task: PublishBuildArtifacts@1
+#          displayName: 'Publish Infra Plan'
+#          condition: succeeded()
+#          inputs:
+#            PathtoPublish: '$(TF_ROOT)/infra-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+#            ArtifactName: 'plan-infra'
+#              
+#  # ── Stage 2: Infra Approve ───────────────────────────────────
+#- stage: Infra_Approve
+#  displayName: 'Infra-Plan-Approve'
+#  dependsOn: Infra_Plan
+#  jobs:
+#  - deployment: Infra_Approve
+#    displayName: 'Approve Infra Apply'
+#    environment: $(TF_ENV)        # ← ADO Environment with approval gate
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - script: |
+#              echo "Approval granted for Infra layer"
+#              echo "Reviewer approved at: $(date -u)"
+#            displayName: 'Approval Confirmed'
+#
+#- stage: Infra_Apply
+#  displayName: 'Infra-Apply'
+#  dependsOn: Infra_Approve
+#  jobs:
+#  - job: Infra_Apply
+#    displayName: 'Infra-Apply'
+#    steps:
+#
+#    - checkout: self
+#
+#    - task: TerraformInstaller@1
+#      displayName: Terraform installer
+#      inputs:
+#        terraformVersion: 'latest'
+#
+#    - task: DownloadBuildArtifacts@0
+#      displayName: 'Download Infra Plan'
+#      inputs:
+#        artifactName: 'plan-infra'
+#        downloadPath: '$(TF_ROOT)'
+#
+## ── Step 2: WIF Token Exchange ────────────────────────────────────────
+#    - task: AzureCLI@3
+#      displayName: Infra-Apply
+#      inputs:
+#        connectionType: 'azureRM'
+#        azureSubscription: $(Azure.WorkloadIdentity.Connection)
+#        addSpnToEnvironment: true
+#        scriptType: 'bash'
+#        scriptLocation: 'inlineScript'
+#        inlineScript: |
+#          echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+#          cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+#          {
+#            "type": "external_account",
+#            "audience": "//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/$(GoogleCloud.WorkloadIdentity.Pool)/providers/$(GoogleCloud.WorkloadIdentity.Provider)",
+#            "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+#            "token_url": "https://sts.googleapis.com/v1/token",
+#            "credential_source": {
+#              "file": "$(Pipeline.Workspace)/.workload_identity.jwt"
+#            },
+#            "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"         
+#          }
+#          EOF
+#          mv $(TF_ROOT)/plan-infra/infra-*.plan $(TF_ROOT)
+#          cd $(TF_ROOT)/infra
+#          make apply ENVNAME=$(TF_ENV)
+#
+#  

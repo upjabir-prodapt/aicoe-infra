@@ -3,7 +3,7 @@
 ###########################################
 
 resource "google_compute_subnetwork" "aicoe_subnet" {
-  name          = "${var.project}${var.envname}-subnet"
+  name          = "${var.project}-subnet"
   region        = var.region
   network       = google_compute_network.aicoe_network.self_link
   ip_cidr_range = var.aicoe_subnet_cidr_range
@@ -17,7 +17,7 @@ resource "google_compute_subnetwork" "aicoe_subnet" {
 ###########################################
 
 resource "google_compute_subnetwork" "aicoe_proxy_only_subnet" {
-  name          = "${var.project}${var.envname}-proxy-subnet"
+  name          = "${var.project}-proxy-subnet"
   region        = var.region
   network       = google_compute_network.aicoe_network.self_link
   ip_cidr_range = var.aicoe_proxy_subnet_cidr_range

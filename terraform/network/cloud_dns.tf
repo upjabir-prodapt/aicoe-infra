@@ -2,7 +2,7 @@
 # Private DNS Zone for Google APIs
 # -----------------------------------------------------------------------------
 resource "google_dns_managed_zone" "aicoe_googleapis_private" {
-  name        = "${var.project}${var.envname}-googleapis-private"
+  name        = "${var.project}-googleapis-private"
   dns_name    = "googleapis.com."
   description = "Private DNS zone for Google APIs via PSC"
   visibility  = "private"

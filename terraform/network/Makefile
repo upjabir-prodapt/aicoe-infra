@@ -1,7 +1,7 @@
 ENVNAME=
-PROJECT=vegadev-499613
+PROJECT=vega
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
+TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)bucket-tf-state
 TFSTATE_DIR=tfstate-network
 TFPLAN_FILE=../network-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
@@ -29,10 +29,10 @@ init: network_safety_check clean get
 	#	-backend-config 'workspace{name=$(PROJECT)$(ENVNAME)}'
 
 plan: init
-	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params//params.tfvars
 
 landscape: init
-	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars | landscape
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params//params.tfvars | landscape
 
 apply: network_safety_check init
 	$(TF_EXEC) apply $(TFPLAN_FILE) && rm $(TFPLAN_FILE)
@@ -48,7 +48,7 @@ refresh: init
 	$(TF_EXEC) -chdir=$(PWD) refresh -var-file=params/${ENVNAME}.tfvars
 
 #importresource: init
-	#$(TF_EXEC) import -var-file=params/$(ENVNAME)/params.tfvars aws_iam_user.ses resource_name
+	#$(TF_EXEC) import -var-file=params//params.tfvars aws_iam_user.ses resource_name
 
 
 network_safety_check:
@@ -58,7 +58,7 @@ else
 	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	@echo -n "\nnetwork LAYER SELECTED - YOU MUST DOUBLE CHECK THE PLAN FOR ANY UNINTENDED CHANGES (SUCH AS RESERVED IPS CHANGING)"
 	@echo -n "\n[type 'UNDERSTOOD' then <enter> to continue] " && read ans && [ $${ans:-N} = UNDERSTOOD ]
-ifeq ($(ENVNAME), prod)
+ifeq (, prod)
 	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	@echo -n "\nLIVE SELECTED - ARE YOU SURE YOU WANT TO CONTINUE?"
 	@echo -n "\n[type '$(PROJECT)$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
