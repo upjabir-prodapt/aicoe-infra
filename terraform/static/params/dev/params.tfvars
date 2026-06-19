@@ -1,6 +1,7 @@
 project = "vegadev-499613"
 envname = "dev"
 region = "europe-west1"
+project_number = "566331480334"
 gcp_apis_required =[
 
     "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training
@@ -10,4 +11,3 @@ gcp_apis_required =[
     "compute.googleapis.com",                  # Compute Engine API 
     
 ]
-artifact_format = "docker" 
