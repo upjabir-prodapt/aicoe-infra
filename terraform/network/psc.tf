@@ -1,5 +1,5 @@
 resource "google_compute_global_address" "aicoe_psc_address" {
-  name          = "${var.project}-psc-google-apis-ip"
+  name          = "vegadev-psc-google-apis-ip"
   address_type  = "INTERNAL"
   purpose       = "PRIVATE_SERVICE_CONNECT"
   network       = google_compute_network.aicoe_network.id
@@ -10,7 +10,7 @@ resource "google_compute_global_address" "aicoe_psc_address" {
 # must be 1-20 characters, lowercase letters and numbers only, starting with a letter.
 # Hyphens are NOT allowed.
 resource "google_compute_global_forwarding_rule" "aicoe_psc_google_apis" {
-  name                  = "${var.project}pscapis"
+  name                  = "vegadevpscapis"
   network               = google_compute_network.aicoe_network.id
   ip_address            = google_compute_global_address.aicoe_psc_address.id
   target                = "all-apis"
