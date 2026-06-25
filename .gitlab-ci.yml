@@ -1,355 +1,203 @@
 # =============================================================================
-
 # GitLab CI/CD Pipeline — Terraform on GCP via Workload Identity Federation
-
 # Single-job design: Plan (all layers) → Approve → Apply (all layers)
-
 # Runners: ShellR2 (#7) | Shell1/Shell2 (#3)
-
 # =============================================================================
- 
+
 workflow:
-
   rules:
-
     - if: '$CI_COMMIT_BRANCH == "main"'
- 
-# ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
 # Default settings
-
 # ---------------------------------------------------------------------------
-
 default:
-
   tags:
-
     - ShellR2
-
   before_script:
-
     - npm config delete prefix 2>/dev/null || true
-
     - |
-
       set -euo pipefail
- 
+
       echo "==> Validating required CI/CD variables..."
-
       MISSING=""
-
       for VAR in TF_ENV TF_PROJECT TF_REGION WORKLOAD_IDENTITY_PROJECT_NUMBER WORKLOAD_IDENTITY_POOL WORKLOAD_IDENTITY_PROVIDER WIF_SERVICE_ACCOUNT; do
-
         if [ -z "${!VAR:-}" ]; then
-
           echo "  MISSING: $VAR"
-
           MISSING="$MISSING $VAR"
-
         else
-
           echo "  OK:      $VAR"
-
         fi
-
       done
-
       if [ -n "$MISSING" ]; then
-
         echo "ERROR: Missing variables. Check GitLab Settings -> CI/CD -> Variables."
-
         echo "If set at Group level, ensure the variable is NOT marked Protected (or protect the main branch)."
-
         exit 1
-
       fi
-
       echo "==> All required variables present."
- 
+
     - |
-
       set -euo pipefail
-
       TFENV_DIR="$HOME/.tfenv"
-
       TF_VERSION="${TF_VERSION:-1.8.5}"
- 
+
       echo "==> [1/4] Checking tfenv..."
-
       if [ ! -d "$TFENV_DIR" ]; then
-
         echo "  Cloning tfenv..."
-
         git clone --depth=1 https://github.com/tfutils/tfenv.git "$TFENV_DIR"
-
       else
-
         echo "  tfenv already present — skipping clone"
-
       fi
- 
+
       echo "==> [2/4] Adding tfenv to PATH..."
-
       export PATH="$TFENV_DIR/bin:$PATH"
- 
+
       echo "==> [3/4] Checking Terraform $TF_VERSION..."
-
       if tfenv list 2>/dev/null | grep -qF "$TF_VERSION"; then
-
         echo "  Already installed — skipping"
-
       else
-
         tfenv install "$TF_VERSION"
-
       fi
- 
+
       echo "==> [4/4] Activating Terraform $TF_VERSION..."
-
       tfenv use "$TF_VERSION"
-
       terraform version
- 
-# ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
 # Pipeline-wide variables
-
 # ---------------------------------------------------------------------------
-
 variables:
-
   TF_ROOT: "${CI_PROJECT_DIR}/terraform"
-
   GOOGLE_APPLICATION_CREDENTIALS: "${CI_PROJECT_DIR}/.workload_identity.wlconfig"
-
   SKIP_INTERACTIVE_SAFETY_PROMPT: "true"
- 
-# ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
 # Hidden anchor: WIF token exchange
-
 # ---------------------------------------------------------------------------
-
 .wif_auth: &wif_auth |
-
   export PATH="$HOME/.tfenv/bin:$PATH"
-
   echo "==> Writing WIF credential file..."
- 
+
   if [ -z "${GCP_OIDC_TOKEN:-}" ]; then
-
     echo "ERROR: GCP_OIDC_TOKEN is empty. Ensure id_tokens block is in this job."
-
     exit 1
-
   fi
- 
+
   echo "${GCP_OIDC_TOKEN}" > "${CI_PROJECT_DIR}/.workload_identity.jwt"
- 
+
   printf '{\n  "type": "external_account",\n  "audience": "//iam.googleapis.com/projects/%s/locations/global/workloadIdentityPools/%s/providers/%s",\n  "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",\n  "token_url": "https://sts.googleapis.com/v1/token",\n  "credential_source": {\n    "file": "%s/.workload_identity.jwt"\n  },\n  "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/%s:generateAccessToken"\n}\n' \
-
     "${WORKLOAD_IDENTITY_PROJECT_NUMBER}" \
-
     "${WORKLOAD_IDENTITY_POOL}" \
-
     "${WORKLOAD_IDENTITY_PROVIDER}" \
-
     "${CI_PROJECT_DIR}" \
-
     "${WIF_SERVICE_ACCOUNT}" \
-> "${GOOGLE_APPLICATION_CREDENTIALS}"
- 
+    > "${GOOGLE_APPLICATION_CREDENTIALS}"
+
   echo "==> WIF credential file written OK"
- 
-# =============================================================================
 
+# =============================================================================
 # STAGE ORDERING
-
 # =============================================================================
-
 stages:
-
   - plan
-
   - approve
-
   - apply
- 
-# =============================================================================
 
+# =============================================================================
 # JOB 1 — PLAN (Static + Network + Infra, all layers sequentially)
-
 # =============================================================================
-
 terraform:plan:
-
   stage: plan
-
   environment: main
-
   tags:
-
     - ShellR2
-
   id_tokens:
-
     GCP_OIDC_TOKEN:
-
-      aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadId…
-
+      aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WORKLOAD_IDENTITY_POOL}/providers/${WORKLOAD_IDENTITY_PROVIDER}"
   script:
-
     - *wif_auth
- 
-    - echo "========================================"
 
+    - echo "========================================"
     - echo "LAYER 1/3 — Static Plan"
-
     - echo "========================================"
-
     - cd "${TF_ROOT}/static"
-
     - make plan ENVNAME="${TF_ENV}"
- 
-    - echo "========================================"
 
+    - echo "========================================"
     - echo "LAYER 2/3 — Network Plan"
-
     - echo "========================================"
-
     - cd "${TF_ROOT}/network"
-
     - make plan ENVNAME="${TF_ENV}"
- 
-    - echo "========================================"
 
+    - echo "========================================"
     - echo "LAYER 3/3 — Infra Plan"
-
     - echo "========================================"
-
     - cd "${TF_ROOT}/infra"
-
     - make plan ENVNAME="${TF_ENV}"
- 
+
     - echo "==> All plans complete. Awaiting approval."
-
   artifacts:
-
     name: "tf-plans-${CI_COMMIT_SHORT_SHA}"
-
     paths:
-
       - "${TF_ROOT}/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-
       - "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-
       - "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-
     expire_in: 7 days
-
     when: on_success
- 
-# =============================================================================
 
+# =============================================================================
 # JOB 2 — APPROVE (manual gate)
-
 # =============================================================================
-
 terraform:approve:
-
   stage: approve
-
   environment: main
-
   tags:
-
     - ShellR2
-
   needs:
-
     - terraform:plan
-
   when: manual
-
   allow_failure: false
-
   script:
-
     - echo "==> Approval granted by ${GITLAB_USER_NAME} at $(date -u)"
-
     - echo "==> Plans approved for commit ${CI_COMMIT_SHORT_SHA}"
- 
-# =============================================================================
 
+# =============================================================================
 # JOB 3 — APPLY (Static + Network + Infra, all layers sequentially)
-
 # =============================================================================
-
 terraform:apply:
-
   stage: apply
-
   environment: main
-
   tags:
-
     - ShellR2
-
   id_tokens:
-
     GCP_OIDC_TOKEN:
-
-      aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadId…
-
+      aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WORKLOAD_IDENTITY_POOL}/providers/${WORKLOAD_IDENTITY_PROVIDER}"
   needs:
-
     - job: terraform:plan
-
       artifacts: true
-
     - terraform:approve
-
   script:
-
     - *wif_auth
- 
-    - echo "========================================"
 
+    - echo "========================================"
     - echo "LAYER 1/3 — Static Apply"
-
     - echo "========================================"
-
     - mv "${TF_ROOT}/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/static/" 2>/dev/null || true
-
     - cd "${TF_ROOT}/static"
-
     - make apply ENVNAME="${TF_ENV}"
- 
-    - echo "========================================"
 
+    - echo "========================================"
     - echo "LAYER 2/3 — Network Apply"
-
     - echo "========================================"
-
     - mv "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/network/" 2>/dev/null || true
-
     - cd "${TF_ROOT}/network"
-
     - make apply ENVNAME="${TF_ENV}"
- 
-    - echo "========================================"
 
+    - echo "========================================"
     - echo "LAYER 3/3 — Infra Apply"
-
     - echo "========================================"
-
     - mv "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/infra/" 2>/dev/null || true
-
     - cd "${TF_ROOT}/infra"
-
     - make apply ENVNAME="${TF_ENV}"
- 
+
     - echo "==> All layers applied successfully."
-GitHub - tfutils/tfenv: Terraform version manager
-Terraform version manager. Contribute to tfutils/tfenv development by creating an account on GitHub.
- 
