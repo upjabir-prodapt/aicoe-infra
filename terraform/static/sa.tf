@@ -19,6 +19,6 @@ resource "google_project_iam_member" "aicoe_app_sa_iam" {
   ])
   project = "${var.project}${var.envname}"
   role    = each.value
-  member  = "serviceAccount:${google_service_account.aicoe_app_sa.email}"
+  ## member  = "serviceAccount:${google_service_account.aicoe_app_sa.email}"
 }
  

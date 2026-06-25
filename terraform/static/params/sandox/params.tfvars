@@ -1,5 +1,5 @@
-project = "aicoe"
-envname = "sandox"
+project = "ai-product-security"
+envname = "dev"
 region = "europe-west1"
 gcp_apis_required =[
 
