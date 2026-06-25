@@ -168,7 +168,6 @@ static:apply:
     - echo "========================================"
     - echo "STATIC — Apply"
     - echo "========================================"
-    - mv "${TF_ROOT}/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/static/" 2>/dev/null || true
     - cd "${TF_ROOT}/static"
     - make apply ENVNAME="${TF_ENV}"
     - echo "==> Static layer applied successfully."
@@ -227,7 +226,6 @@ network:apply:
     - echo "========================================"
     - echo "NETWORK — Apply"
     - echo "========================================"
-    - mv "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/network/" 2>/dev/null || true
     - cd "${TF_ROOT}/network"
     - make apply ENVNAME="${TF_ENV}"
     - echo "==> Network layer applied successfully."
@@ -286,7 +284,6 @@ infra:apply:
     - echo "========================================"
     - echo "INFRA — Apply"
     - echo "========================================"
-    - mv "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/infra/" 2>/dev/null || true
     - cd "${TF_ROOT}/infra"
     - make apply ENVNAME="${TF_ENV}"
     - echo "==> Infra layer applied successfully."
