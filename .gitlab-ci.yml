@@ -131,6 +131,14 @@ static:plan:
     - echo "========================================"
     - echo "STATIC — Plan"
     - echo "========================================"
+    - |
+      echo "ENV scope of this job: ${CI_ENVIRONMENT_NAME:-<none>}"
+      echo "POOL=${WORKLOAD_IDENTITY_POOL}"
+      echo "PROVIDER=${WORKLOAD_IDENTITY_PROVIDER}"
+      echo "PROJNUM=${WORKLOAD_IDENTITY_PROJECT_NUMBER}"
+      echo "SA=$(echo "$WIF_SERVICE_ACCOUNT" | sed 's/@.*/@.../')"
+      echo "GCP_PROJECT_ID=${GCP_PROJECT_ID:-<unset>}"
+
     - cd "${TF_ROOT}/static"
     - make plan ENVNAME="${TF_ENV}"
     - echo "==> Static plan complete. Awaiting approval."
