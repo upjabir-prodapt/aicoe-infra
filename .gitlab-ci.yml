@@ -117,7 +117,7 @@ stages:
   - infra-apply
 
 # =============================================================================
-# ██████████  STATIC LAYER  ██████████
+# STATIC LAYER
 # =============================================================================
 
 # --- STATIC: Plan ---
@@ -137,7 +137,7 @@ static:plan:
   artifacts:
     name: "tf-static-plan-${CI_COMMIT_SHORT_SHA}"
     paths:
-      - "${TF_ROOT}/static/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      - "${TF_ROOT}/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
     expire_in: 7 days
     when: on_success
 
@@ -168,12 +168,13 @@ static:apply:
     - echo "========================================"
     - echo "STATIC — Apply"
     - echo "========================================"
+    - mv "${TF_ROOT}/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/static/" 2>/dev/null || true
     - cd "${TF_ROOT}/static"
     - make apply ENVNAME="${TF_ENV}"
     - echo "==> Static layer applied successfully."
 
 # =============================================================================
-# ██████████  NETWORK LAYER  ██████████
+# NETWORK LAYER
 # =============================================================================
 
 # --- NETWORK: Plan ---
@@ -195,7 +196,7 @@ network:plan:
   artifacts:
     name: "tf-network-plan-${CI_COMMIT_SHORT_SHA}"
     paths:
-      - "${TF_ROOT}/network/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      - "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
     expire_in: 7 days
     when: on_success
 
@@ -226,12 +227,13 @@ network:apply:
     - echo "========================================"
     - echo "NETWORK — Apply"
     - echo "========================================"
+    - mv "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/network/" 2>/dev/null || true
     - cd "${TF_ROOT}/network"
     - make apply ENVNAME="${TF_ENV}"
     - echo "==> Network layer applied successfully."
 
 # =============================================================================
-# ██████████  INFRA LAYER  ██████████
+# INFRA LAYER
 # =============================================================================
 
 # --- INFRA: Plan ---
@@ -253,7 +255,7 @@ infra:plan:
   artifacts:
     name: "tf-infra-plan-${CI_COMMIT_SHORT_SHA}"
     paths:
-      - "${TF_ROOT}/infra/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      - "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
     expire_in: 7 days
     when: on_success
 
@@ -284,6 +286,7 @@ infra:apply:
     - echo "========================================"
     - echo "INFRA — Apply"
     - echo "========================================"
+    - mv "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/infra/" 2>/dev/null || true
     - cd "${TF_ROOT}/infra"
     - make apply ENVNAME="${TF_ENV}"
     - echo "==> Infra layer applied successfully."
