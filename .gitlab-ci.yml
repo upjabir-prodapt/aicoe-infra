@@ -1,7 +1,7 @@
 # =============================================================================
 # GitLab CI/CD Pipeline — Terraform on GCP via Workload Identity Federation
-# Single-job design: Plan (all layers) → Approve → Apply (all layers)
-# Runners: ShellR2 (#7) | Shell1/Shell2 (#3)
+# Segregated: Each layer has its own Plan → Approve → Apply
+# Runners: ShellR2
 # =============================================================================
 
 workflow:
@@ -95,109 +95,195 @@ variables:
 
   echo "==> WIF credential file written OK"
 
+# ---------------------------------------------------------------------------
+# Reusable id_tokens anchor
+# ---------------------------------------------------------------------------
+.id_tokens: &id_tokens
+  GCP_OIDC_TOKEN:
+    aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WORKLOAD_IDENTITY_POOL}/providers/${WORKLOAD_IDENTITY_PROVIDER}"
+
 # =============================================================================
 # STAGE ORDERING
 # =============================================================================
 stages:
-  - plan
-  - approve
-  - apply
+  - static-plan
+  - static-approve
+  - static-apply
+  - network-plan
+  - network-approve
+  - network-apply
+  - infra-plan
+  - infra-approve
+  - infra-apply
 
 # =============================================================================
-# JOB 1 — PLAN (Static + Network + Infra, all layers sequentially)
+# ██████████  STATIC LAYER  ██████████
 # =============================================================================
-terraform:plan:
-  stage: plan
+
+# --- STATIC: Plan ---
+static:plan:
+  stage: static-plan
   environment: main
-  tags:
-    - ShellR2
   id_tokens:
-    GCP_OIDC_TOKEN:
-      aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WORKLOAD_IDENTITY_POOL}/providers/${WORKLOAD_IDENTITY_PROVIDER}"
+    <<: *id_tokens
   script:
     - *wif_auth
-
     - echo "========================================"
-    - echo "LAYER 1/3 — Static Plan"
+    - echo "STATIC — Plan"
     - echo "========================================"
     - cd "${TF_ROOT}/static"
     - make plan ENVNAME="${TF_ENV}"
-
-    - echo "========================================"
-    - echo "LAYER 2/3 — Network Plan"
-    - echo "========================================"
-    - cd "${TF_ROOT}/network"
-    - make plan ENVNAME="${TF_ENV}"
-
-    - echo "========================================"
-    - echo "LAYER 3/3 — Infra Plan"
-    - echo "========================================"
-    - cd "${TF_ROOT}/infra"
-    - make plan ENVNAME="${TF_ENV}"
-
-    - echo "==> All plans complete. Awaiting approval."
+    - echo "==> Static plan complete. Awaiting approval."
   artifacts:
-    name: "tf-plans-${CI_COMMIT_SHORT_SHA}"
+    name: "tf-static-plan-${CI_COMMIT_SHORT_SHA}"
     paths:
-      - "${TF_ROOT}/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-      - "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-      - "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      - "${TF_ROOT}/static/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
     expire_in: 7 days
     when: on_success
 
-# =============================================================================
-# JOB 2 — APPROVE (manual gate)
-# =============================================================================
-terraform:approve:
-  stage: approve
+# --- STATIC: Approve ---
+static:approve:
+  stage: static-approve
   environment: main
-  tags:
-    - ShellR2
   needs:
-    - terraform:plan
+    - static:plan
   when: manual
   allow_failure: false
   script:
-    - echo "==> Approval granted by ${GITLAB_USER_NAME} at $(date -u)"
-    - echo "==> Plans approved for commit ${CI_COMMIT_SHORT_SHA}"
+    - echo "==> Static approval granted by ${GITLAB_USER_NAME} at $(date -u)"
+    - echo "==> Static plan approved for commit ${CI_COMMIT_SHORT_SHA}"
 
-# =============================================================================
-# JOB 3 — APPLY (Static + Network + Infra, all layers sequentially)
-# =============================================================================
-terraform:apply:
-  stage: apply
+# --- STATIC: Apply ---
+static:apply:
+  stage: static-apply
   environment: main
-  tags:
-    - ShellR2
   id_tokens:
-    GCP_OIDC_TOKEN:
-      aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WORKLOAD_IDENTITY_POOL}/providers/${WORKLOAD_IDENTITY_PROVIDER}"
+    <<: *id_tokens
   needs:
-    - job: terraform:plan
+    - job: static:plan
       artifacts: true
-    - terraform:approve
+    - static:approve
   script:
     - *wif_auth
-
     - echo "========================================"
-    - echo "LAYER 1/3 — Static Apply"
+    - echo "STATIC — Apply"
     - echo "========================================"
-    - mv "${TF_ROOT}/static-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/static/" 2>/dev/null || true
     - cd "${TF_ROOT}/static"
     - make apply ENVNAME="${TF_ENV}"
+    - echo "==> Static layer applied successfully."
 
+# =============================================================================
+# ██████████  NETWORK LAYER  ██████████
+# =============================================================================
+
+# --- NETWORK: Plan ---
+network:plan:
+  stage: network-plan
+  environment: main
+  id_tokens:
+    <<: *id_tokens
+  needs:
+    - static:apply
+  script:
+    - *wif_auth
     - echo "========================================"
-    - echo "LAYER 2/3 — Network Apply"
+    - echo "NETWORK — Plan"
     - echo "========================================"
-    - mv "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/network/" 2>/dev/null || true
+    - cd "${TF_ROOT}/network"
+    - make plan ENVNAME="${TF_ENV}"
+    - echo "==> Network plan complete. Awaiting approval."
+  artifacts:
+    name: "tf-network-plan-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - "${TF_ROOT}/network/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+    expire_in: 7 days
+    when: on_success
+
+# --- NETWORK: Approve ---
+network:approve:
+  stage: network-approve
+  environment: main
+  needs:
+    - network:plan
+  when: manual
+  allow_failure: false
+  script:
+    - echo "==> Network approval granted by ${GITLAB_USER_NAME} at $(date -u)"
+    - echo "==> Network plan approved for commit ${CI_COMMIT_SHORT_SHA}"
+
+# --- NETWORK: Apply ---
+network:apply:
+  stage: network-apply
+  environment: main
+  id_tokens:
+    <<: *id_tokens
+  needs:
+    - job: network:plan
+      artifacts: true
+    - network:approve
+  script:
+    - *wif_auth
+    - echo "========================================"
+    - echo "NETWORK — Apply"
+    - echo "========================================"
     - cd "${TF_ROOT}/network"
     - make apply ENVNAME="${TF_ENV}"
+    - echo "==> Network layer applied successfully."
 
+# =============================================================================
+# ██████████  INFRA LAYER  ██████████
+# =============================================================================
+
+# --- INFRA: Plan ---
+infra:plan:
+  stage: infra-plan
+  environment: main
+  id_tokens:
+    <<: *id_tokens
+  needs:
+    - network:apply
+  script:
+    - *wif_auth
     - echo "========================================"
-    - echo "LAYER 3/3 — Infra Apply"
+    - echo "INFRA — Plan"
     - echo "========================================"
-    - mv "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan" "${TF_ROOT}/infra/" 2>/dev/null || true
+    - cd "${TF_ROOT}/infra"
+    - make plan ENVNAME="${TF_ENV}"
+    - echo "==> Infra plan complete. Awaiting approval."
+  artifacts:
+    name: "tf-infra-plan-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - "${TF_ROOT}/infra/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+    expire_in: 7 days
+    when: on_success
+
+# --- INFRA: Approve ---
+infra:approve:
+  stage: infra-approve
+  environment: main
+  needs:
+    - infra:plan
+  when: manual
+  allow_failure: false
+  script:
+    - echo "==> Infra approval granted by ${GITLAB_USER_NAME} at $(date -u)"
+    - echo "==> Infra plan approved for commit ${CI_COMMIT_SHORT_SHA}"
+
+# --- INFRA: Apply ---
+infra:apply:
+  stage: infra-apply
+  environment: main
+  id_tokens:
+    <<: *id_tokens
+  needs:
+    - job: infra:plan
+      artifacts: true
+    - infra:approve
+  script:
+    - *wif_auth
+    - echo "========================================"
+    - echo "INFRA — Apply"
+    - echo "========================================"
     - cd "${TF_ROOT}/infra"
     - make apply ENVNAME="${TF_ENV}"
-
-    - echo "==> All layers applied successfully."
+    - echo "==> Infra layer applied successfully."
