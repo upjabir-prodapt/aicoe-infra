@@ -11,17 +11,3 @@ resource "google_compute_subnetwork" "aicoe_subnet" {
   private_ip_google_access = true
 
   }
- 
-###########################################
-###      AICOE  proxy subnet            ###
-###########################################
-
-resource "google_compute_subnetwork" "aicoe_proxy_only_subnet" {
-  name          = "${var.project}-proxy-subnet"
-  region        = var.region
-  network       = google_compute_network.aicoe_network.self_link
-  ip_cidr_range = var.aicoe_proxy_subnet_cidr_range
-  purpose       = "REGIONAL_MANAGED_PROXY"
-  role          = "ACTIVE"   
-
-  }

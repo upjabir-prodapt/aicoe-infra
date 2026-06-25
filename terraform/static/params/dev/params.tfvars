@@ -5,7 +5,6 @@ project_number = "566331480334"
 gcp_apis_required =[
 
     "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training
-    "dns.googleapis.com",                      # Cloud DNS - DNS zones and records
     "logging.googleapis.com",                  # Cloud Logging - log ingestion, sinks, routing
     "serviceusage.googleapis.com",             # Service Usage API - enable/disable APIs
     "compute.googleapis.com",                  # Compute Engine API 
