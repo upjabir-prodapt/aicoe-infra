@@ -3,7 +3,7 @@ resource "google_compute_global_address" "aicoe_psc_address" {
   address_type  = "INTERNAL"
   purpose       = "PRIVATE_SERVICE_CONNECT"
   network       = google_compute_network.aicoe_network.id
-  address       = "10.6.4.66"
+  address       = "10.6.4.67"
 }
 
 # IMPORTANT: PSC forwarding rule names for Google API bundles (all-apis, vpc-sc)
