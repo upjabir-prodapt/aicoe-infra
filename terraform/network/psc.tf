@@ -15,6 +15,6 @@ resource "google_compute_global_forwarding_rule" "aicoe_psc_google_apis" {
   ip_address            = google_compute_global_address.aicoe_psc_address.id
   target                = "all-apis"
   load_balancing_scheme = ""
-}
+} 
 
 
