@@ -1,7 +1,7 @@
 ENVNAME=dev
 PROJECT=ai-product-security
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
+TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-static
 TFPLAN_FILE=../static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
