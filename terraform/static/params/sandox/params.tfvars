@@ -1,4 +1,4 @@
-project = "ai-product-security"
+project = "ai-product-security-dev"
 envname = "dev"
 region = "europe-west1"
 gcp_apis_required =[

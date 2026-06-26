@@ -1,5 +1,5 @@
 ENVNAME=dev
-PROJECT=ai-product-security
+PROJECT=ai-product-security-dev
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-static
