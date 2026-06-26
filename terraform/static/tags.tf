@@ -1,8 +1,14 @@
-locals {
-  common_labels = {
-    env        = var.envname
-    system     = "${var.project}${var.envname}"
-    managed_by = "terraform"
-    team       = "aicoe"
-  }
+
+resource "google_tags_tag_key" "env" {
+   parent = "projects/${var.project}"
+   short_name = "environment"
+}
+resource "google_tags_tag_value" "env" {
+   parent = google_tags_tag_key.env.id
+   short_name = var.envname
+}
+# Bind the value to the whole project.
+resource "google_tags_tag_binding" "env_project" {
+   parent = "//cloudresourcemanager.googleapis.com/projects/${var.project}"
+   tag_value = google_tags_tag_value.env.id
 }
