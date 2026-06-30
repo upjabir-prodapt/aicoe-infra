@@ -26,7 +26,7 @@ init: static_safety_check clean get
  		-backend-config 'prefix=$(TFSTATE_DIR)'
     # For Hashicorp hosted state
 	#$(TF_EXEC) init \
-	#	-backend-config 'workspace{name=$(PROJECT)$(ENVNAME)}'
+	#	-backend-config 'workspace{name=$(PROJECT)-$(ENVNAME)}'
 
 plan: init
 	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars
