@@ -1,0 +1,314 @@
+include:
+  - local: .gitlab/ci/terraform-project.yml
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+
+stages:
+  - static_plan
+  - static_apply
+  - network_plan
+  - network_apply
+  - infra_plan
+  - infra_apply
+
+variables:
+  TF_REGION: europe-west1
+
+aicoesandox_static_plan:
+  extends: .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: aicoesandox
+    TF_LAYER: static
+    TF_ENV: sandox
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoesandox
+    TFSTATE_BUCKET: aicoesandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoesandox/**
+        - terraform/modules/**
+
+aicoesandox_static_apply:
+  extends: .terraform_apply
+  stage: static_apply
+  needs:
+    - job: aicoesandox_static_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: aicoesandox
+    TF_LAYER: static
+    TF_ENV: sandox
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoesandox
+    TFSTATE_BUCKET: aicoesandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoesandox/**
+        - terraform/modules/**
+      when: manual
+
+aicoesandox_network_plan:
+  extends: .terraform_plan
+  stage: network_plan
+  needs:
+    - job: aicoesandox_static_apply
+      artifacts: false
+  variables:
+    PROJECT_NAME: aicoesandox
+    TF_LAYER: network
+    TF_ENV: sandox
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoesandox
+    TFSTATE_BUCKET: aicoesandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoesandox/**
+        - terraform/modules/**
+
+aicoesandox_network_apply:
+  extends: .terraform_apply
+  stage: network_apply
+  needs:
+    - job: aicoesandox_network_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: aicoesandox
+    TF_LAYER: network
+    TF_ENV: sandox
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoesandox
+    TFSTATE_BUCKET: aicoesandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoesandox/**
+        - terraform/modules/**
+      when: manual
+
+aicoesandox_infra_plan:
+  extends: .terraform_plan
+  stage: infra_plan
+  needs:
+    - job: aicoesandox_network_apply
+      artifacts: false
+  variables:
+    PROJECT_NAME: aicoesandox
+    TF_LAYER: infra
+    TF_ENV: sandox
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoesandox
+    TFSTATE_BUCKET: aicoesandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoesandox/**
+        - terraform/modules/**
+
+aicoesandox_infra_apply:
+  extends: .terraform_apply
+  stage: infra_apply
+  needs:
+    - job: aicoesandox_infra_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: aicoesandox
+    TF_LAYER: infra
+    TF_ENV: sandox
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoesandox
+    TFSTATE_BUCKET: aicoesandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoesandox/**
+        - terraform/modules/**
+      when: manual
+
+ai_research_static_plan:
+  extends: .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: ai-research
+    TF_LAYER: static
+    TF_ENV: sandbox
+    TF_PROJECT: ai-research
+    GCP_PROJECT_ID: ai-research-sandbox-499209
+    TFSTATE_BUCKET: ai-research-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/ai-research/**
+        - terraform/modules/**
+
+ai_research_static_apply:
+  extends: .terraform_apply
+  stage: static_apply
+  needs:
+    - job: ai_research_static_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: ai-research
+    TF_LAYER: static
+    TF_ENV: sandbox
+    TF_PROJECT: ai-research
+    GCP_PROJECT_ID: ai-research-sandbox-499209
+    TFSTATE_BUCKET: ai-research-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/ai-research/**
+        - terraform/modules/**
+      when: manual
+
+pricing_agent_static_plan:
+  extends: .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: pricing-agent
+    TF_LAYER: static
+    TF_ENV: sandbox
+    TF_PROJECT: pricingagent
+    GCP_PROJECT_ID: pricingagent-sandbox
+    TFSTATE_BUCKET: pricingagent-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/pricing-agent/**
+        - terraform/modules/**
+
+pricing_agent_static_apply:
+  extends: .terraform_apply
+  stage: static_apply
+  needs:
+    - job: pricing_agent_static_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: pricing-agent
+    TF_LAYER: static
+    TF_ENV: sandbox
+    TF_PROJECT: pricingagent
+    GCP_PROJECT_ID: pricingagent-sandbox
+    TFSTATE_BUCKET: pricingagent-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/pricing-agent/**
+        - terraform/modules/**
+      when: manual
+
+aicoeaiworkshop_static_plan:
+  extends: .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: aicoeaiworkshop
+    TF_LAYER: static
+    TF_ENV: sandox
+    TF_PROJECT: aicoeaiworkshop
+    GCP_PROJECT_ID: aicoeaiworkshopsandox
+    TFSTATE_BUCKET: aicoeaiworkshopsandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoeaiworkshop/**
+        - terraform/modules/**
+
+aicoeaiworkshop_static_apply:
+  extends: .terraform_apply
+  stage: static_apply
+  needs:
+    - job: aicoeaiworkshop_static_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: aicoeaiworkshop
+    TF_LAYER: static
+    TF_ENV: sandox
+    TF_PROJECT: aicoeaiworkshop
+    GCP_PROJECT_ID: aicoeaiworkshopsandox
+    TFSTATE_BUCKET: aicoeaiworkshopsandox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/aicoeaiworkshop/**
+        - terraform/modules/**
+      when: manual
+
+svcmgmtops_static_plan:
+  extends: .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: svcmgmtops
+    TF_LAYER: static
+    TF_ENV: sandbox
+    TF_PROJECT: svcmgmtops
+    GCP_PROJECT_ID: svcmgmtops-sandbox
+    TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/svcmgmtops/**
+        - terraform/modules/**
+
+svcmgmtops_static_apply:
+  extends: .terraform_apply
+  stage: static_apply
+  needs:
+    - job: svcmgmtops_static_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: svcmgmtops
+    TF_LAYER: static
+    TF_ENV: sandbox
+    TF_PROJECT: svcmgmtops
+    GCP_PROJECT_ID: svcmgmtops-sandbox
+    TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/svcmgmtops/**
+        - terraform/modules/**
+      when: manual
+
+svcmgmtops_infra_plan:
+  extends: .terraform_plan
+  stage: infra_plan
+  needs:
+    - job: svcmgmtops_static_apply
+      artifacts: false
+  variables:
+    PROJECT_NAME: svcmgmtops
+    TF_LAYER: infra
+    TF_ENV: sandbox
+    TF_PROJECT: svcmgmtops
+    GCP_PROJECT_ID: svcmgmtops-sandbox
+    TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/svcmgmtops/**
+        - terraform/modules/**
+
+svcmgmtops_infra_apply:
+  extends: .terraform_apply
+  stage: infra_apply
+  needs:
+    - job: svcmgmtops_infra_plan
+      artifacts: true
+  variables:
+    PROJECT_NAME: svcmgmtops
+    TF_LAYER: infra
+    TF_ENV: sandbox
+    TF_PROJECT: svcmgmtops
+    GCP_PROJECT_ID: svcmgmtops-sandbox
+    TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+      changes:
+        - terraform/projects/svcmgmtops/**
+        - terraform/modules/**
+      when: manual

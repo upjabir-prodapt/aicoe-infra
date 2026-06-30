@@ -1,8 +1,4 @@
-output "aicoe_app_sa_email" {
-  value       = google_service_account.aicoe_app_sa.email
-  description = "Application service account used by Cloud Run and vector search APIs"
-}
-
-output "aicoe_ui_sa_email" {
-  value = google_service_account.aicoe_ui_sa.email
+output "service_account_emails" {
+  value       = { for key, sa in google_service_account.this : key => sa.email }
+  description = "Map of service account keys to email addresses"
 }

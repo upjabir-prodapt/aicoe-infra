@@ -1,23 +1,23 @@
-output "aicoe_network" {
-  value = google_compute_network.aicoe_network.self_link
+output "network_self_link" {
+  value = google_compute_network.network.self_link
 }
 
-output "aicoe_network_id" {
-  value = google_compute_network.aicoe_network.id
+output "network_id" {
+  value = google_compute_network.network.id
 }
 
-output "aicoe_subnet_name" {
-  value = google_compute_subnetwork.aicoe_subnet.self_link
+output "subnet_self_link" {
+  value = google_compute_subnetwork.subnet.self_link
 }
 
-output "aicoe_subnet_id" {
-  value = google_compute_subnetwork.aicoe_subnet.id
+output "subnet_id" {
+  value = google_compute_subnetwork.subnet.id
 }
 
-output "aicoe_proxy_only_subnet_name" {
-  value = google_compute_subnetwork.aicoe_proxy_only_subnet.self_link
+output "proxy_only_subnet_self_link" {
+  value = google_compute_subnetwork.proxy_only_subnet.self_link
 }
 
-output "aicoe_subnet_cidr" {
-  value = var.aicoe_subnet_cidr_range
+output "subnet_cidr_range" {
+  value = var.subnet_cidr_range
 }

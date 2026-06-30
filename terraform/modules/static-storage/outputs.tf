@@ -1,14 +1,9 @@
-output "aicoe_app_bucket_key_id" {
-  value = try(google_kms_crypto_key.aicoe_app_bucket_key[0].id, null)
+output "bucket_key_id" {
+  value = try(google_kms_crypto_key.bucket_key[0].id, null)
 }
 
-output "aicoe_vxai_wkb_key_id" {
-  value = try(google_kms_crypto_key.aicoe_vxai_wkb_key[0].id, null)
-}
-
-output "vector_search_bucket_name" {
-  value       = try(google_storage_bucket.buckets["vector-search"].name, null)
-  description = "GCS bucket for catalog embeddings and vector search artifacts"
+output "workbench_key_id" {
+  value = try(google_kms_crypto_key.workbench_key[0].id, null)
 }
 
 output "vertex_ai_service_agent_email" {

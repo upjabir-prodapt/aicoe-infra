@@ -2,15 +2,12 @@ variable "gcp_project_id" {
   type = string
 }
 
-variable "project" {
-  type = string
-}
-
-variable "envname" {
-  type = string
-}
-
-variable "resource_prefix" {
-  type        = string
-  description = "Prefix used for resource names, typically project+envname or project-envname"
+variable "service_accounts" {
+  type = map(object({
+    account_id                 = string
+    display_name               = string
+    roles                      = list(string)
+    grant_roles_to_account_key = optional(string)
+  }))
+  description = "Service accounts to create and project IAM roles to grant"
 }

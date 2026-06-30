@@ -4,8 +4,5 @@ resource "google_bigquery_dataset" "dataset" {
   project                    = var.gcp_project_id
   delete_contents_on_destroy = true
 
-  labels = {
-    env    = var.envname
-    system = var.resource_prefix
-  }
+  labels = var.labels
 }

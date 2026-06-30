@@ -2,14 +2,6 @@ variable "gcp_project_id" {
   type = string
 }
 
-variable "project" {
-  type = string
-}
-
-variable "envname" {
-  type = string
-}
-
 variable "region" {
   type = string
 }
@@ -35,15 +27,37 @@ variable "enable_workbench_kms" {
   default = true
 }
 
+variable "bucket_kms_key_ring_name_suffix" {
+  type        = string
+  default     = "bucket-key-ring"
+  description = "Suffix appended to resource_prefix for the bucket KMS key ring"
+}
+
+variable "bucket_kms_key_name_suffix" {
+  type        = string
+  default     = "bucket-key"
+  description = "Suffix appended to resource_prefix for the bucket KMS key"
+}
+
+variable "workbench_kms_key_ring_name_suffix" {
+  type        = string
+  default     = "workbench-key-ring"
+  description = "Suffix appended to resource_prefix for the optional workbench KMS key ring"
+}
+
+variable "workbench_kms_key_name_suffix" {
+  type        = string
+  default     = "workbench-key"
+  description = "Suffix appended to resource_prefix for the optional workbench KMS key"
+}
+
 variable "bucket_suffixes" {
-  type = list(string)
-  default = [
-    "vx-app-001",
-    "vxai-bs",
-    "vxai-translation-app-001",
-    "vxai-sales-app-001",
-    "vector-search",
-    "vxai-cont-mgmt-app-001",
-  ]
+  type        = list(string)
+  default     = []
   description = "Bucket name suffixes appended to resource_prefix"
+}
+
+variable "labels" {
+  type        = map(string)
+  description = "Canonical labels applied to label-capable resources"
 }

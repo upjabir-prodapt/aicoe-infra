@@ -1,22 +1,20 @@
-resource "google_artifact_registry_repository" "aicoe_artifact_repo" {
+resource "google_artifact_registry_repository" "repository" {
   project       = var.gcp_project_id
   location      = var.region
   repository_id = "${var.resource_prefix}-${var.artifact_format}-repo"
   format        = var.artifact_format
 
-  labels = {
-    env    = var.envname
-    system = var.resource_prefix
-  }
+  labels = var.labels
 
   docker_config {
     immutable_tags = true
   }
 }
 
-resource "google_storage_bucket_iam_member" "vector_search_vertex_sa" {
-  count  = var.vector_search_bucket_name != "" && var.vertex_ai_service_agent != "" ? 1 : 0
-  bucket = var.vector_search_bucket_name
-  role   = "roles/storage.objectViewer"
-  member = var.vertex_ai_service_agent
+resource "google_storage_bucket_iam_member" "bucket_iam_members" {
+  for_each = var.bucket_iam_members
+
+  bucket = each.value.bucket
+  role   = each.value.role
+  member = each.value.member
 }

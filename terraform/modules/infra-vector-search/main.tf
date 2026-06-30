@@ -1,23 +1,24 @@
 locals {
-  vector_search_deployed_index_id = "${var.resource_prefix}_vector_index"
+  vector_search_deployed_index_id = var.deployed_index_id
+  psc_project_allowlist           = length(var.psc_project_allowlist) > 0 ? var.psc_project_allowlist : [var.resource_prefix]
 }
 
-# Vertex AI Index (import console-created resource for sandox)
-resource "google_vertex_ai_index" "aicoe_vector_search_index" {
+resource "google_vertex_ai_index" "vector_search_index" {
   region       = var.region
   project      = var.gcp_project_id
-  display_name = "${var.resource_prefix}_salesagent_index"
+  display_name = var.index_display_name
+  labels       = var.labels
 
   metadata {
     config {
-      dimensions                   = 768
-      approximate_neighbors_count  = 10
-      distance_measure_type        = "DOT_PRODUCT_DISTANCE"
+      dimensions                  = var.dimensions
+      approximate_neighbors_count = var.approximate_neighbors_count
+      distance_measure_type       = var.distance_measure_type
 
       algorithm_config {
         tree_ah_config {
-          leaf_node_embedding_count    = 1000
-          leaf_nodes_to_search_percent = 7
+          leaf_node_embedding_count    = var.leaf_node_embedding_count
+          leaf_nodes_to_search_percent = var.leaf_nodes_to_search_percent
         }
       }
     }
@@ -31,18 +32,16 @@ resource "google_vertex_ai_index" "aicoe_vector_search_index" {
   }
 }
 
-# Vertex AI Index Endpoint (PSC-enabled; import console-created resource for sandox)
-resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
+resource "google_vertex_ai_index_endpoint" "vector_index_endpoint" {
   region       = var.region
   project      = var.gcp_project_id
-  display_name = "${var.resource_prefix}-salesagent-endpoint"
+  display_name = var.endpoint_display_name
   description  = "PSC-enabled index endpoint"
+  labels       = var.labels
 
   private_service_connect_config {
     enable_private_service_connect = true
-    project_allowlist = [
-      "${var.resource_prefix}",
-    ]
+    project_allowlist              = local.psc_project_allowlist
   }
 
   lifecycle {
@@ -50,20 +49,19 @@ resource "google_vertex_ai_index_endpoint" "aicoe_vector_index_endpoint" {
   }
 
   depends_on = [
-    google_vertex_ai_index.aicoe_vector_search_index,
+    google_vertex_ai_index.vector_search_index,
   ]
 }
 
-# Deployed Vector Search Index (import console-created resource for sandox)
-resource "google_vertex_ai_index_endpoint_deployed_index" "aicoe_vector_deployed_index" {
-  index_endpoint    = google_vertex_ai_index_endpoint.aicoe_vector_index_endpoint.id
-  index             = google_vertex_ai_index.aicoe_vector_search_index.id
+resource "google_vertex_ai_index_endpoint_deployed_index" "vector_deployed_index" {
+  index_endpoint    = google_vertex_ai_index_endpoint.vector_index_endpoint.id
+  index             = google_vertex_ai_index.vector_search_index.id
   deployed_index_id = local.vector_search_deployed_index_id
-  display_name      = "AICOE salesagent Deployed Index"
+  display_name      = var.deployed_index_display_name
 
   automatic_resources {
-    min_replica_count = 1
-    max_replica_count = 1
+    min_replica_count = var.min_replica_count
+    max_replica_count = var.max_replica_count
   }
 
   lifecycle {

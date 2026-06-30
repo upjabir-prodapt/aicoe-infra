@@ -1,37 +1,26 @@
-resource "google_service_account" "aicoe_app_sa" {
-  account_id   = "${var.resource_prefix}-app-sa"
-  display_name = "Service Account for Application"
+resource "google_service_account" "this" {
+  for_each = var.service_accounts
+
+  account_id   = each.value.account_id
+  display_name = each.value.display_name
   project      = var.gcp_project_id
 }
 
-resource "google_project_iam_member" "aicoe_app_sa_iam" {
-  for_each = toset([
-    "roles/aiplatform.admin",
-    "roles/aiplatform.user",
-    "roles/storage.admin",
-    "roles/bigquery.dataEditor",
-    "roles/bigquery.jobUser",
-    "roles/run.admin",
-    "roles/cloudtrace.agent",
-    "roles/iap.httpsResourceAccessor",
-    "roles/secretmanager.secretAccessor",
-  ])
-  project = var.gcp_project_id
-  role    = each.value
-  member  = "serviceAccount:${google_service_account.aicoe_app_sa.email}"
+locals {
+  iam_bindings = merge([
+    for sa_key, sa in var.service_accounts : {
+      for role in sa.roles : "${sa_key}-${role}" => {
+        role       = role
+        member_key = coalesce(sa.grant_roles_to_account_key, sa_key)
+      }
+    }
+  ]...)
 }
 
-resource "google_service_account" "aicoe_ui_sa" {
-  account_id   = "${var.resource_prefix}-ui-sa"
-  display_name = "Service Account for UI"
-  project      = var.gcp_project_id
-}
+resource "google_project_iam_member" "this" {
+  for_each = local.iam_bindings
 
-resource "google_project_iam_member" "aicoe_ui_sa_iam" {
-  for_each = toset([
-    "roles/run.invoker",
-  ])
   project = var.gcp_project_id
-  role    = each.value
-  member  = "serviceAccount:${google_service_account.aicoe_app_sa.email}"
+  role    = each.value.role
+  member  = "serviceAccount:${google_service_account.this[each.value.member_key].email}"
 }

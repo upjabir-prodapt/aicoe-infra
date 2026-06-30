@@ -1,30 +1,33 @@
-output "aicoe_staticip_ilb" {
-  value = try(google_compute_address.aicoe_staticip_ilb[0].address, null)
+output "reserved_internal_addresses" {
+  value = {
+    for key, address in google_compute_address.reserved_internal_address : key => {
+      address   = address.address
+      self_link = address.self_link
+      id        = address.id
+    }
+  }
+  description = "Regional internal IP reservations keyed by project-owned names"
 }
 
-output "aicoe_staticip_ilb_salesagent" {
-  value = try(google_compute_address.aicoe_staticip_ilb_salesagent[0].address, null)
+output "regional_psc_addresses" {
+  value = {
+    for key, address in google_compute_address.regional_psc_address : key => {
+      address   = address.address
+      self_link = address.self_link
+      id        = address.id
+    }
+  }
+  description = "Regional PSC endpoint IP reservations keyed by project-owned names"
 }
 
-output "aicoe_static_ilb_frontend_ip" {
-  value       = try(google_compute_address.aicoe_staticip_ilb_frontend[0].address, null)
-  description = "Internal IP for Frontend service ILB"
+output "psc_google_apis_ip" {
+  value = try(google_compute_global_address.psc_google_apis_address[0].address, null)
 }
 
-output "psc_endpoint_ip" {
-  value = try(google_compute_global_address.aicoe_psc_address[0].address, null)
+output "googleapis_dns_zone_name" {
+  value = try(google_dns_managed_zone.googleapis_private[0].name, null)
 }
 
-output "dns_zone_name" {
-  value = try(google_dns_managed_zone.aicoe_googleapis_private[0].name, null)
-}
-
-output "vector_search_psc_ip" {
-  value       = try(google_compute_address.aicoe_psc_vector_index_ip[0].address, null)
-  description = "Internal IP for PSC access to the vector index endpoint"
-}
-
-output "vector_search_psc_ip_self_link" {
-  value       = try(google_compute_address.aicoe_psc_vector_index_ip[0].self_link, null)
-  description = "Self link for the vector search PSC reserved IP"
+output "internal_dns_zone_name" {
+  value = try(google_dns_managed_zone.internal[0].name, null)
 }

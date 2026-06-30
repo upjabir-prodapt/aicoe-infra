@@ -2,14 +2,6 @@ variable "gcp_project_id" {
   type = string
 }
 
-variable "project" {
-  type = string
-}
-
-variable "envname" {
-  type = string
-}
-
 variable "region" {
   type = string
 }
@@ -44,4 +36,9 @@ variable "network_self_link" {
 
 variable "subnet_self_link" {
   type = string
+}
+
+variable "labels" {
+  type        = map(string)
+  description = "Canonical labels applied to label-capable resources"
 }

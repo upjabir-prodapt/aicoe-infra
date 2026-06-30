@@ -2,7 +2,7 @@ variable "gcp_project_id" {
   type = string
 }
 
-variable "envname" {
+variable "environment_name" {
   type = string
 }
 

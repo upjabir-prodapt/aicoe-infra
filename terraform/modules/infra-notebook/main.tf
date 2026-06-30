@@ -1,4 +1,4 @@
-resource "google_workbench_instance" "aicoe_vertex_ai_workbench" {
+resource "google_workbench_instance" "workbench_instance" {
   name        = "${var.resource_prefix}-notebook"
   location    = "${var.region}-b"
   project     = var.gcp_project_id
@@ -39,10 +39,7 @@ resource "google_workbench_instance" "aicoe_vertex_ai_workbench" {
     }
   }
 
-  labels = {
-    env    = var.envname
-    system = var.resource_prefix
-  }
+  labels = var.labels
 
   timeouts {
     create = "15m"

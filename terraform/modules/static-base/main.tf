@@ -38,7 +38,7 @@ resource "google_tags_tag_key" "env" {
 
 resource "google_tags_tag_value" "env" {
   parent     = google_tags_tag_key.env.id
-  short_name = var.envname
+  short_name = var.environment_name
 }
 
 resource "google_tags_tag_binding" "env_project" {
