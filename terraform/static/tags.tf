@@ -1,6 +1,6 @@
 
 resource "google_tags_tag_key" "env" {
-   parent = "projects/${var.project}"
+   parent = "projects/${var.project}-${var.envname}"
    short_name = "environment"
 }
 resource "google_tags_tag_value" "env" {
@@ -9,6 +9,6 @@ resource "google_tags_tag_value" "env" {
 }
 # Bind the value to the whole project.
 resource "google_tags_tag_binding" "env_project" {
-   parent = "//cloudresourcemanager.googleapis.com/projects/${var.project}"
+   parent = "//cloudresourcemanager.googleapis.com/projects/${var.project}-${var.envname}"
    tag_value = google_tags_tag_value.env.id
 }

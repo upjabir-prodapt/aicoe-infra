@@ -3,7 +3,7 @@ PROJECT=ai-product-security
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-static
-TFPLAN_FILE=../static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
+TFPLAN_FILE=../static-$(PROJECT)-$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 # CREDS_FILE=../$(PROJECT)$(ENVNAME).json
@@ -61,7 +61,7 @@ else
 ifeq ($(ENVNAME), prod)
 	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	@echo -n "\nLIVE SELECTED - ARE YOU SURE YOU WANT TO CONTINUE?"
-	@echo -n "\n[type '$(PROJECT)$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
+	@echo -n "\n[type '$(PROJECT)-$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)-$(ENVNAME) ]
 else
 	@echo "non-live selected, continuing without safety check prompt."
 endif
