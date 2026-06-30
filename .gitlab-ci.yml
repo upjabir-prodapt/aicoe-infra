@@ -1,12 +1,28 @@
 # =============================================================================
 # GitLab CI/CD Pipeline — Terraform on GCP via Workload Identity Federation
-# Segregated: Each layer has its own Plan → Approve → Apply
+# Segregated layers: static -> network -> infra, each Plan -> Approve -> Apply
 # Runners: ShellR2
+#
+# REUSABLE ACROSS BRANCHES/ENVIRONMENTS
+# --------------------------------------
+# Add one entry to .env_map below per branch you want to deploy from, then
+# create the matching GitLab CI/CD variables (Project or Group level) for
+# that environment:
+#   TF_ENV, TF_PROJECT, TF_REGION, WORKLOAD_IDENTITY_PROJECT_NUMBER,
+#   WORKLOAD_IDENTITY_POOL, WORKLOAD_IDENTITY_PROVIDER, WIF_SERVICE_ACCOUNT
+#
+# Tip: if these differ per branch/environment, scope each variable in
+# Settings -> CI/CD -> Variables to the relevant "Environment" (matching the
+# `environment:` keyword used in the jobs below) instead of hardcoding here.
 # =============================================================================
 
 workflow:
   rules:
+    # Add every branch that is allowed to run this pipeline here.
     - if: '$CI_COMMIT_BRANCH == "billproject"'
+### - if: '$CI_COMMIT_BRANCH == "dev"'
+### - if: '$CI_COMMIT_BRANCH == "staging"'
+### - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------------------------------------------------------
 # Default settings
@@ -16,10 +32,26 @@ default:
     - ShellR2
   before_script:
     - npm config delete prefix 2>/dev/null || true
+    - !reference [.validate_vars, script]
+    - !reference [.install_terraform, script]
+
+# ---------------------------------------------------------------------------
+# Pipeline-wide variables
+# ---------------------------------------------------------------------------
+variables:
+  TF_ROOT: "${CI_PROJECT_DIR}/terraform"
+  GOOGLE_APPLICATION_CREDENTIALS: "${CI_PROJECT_DIR}/.workload_identity.wlconfig"
+  SKIP_INTERACTIVE_SAFETY_PROMPT: "true"
+  TF_VERSION: "1.8.5"
+
+# ---------------------------------------------------------------------------
+# Hidden template: validate required CI/CD variables
+# ---------------------------------------------------------------------------
+.validate_vars:
+  script:
     - |
       set -euo pipefail
-
-      echo "==> Validating required CI/CD variables..."
+      echo "==> Validating required CI/CD variables for branch ${CI_COMMIT_BRANCH}..."
       MISSING=""
       for VAR in TF_ENV TF_PROJECT TF_REGION WORKLOAD_IDENTITY_PROJECT_NUMBER WORKLOAD_IDENTITY_POOL WORKLOAD_IDENTITY_PROVIDER WIF_SERVICE_ACCOUNT; do
         if [ -z "${!VAR:-}" ]; then
@@ -30,17 +62,22 @@ default:
         fi
       done
       if [ -n "$MISSING" ]; then
-        echo "ERROR: Missing variables. Check GitLab Settings -> CI/CD -> Variables."
-        echo "If set at Group level, ensure the variable is NOT marked Protected (or protect the billproject branch)."
+        echo "ERROR: Missing variables:$MISSING"
+        echo "Check GitLab Settings -> CI/CD -> Variables."
+        echo "If set at Group level, ensure the variable is NOT marked Protected (or protect this branch),"
+        echo "and that it is scoped to the correct Environment if you use environment-scoped variables."
         exit 1
       fi
       echo "==> All required variables present."
 
+# ---------------------------------------------------------------------------
+# Hidden template: install/select Terraform via tfenv
+# ---------------------------------------------------------------------------
+.install_terraform:
+  script:
     - |
       set -euo pipefail
       TFENV_DIR="$HOME/.tfenv"
-      TF_VERSION="${TF_VERSION:-1.8.5}"
-
       echo "==> [1/4] Checking tfenv..."
       if [ ! -d "$TFENV_DIR" ]; then
         echo "  Cloning tfenv..."
@@ -48,43 +85,29 @@ default:
       else
         echo "  tfenv already present — skipping clone"
       fi
-
       echo "==> [2/4] Adding tfenv to PATH..."
       export PATH="$TFENV_DIR/bin:$PATH"
-
-      echo "==> [3/4] Checking Terraform $TF_VERSION..."
-      if tfenv list 2>/dev/null | grep -qF "$TF_VERSION"; then
+      echo "==> [3/4] Checking Terraform ${TF_VERSION}..."
+      if tfenv list 2>/dev/null | grep -qF "${TF_VERSION}"; then
         echo "  Already installed — skipping"
       else
-        tfenv install "$TF_VERSION"
+        tfenv install "${TF_VERSION}"
       fi
-
-      echo "==> [4/4] Activating Terraform $TF_VERSION..."
-      tfenv use "$TF_VERSION"
+      echo "==> [4/4] Activating Terraform ${TF_VERSION}..."
+      tfenv use "${TF_VERSION}"
       terraform version
 
 # ---------------------------------------------------------------------------
-# Pipeline-wide variables
-# ---------------------------------------------------------------------------
-variables:
-  TF_ROOT: "${CI_PROJECT_DIR}/terraform"
-  GOOGLE_APPLICATION_CREDENTIALS: "${CI_PROJECT_DIR}/.workload_identity.wlconfig"
-  SKIP_INTERACTIVE_SAFETY_PROMPT: "true"
-
-# ---------------------------------------------------------------------------
-# Hidden anchor: WIF token exchange
+# Hidden template: WIF token exchange (writes ADC credential file)
 # ---------------------------------------------------------------------------
 .wif_auth: &wif_auth |
   export PATH="$HOME/.tfenv/bin:$PATH"
   echo "==> Writing WIF credential file..."
-
   if [ -z "${GCP_OIDC_TOKEN:-}" ]; then
     echo "ERROR: GCP_OIDC_TOKEN is empty. Ensure id_tokens block is in this job."
     exit 1
   fi
-
   echo "${GCP_OIDC_TOKEN}" > "${CI_PROJECT_DIR}/.workload_identity.jwt"
-
   printf '{\n  "type": "external_account",\n  "audience": "//iam.googleapis.com/projects/%s/locations/global/workloadIdentityPools/%s/providers/%s",\n  "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",\n  "token_url": "https://sts.googleapis.com/v1/token",\n  "credential_source": {\n    "file": "%s/.workload_identity.jwt"\n  },\n  "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/%s:generateAccessToken"\n}\n' \
     "${WORKLOAD_IDENTITY_PROJECT_NUMBER}" \
     "${WORKLOAD_IDENTITY_POOL}" \
@@ -92,7 +115,6 @@ variables:
     "${CI_PROJECT_DIR}" \
     "${WIF_SERVICE_ACCOUNT}" \
     > "${GOOGLE_APPLICATION_CREDENTIALS}"
-
   echo "==> WIF credential file written OK"
 
 # ---------------------------------------------------------------------------
@@ -102,6 +124,47 @@ variables:
   GCP_OIDC_TOKEN:
     aud: "https://iam.googleapis.com/projects/${WORKLOAD_IDENTITY_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WORKLOAD_IDENTITY_POOL}/providers/${WORKLOAD_IDENTITY_PROVIDER}"
 
+# ---------------------------------------------------------------------------
+# Reusable job templates — one set of rules drives every layer below,
+# so adding a 4th layer is just 3 jobs using these `extends`.
+# ---------------------------------------------------------------------------
+.plan_template:
+  id_tokens:
+    <<: *id_tokens
+  artifacts:
+    name: "tf-${LAYER}-plan-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - "${TF_ROOT}/${LAYER}-${TF_PROJECT}-${TF_ENV}-${TF_REGION}-tf.plan"
+    expire_in: 7 days
+    when: on_success
+  script:
+    - *wif_auth
+    - echo "========================================"
+    - echo "${LAYER} — Plan (branch ${CI_COMMIT_BRANCH}, env ${TF_ENV})"
+    - echo "========================================"
+    - cd "${TF_ROOT}/${LAYER}"
+    - make plan ENVNAME="${TF_ENV}"
+    - echo "==> ${LAYER} plan complete. Awaiting approval."
+
+.approve_template:
+  when: manual
+  allow_failure: false
+  script:
+    - echo "==> ${LAYER} approval granted by ${GITLAB_USER_NAME} at $(date -u)"
+    - echo "==> ${LAYER} plan approved for commit ${CI_COMMIT_SHORT_SHA} on branch ${CI_COMMIT_BRANCH}"
+
+.apply_template:
+  id_tokens:
+    <<: *id_tokens
+  script:
+    - *wif_auth
+    - echo "========================================"
+    - echo "${LAYER} — Apply (branch ${CI_COMMIT_BRANCH}, env ${TF_ENV})"
+    - echo "========================================"
+    - cd "${TF_ROOT}/${LAYER}"
+    - make apply ENVNAME="${TF_ENV}"
+    - echo "==> ${LAYER} layer applied successfully."
+
 # =============================================================================
 # STAGE ORDERING
 # =============================================================================
@@ -109,181 +172,103 @@ stages:
   - static-plan
   - static-approve
   - static-apply
-  - network-plan
-  - network-approve
-  - network-apply
-  - infra-plan
-  - infra-approve
-  - infra-apply
-
+###  - network-plan
+###  - network-approve
+###  - network-apply
+###  - infra-plan
+###  - infra-approve
+###  - infra-apply
+###
 # =============================================================================
 # STATIC LAYER
 # =============================================================================
-
-# --- STATIC: Plan ---
 static:plan:
+  extends: .plan_template
   stage: static-plan
-  environment: billproject
-  id_tokens:
-    <<: *id_tokens
-  script:
-    - *wif_auth
-    - echo "========================================"
-    - echo "STATIC — Plan"
-    - echo "========================================"
-    - cd "${TF_ROOT}/static"
-    - make plan ENVNAME="${TF_ENV}"
-    - echo "==> Static plan complete. Awaiting approval."
-  artifacts:
-    name: "tf-static-plan-${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - "${TF_ROOT}/static-${TF_PROJECT}-${TF_ENV}-${TF_REGION}-tf.plan"
-    expire_in: 7 days
-    when: on_success
+  environment: "$CI_COMMIT_BRANCH"
+  variables:
+    LAYER: "static"
 
-# --- STATIC: Approve ---
 static:approve:
+  extends: .approve_template
   stage: static-approve
-  environment: billproject
+  environment: "$CI_COMMIT_BRANCH"
   needs:
     - static:plan
-  when: manual
-  allow_failure: false
-  script:
-    - echo "==> Static approval granted by ${GITLAB_USER_NAME} at $(date -u)"
-    - echo "==> Static plan approved for commit ${CI_COMMIT_SHORT_SHA}"
+  variables:
+    LAYER: "static"
 
-# --- STATIC: Apply ---
 static:apply:
+  extends: .apply_template
   stage: static-apply
-  environment: billproject
-  id_tokens:
-    <<: *id_tokens
+  environment: "$CI_COMMIT_BRANCH"
   needs:
     - job: static:plan
       artifacts: true
     - static:approve
-  script:
-    - *wif_auth
-    - echo "========================================"
-    - echo "STATIC — Apply"
-    - echo "========================================"
-    - cd "${TF_ROOT}/static"
-    - make apply ENVNAME="${TF_ENV}"
-    - echo "==> Static layer applied successfully."
-###
+  variables:
+    LAYER: "static"
+
 #### =============================================================================
 #### NETWORK LAYER
 #### =============================================================================
-###
-#### --- NETWORK: Plan ---
 ###network:plan:
+###  extends: .plan_template
 ###  stage: network-plan
-###  environment: billproject
-###  id_tokens:
-###    <<: *id_tokens
+###  environment: "$CI_COMMIT_BRANCH"
 ###  needs:
 ###    - static:apply
-###  script:
-###    - *wif_auth
-###    - echo "========================================"
-###    - echo "NETWORK — Plan"
-###    - echo "========================================"
-###    - cd "${TF_ROOT}/network"
-###    - make plan ENVNAME="${TF_ENV}"
-###    - echo "==> Network plan complete. Awaiting approval."
-###  artifacts:
-###    name: "tf-network-plan-${CI_COMMIT_SHORT_SHA}"
-###    paths:
-###      - "${TF_ROOT}/network-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-###    expire_in: 7 days
-###    when: on_success
+###  variables:
+###    LAYER: "network"
 ###
-#### --- NETWORK: Approve ---
 ###network:approve:
+###  extends: .approve_template
 ###  stage: network-approve
-###  environment: billproject
+###  environment: "$CI_COMMIT_BRANCH"
 ###  needs:
 ###    - network:plan
-###  when: manual
-###  allow_failure: false
-###  script:
-###    - echo "==> Network approval granted by ${GITLAB_USER_NAME} at $(date -u)"
-###    - echo "==> Network plan approved for commit ${CI_COMMIT_SHORT_SHA}"
+###  variables:
+###    LAYER: "network"
 ###
-#### --- NETWORK: Apply ---
 ###network:apply:
+###  extends: .apply_template
 ###  stage: network-apply
-###  environment: billproject
-###  id_tokens:
-###    <<: *id_tokens
+###  environment: "$CI_COMMIT_BRANCH"
 ###  needs:
 ###    - job: network:plan
 ###      artifacts: true
 ###    - network:approve
-###  script:
-###    - *wif_auth
-###    - echo "========================================"
-###    - echo "NETWORK — Apply"
-###    - echo "========================================"
-###    - cd "${TF_ROOT}/network"
-###    - make apply ENVNAME="${TF_ENV}"
-###    - echo "==> Network layer applied successfully."
+###  variables:
+###    LAYER: "network"
 ###
 #### =============================================================================
 #### INFRA LAYER
 #### =============================================================================
-###
-#### --- INFRA: Plan ---
 ###infra:plan:
+###  extends: .plan_template
 ###  stage: infra-plan
-###  environment: billproject
-###  id_tokens:
-###    <<: *id_tokens
+###  environment: "$CI_COMMIT_BRANCH"
 ###  needs:
 ###    - network:apply
-###  script:
-###    - *wif_auth
-###    - echo "========================================"
-###    - echo "INFRA — Plan"
-###    - echo "========================================"
-###    - cd "${TF_ROOT}/infra"
-###    - make plan ENVNAME="${TF_ENV}"
-###    - echo "==> Infra plan complete. Awaiting approval."
-###  artifacts:
-###    name: "tf-infra-plan-${CI_COMMIT_SHORT_SHA}"
-###    paths:
-###      - "${TF_ROOT}/infra-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-###    expire_in: 7 days
-###    when: on_success
+###  variables:
+###    LAYER: "infra"
 ###
-#### --- INFRA: Approve ---
 ###infra:approve:
+###  extends: .approve_template
 ###  stage: infra-approve
-###  environment: billproject
+###  environment: "$CI_COMMIT_BRANCH"
 ###  needs:
 ###    - infra:plan
-###  when: manual
-###  allow_failure: false
-###  script:
-###    - echo "==> Infra approval granted by ${GITLAB_USER_NAME} at $(date -u)"
-###    - echo "==> Infra plan approved for commit ${CI_COMMIT_SHORT_SHA}"
+###  variables:
+###    LAYER: "infra"
 ###
-#### --- INFRA: Apply ---
 ###infra:apply:
+###  extends: .apply_template
 ###  stage: infra-apply
-###  environment: billproject
-###  id_tokens:
-###    <<: *id_tokens
+###  environment: "$CI_COMMIT_BRANCH"
 ###  needs:
 ###    - job: infra:plan
 ###      artifacts: true
 ###    - infra:approve
-###  script:
-###    - *wif_auth
-###    - echo "========================================"
-###    - echo "INFRA — Apply"
-###    - echo "========================================="
-###    - cd "${TF_ROOT}/infra"
-###    - make apply ENVNAME="${TF_ENV}"
-###    - echo "==> Infra layer applied successfully."
+###  variables:
+###    LAYER: "infra"
