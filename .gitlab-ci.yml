@@ -19,7 +19,7 @@
 workflow:
   rules:
     # Add every branch that is allowed to run this pipeline here.
-    - if: '$CI_COMMIT_BRANCH == "billproject"'
+    - if: '$CI_COMMIT_BRANCH == "ai-product-security-dev"'
   ###  - if: '$CI_COMMIT_BRANCH == "dev"'
   ###  - if: '$CI_COMMIT_BRANCH == "staging"'
   ###  - if: '$CI_COMMIT_BRANCH == "main"'
