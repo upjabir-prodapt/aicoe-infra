@@ -5,22 +5,21 @@ trigger:
       - sandbox-v1
   paths:
     include:
-      - terraform/projects/aicoe-core/**
+      - terraform/projects/aicoeaiworkshop/**
       - terraform/modules/**
-      - pipelines/**
 
 pool:
   vmImage: ubuntu-latest
 
 extends:
-  template: pipelines/pipeline-template.yml
+  template: pipeline-template.yml
   parameters:
-    projectName: aicoe-core
+    projectName: aicoeaiworkshop
     tfEnv: sandox
-    tfProject: aicoe
-    gcpProjectId: aicoesandox
-    gcpProjectNumber: '297743845367'
+    tfProject: aicoeaiworkshop
+    gcpProjectId: aicoeaiworkshopsandox
+    gcpProjectNumber: '775524029915'
     wifServiceAccount: aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com
     enableStatic: true
-    enableNetwork: true
-    enableInfra: true
+    enableNetwork: false
+    enableInfra: false

@@ -1,0 +1,25 @@
+trigger:
+  branches:
+    include:
+      - main
+      - sandbox-v1
+  paths:
+    include:
+      - terraform/projects/ai-research/**
+      - terraform/modules/**
+
+pool:
+  vmImage: ubuntu-latest
+
+extends:
+  template: pipeline-template.yml
+  parameters:
+    projectName: ai-research
+    tfEnv: sandbox
+    tfProject: ai-research
+    gcpProjectId: ai-research-sandbox-499209
+    gcpProjectNumber: '1074004789564'
+    wifServiceAccount: aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com
+    enableStatic: true
+    enableNetwork: false
+    enableInfra: false

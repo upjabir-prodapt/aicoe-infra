@@ -1,0 +1,25 @@
+trigger:
+  branches:
+    include:
+      - main
+      - sandbox-v1
+  paths:
+    include:
+      - terraform/projects/pricing-agent/**
+      - terraform/modules/**
+
+pool:
+  vmImage: ubuntu-latest
+
+extends:
+  template: pipeline-template.yml
+  parameters:
+    projectName: pricing-agent
+    tfEnv: sandbox
+    tfProject: pricingagent
+    gcpProjectId: pricingagent-sandbox
+    gcpProjectNumber: '571016044556'
+    wifServiceAccount: aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com
+    enableStatic: true
+    enableNetwork: false
+    enableInfra: false

@@ -1,0 +1,6 @@
+project_name    = "omfocuslane"
+project         = "om-focus-lane"
+envname         = "dev"
+region          = "europe-west1"
+gcp_project_id  = "om-focus-lane"
+resource_prefix = "om-focus-lane-dev"

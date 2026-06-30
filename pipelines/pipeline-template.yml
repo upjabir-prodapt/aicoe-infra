@@ -1,0 +1,238 @@
+parameters:
+  - name: projectName
+    type: string
+  - name: tfEnv
+    type: string
+  - name: tfProject
+    type: string
+    default: 'aicoe'
+  - name: tfRegion
+    type: string
+    default: 'europe-west1'
+  - name: gcpProjectId
+    type: string
+  - name: gcpProjectNumber
+    type: string
+  - name: wifServiceAccount
+    type: string
+  - name: enableStatic
+    type: boolean
+    default: true
+  - name: enableNetwork
+    type: boolean
+    default: true
+  - name: enableInfra
+    type: boolean
+    default: true
+
+variables:
+  TF_ROOT: '$(Build.SourcesDirectory)/terraform/projects/${{ parameters.projectName }}'
+  TF_ENV: '${{ parameters.tfEnv }}'
+  TF_PROJECT: '${{ parameters.tfProject }}'
+  TF_REGION: '${{ parameters.tfRegion }}'
+  GCP_PROJECT_ID: '${{ parameters.gcpProjectId }}'
+  GoogleCloud.WorkloadIdentity.ProjectNumber: '${{ parameters.gcpProjectNumber }}'
+  GoogleCloud.WorkloadIdentity.ServiceAccount: '${{ parameters.wifServiceAccount }}'
+  SKIP_INTERACTIVE_SAFETY_PROMPT: 'true'
+  GOOGLE_APPLICATION_CREDENTIALS: '$(Pipeline.Workspace)/.workload_identity.wlconfig'
+
+stages:
+- ${{ if eq(parameters.enableStatic, true) }}:
+  - stage: Static_Plan
+    displayName: '${{ parameters.projectName }} Static Plan'
+    jobs:
+      - job: Static_Plan_Job
+        steps:
+          - checkout: self
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+          - task: AzureCLI@3
+            displayName: Static Plan
+            inputs:
+              azureSubscription: 'sc-ado-gcp-aicoe'
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+                cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+                {"type":"external_account","audience":"//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/aicoesandox-ado-wip/providers/aicoesandox-ado-wip-provider","subject_token_type":"urn:ietf:params:oauth:token-type:jwt","token_url":"https://sts.googleapis.com/v1/token","credential_source":{"file":"$(Pipeline.Workspace)/.workload_identity.jwt"},"service_account_impersonation_url":"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"}
+                EOF
+                cd $(TF_ROOT)/static
+                make plan ENVNAME=$(TF_ENV)
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)/terraform/projects/${{ parameters.projectName }}-${{ parameters.projectName }}-static-$(TF_PROJECT)$(TF_ENV)-$(TF_REGION)-tf.plan'
+              ArtifactName: 'plan-static-${{ parameters.projectName }}'
+
+  - stage: Static_Approve
+    displayName: '${{ parameters.projectName }} Static Approve'
+    dependsOn: Static_Plan
+    jobs:
+      - deployment: Static_Approve
+        environment: $(TF_ENV)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: echo "Approval granted for Static"
+
+  - stage: Static_Apply
+    displayName: '${{ parameters.projectName }} Static Apply'
+    dependsOn: Static_Approve
+    jobs:
+      - job: Static_Apply
+        steps:
+          - checkout: self
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              artifactName: 'plan-static-${{ parameters.projectName }}'
+              downloadPath: '$(Build.SourcesDirectory)/terraform/projects'
+          - task: AzureCLI@3
+            displayName: Static Apply
+            inputs:
+              azureSubscription: 'sc-ado-gcp-aicoe'
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+                cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+                {"type":"external_account","audience":"//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/aicoesandox-ado-wip/providers/aicoesandox-ado-wip-provider","subject_token_type":"urn:ietf:params:oauth:token-type:jwt","token_url":"https://sts.googleapis.com/v1/token","credential_source":{"file":"$(Pipeline.Workspace)/.workload_identity.jwt"},"service_account_impersonation_url":"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"}
+                EOF
+                cd $(TF_ROOT)/static
+                make apply ENVNAME=$(TF_ENV)
+
+- ${{ if eq(parameters.enableNetwork, true) }}:
+  - stage: Network_Plan
+    displayName: '${{ parameters.projectName }} Network Plan'
+    ${{ if eq(parameters.enableStatic, true) }}:
+      dependsOn: Static_Apply
+    jobs:
+      - job: Network_Plan_Job
+        steps:
+          - checkout: self
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+          - task: AzureCLI@3
+            displayName: Network Plan
+            inputs:
+              azureSubscription: 'sc-ado-gcp-aicoe'
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+                cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+                {"type":"external_account","audience":"//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/aicoesandox-ado-wip/providers/aicoesandox-ado-wip-provider","subject_token_type":"urn:ietf:params:oauth:token-type:jwt","token_url":"https://sts.googleapis.com/v1/token","credential_source":{"file":"$(Pipeline.Workspace)/.workload_identity.jwt"},"service_account_impersonation_url":"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"}
+                EOF
+                cd $(TF_ROOT)/network
+                make plan ENVNAME=$(TF_ENV)
+
+  - stage: Network_Approve
+    displayName: '${{ parameters.projectName }} Network Approve'
+    dependsOn: Network_Plan
+    jobs:
+      - deployment: Network_Approve
+        environment: $(TF_ENV)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: echo "Approval granted for Network"
+
+  - stage: Network_Apply
+    displayName: '${{ parameters.projectName }} Network Apply'
+    dependsOn: Network_Approve
+    jobs:
+      - job: Network_Apply
+        steps:
+          - checkout: self
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+          - task: AzureCLI@3
+            displayName: Network Apply
+            inputs:
+              azureSubscription: 'sc-ado-gcp-aicoe'
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+                cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+                {"type":"external_account","audience":"//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/aicoesandox-ado-wip/providers/aicoesandox-ado-wip-provider","subject_token_type":"urn:ietf:params:oauth:token-type:jwt","token_url":"https://sts.googleapis.com/v1/token","credential_source":{"file":"$(Pipeline.Workspace)/.workload_identity.jwt"},"service_account_impersonation_url":"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"}
+                EOF
+                cd $(TF_ROOT)/network
+                make apply ENVNAME=$(TF_ENV)
+
+- ${{ if eq(parameters.enableInfra, true) }}:
+  - stage: Infra_Plan
+    displayName: '${{ parameters.projectName }} Infra Plan'
+    ${{ if eq(parameters.enableNetwork, true) }}:
+      dependsOn: Network_Apply
+    ${{ elseif eq(parameters.enableStatic, true) }}:
+      dependsOn: Static_Apply
+    jobs:
+      - job: Infra_Plan_Job
+        steps:
+          - checkout: self
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+          - task: AzureCLI@3
+            displayName: Infra Plan
+            inputs:
+              azureSubscription: 'sc-ado-gcp-aicoe'
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+                cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+                {"type":"external_account","audience":"//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/aicoesandox-ado-wip/providers/aicoesandox-ado-wip-provider","subject_token_type":"urn:ietf:params:oauth:token-type:jwt","token_url":"https://sts.googleapis.com/v1/token","credential_source":{"file":"$(Pipeline.Workspace)/.workload_identity.jwt"},"service_account_impersonation_url":"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"}
+                EOF
+                cd $(TF_ROOT)/infra
+                make plan ENVNAME=$(TF_ENV)
+
+  - stage: Infra_Approve
+    displayName: '${{ parameters.projectName }} Infra Approve'
+    dependsOn: Infra_Plan
+    jobs:
+      - deployment: Infra_Approve
+        environment: $(TF_ENV)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: echo "Approval granted for Infra"
+
+  - stage: Infra_Apply
+    displayName: '${{ parameters.projectName }} Infra Apply'
+    dependsOn: Infra_Approve
+    jobs:
+      - job: Infra_Apply
+        steps:
+          - checkout: self
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+          - task: AzureCLI@3
+            displayName: Infra Apply
+            inputs:
+              azureSubscription: 'sc-ado-gcp-aicoe'
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                echo $idToken > $(Pipeline.Workspace)/.workload_identity.jwt
+                cat << EOF > $GOOGLE_APPLICATION_CREDENTIALS
+                {"type":"external_account","audience":"//iam.googleapis.com/projects/$(GoogleCloud.WorkloadIdentity.ProjectNumber)/locations/global/workloadIdentityPools/aicoesandox-ado-wip/providers/aicoesandox-ado-wip-provider","subject_token_type":"urn:ietf:params:oauth:token-type:jwt","token_url":"https://sts.googleapis.com/v1/token","credential_source":{"file":"$(Pipeline.Workspace)/.workload_identity.jwt"},"service_account_impersonation_url":"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$(GoogleCloud.WorkloadIdentity.ServiceAccount):generateAccessToken"}
+                EOF
+                cd $(TF_ROOT)/infra
+                make apply ENVNAME=$(TF_ENV)

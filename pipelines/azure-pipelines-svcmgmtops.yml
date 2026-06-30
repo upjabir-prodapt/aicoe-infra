@@ -5,22 +5,21 @@ trigger:
       - sandbox-v1
   paths:
     include:
-      - terraform/projects/aicoe-core/**
+      - terraform/projects/svcmgmtops/**
       - terraform/modules/**
-      - pipelines/**
 
 pool:
   vmImage: ubuntu-latest
 
 extends:
-  template: pipelines/pipeline-template.yml
+  template: pipeline-template.yml
   parameters:
-    projectName: aicoe-core
-    tfEnv: sandox
-    tfProject: aicoe
-    gcpProjectId: aicoesandox
-    gcpProjectNumber: '297743845367'
+    projectName: svcmgmtops
+    tfEnv: sandbox
+    tfProject: svcmgmtops
+    gcpProjectId: svcmgmtops-sandbox
+    gcpProjectNumber: '892497331362'
     wifServiceAccount: aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com
     enableStatic: true
-    enableNetwork: true
+    enableNetwork: false
     enableInfra: true

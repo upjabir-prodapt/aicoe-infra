@@ -1,25 +1,23 @@
 trigger:
   branches:
     include:
-      - main
-      - sandbox-v1
+      - dev
   paths:
     include:
-      - terraform/projects/aicoe-core/**
+      - terraform/projects/omfocuslane/**
       - terraform/modules/**
-      - pipelines/**
 
 pool:
   vmImage: ubuntu-latest
 
 extends:
-  template: pipelines/pipeline-template.yml
+  template: pipeline-template.yml
   parameters:
-    projectName: aicoe-core
-    tfEnv: sandox
-    tfProject: aicoe
-    gcpProjectId: aicoesandox
-    gcpProjectNumber: '297743845367'
+    projectName: omfocuslane
+    tfEnv: dev
+    tfProject: om-focus-lane
+    gcpProjectId: om-focus-lane
+    gcpProjectNumber: '35927785065'
     wifServiceAccount: aicoe-sbx-wif-sa-tf@aicoesandox.iam.gserviceaccount.com
     enableStatic: true
     enableNetwork: true
