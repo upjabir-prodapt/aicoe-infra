@@ -66,4 +66,3 @@ else
 	@echo "non-live selected, continuing without safety check prompt."
 endif
 endif
-####################
