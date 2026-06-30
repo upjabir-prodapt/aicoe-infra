@@ -20,9 +20,9 @@ workflow:
   rules:
     # Add every branch that is allowed to run this pipeline here.
     - if: '$CI_COMMIT_BRANCH == "billproject"'
-### - if: '$CI_COMMIT_BRANCH == "dev"'
-### - if: '$CI_COMMIT_BRANCH == "staging"'
-### - if: '$CI_COMMIT_BRANCH == "main"'
+  ###  - if: '$CI_COMMIT_BRANCH == "dev"'
+  ###  - if: '$CI_COMMIT_BRANCH == "staging"'
+  ###  - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------------------------------------------------------
 # Default settings
@@ -52,6 +52,7 @@ variables:
     - |
       set -euo pipefail
       echo "==> Validating required CI/CD variables for branch ${CI_COMMIT_BRANCH}..."
+      echo "    CI_COMMIT_REF_PROTECTED=${CI_COMMIT_REF_PROTECTED:-unknown}"
       MISSING=""
       for VAR in TF_ENV TF_PROJECT TF_REGION WORKLOAD_IDENTITY_PROJECT_NUMBER WORKLOAD_IDENTITY_POOL WORKLOAD_IDENTITY_PROVIDER WIF_SERVICE_ACCOUNT; do
         if [ -z "${!VAR:-}" ]; then
@@ -63,9 +64,18 @@ variables:
       done
       if [ -n "$MISSING" ]; then
         echo "ERROR: Missing variables:$MISSING"
-        echo "Check GitLab Settings -> CI/CD -> Variables."
-        echo "If set at Group level, ensure the variable is NOT marked Protected (or protect this branch),"
-        echo "and that it is scoped to the correct Environment if you use environment-scoped variables."
+        if [ "${CI_COMMIT_REF_PROTECTED:-false}" != "true" ]; then
+          echo "DIAGNOSIS: CI_COMMIT_REF_PROTECTED=${CI_COMMIT_REF_PROTECTED:-unset} -- branch '${CI_COMMIT_BRANCH}' is NOT protected."
+          echo "  -> If any missing variable is marked 'Protected' in Settings -> CI/CD -> Variables,"
+          echo "     it will only be exposed on protected branches/tags. Protect this branch, or"
+          echo "     untick 'Protect variable' for these (less secure)."
+        else
+          echo "DIAGNOSIS: branch IS protected, so this is NOT a protected-branch issue."
+          echo "  -> Check each missing variable's 'Environment scope' in Settings -> CI/CD -> Variables."
+          echo "     It must be '*' or exactly match this job's environment ('${CI_COMMIT_BRANCH}'),"
+          echo "     since jobs use environment: \$CI_COMMIT_BRANCH."
+        fi
+        echo "Also confirm the variables exist at the correct level (Project vs Group) and are not typo'd."
         exit 1
       fi
       echo "==> All required variables present."
@@ -178,7 +188,7 @@ stages:
 ###  - infra-plan
 ###  - infra-approve
 ###  - infra-apply
-###
+
 # =============================================================================
 # STATIC LAYER
 # =============================================================================
