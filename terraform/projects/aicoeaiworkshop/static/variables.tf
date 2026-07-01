@@ -30,5 +30,6 @@ variable "gcp_apis_required" {
 }
 
 variable "group_email" {
-  type = string
+  type    = string
+  default = ""
 }

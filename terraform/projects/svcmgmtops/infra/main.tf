@@ -9,8 +9,9 @@ data "terraform_remote_state" "static" {
 module "bq_dataset" {
   source = "../../../modules/infra-bq-dataset"
 
-  gcp_project_id  = local.gcp_project_id
-  region          = var.region
-  resource_prefix = local.resource_prefix
-  labels          = local.default_labels
+  gcp_project_id     = local.gcp_project_id
+  region             = var.region
+  resource_prefix    = "svcmgmtops"
+  dataset_id_suffix  = "sandbox_dataset"
+  labels             = local.default_labels
 }

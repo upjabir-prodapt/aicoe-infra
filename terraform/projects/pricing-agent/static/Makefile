@@ -1,8 +1,8 @@
-ENVNAME=
-PROJECT=pricing-agent
+ENVNAME=sandbox
+PROJECT=pricingagent
 PROJECT_NAME=pricing-agent
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
+TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=$(PROJECT_NAME)/tfstate-static
 TFPLAN_FILE=../../$(PROJECT_NAME)-static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform

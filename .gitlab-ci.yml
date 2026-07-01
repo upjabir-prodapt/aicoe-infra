@@ -31,6 +31,8 @@ aicoesandox_static_plan:
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 aicoesandox_static_apply:
   extends: .terraform_apply
@@ -50,6 +52,8 @@ aicoesandox_static_apply:
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual
 
 aicoesandox_network_plan:
@@ -70,6 +74,8 @@ aicoesandox_network_plan:
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 aicoesandox_network_apply:
   extends: .terraform_apply
@@ -89,6 +95,8 @@ aicoesandox_network_apply:
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual
 
 aicoesandox_infra_plan:
@@ -109,6 +117,8 @@ aicoesandox_infra_plan:
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 aicoesandox_infra_apply:
   extends: .terraform_apply
@@ -128,6 +138,8 @@ aicoesandox_infra_apply:
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual
 
 ai_research_static_plan:
@@ -145,6 +157,8 @@ ai_research_static_plan:
       changes:
         - terraform/projects/ai-research/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 ai_research_static_apply:
   extends: .terraform_apply
@@ -164,6 +178,8 @@ ai_research_static_apply:
       changes:
         - terraform/projects/ai-research/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual
 
 pricing_agent_static_plan:
@@ -181,6 +197,8 @@ pricing_agent_static_plan:
       changes:
         - terraform/projects/pricing-agent/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 pricing_agent_static_apply:
   extends: .terraform_apply
@@ -200,6 +218,8 @@ pricing_agent_static_apply:
       changes:
         - terraform/projects/pricing-agent/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual
 
 aicoeaiworkshop_static_plan:
@@ -210,13 +230,15 @@ aicoeaiworkshop_static_plan:
     TF_LAYER: static
     TF_ENV: sandox
     TF_PROJECT: aicoeaiworkshop
-    GCP_PROJECT_ID: aicoeaiworkshopsandox
+    GCP_PROJECT_ID: aicoeaiworkshop
     TFSTATE_BUCKET: aicoeaiworkshopsandox-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
       changes:
         - terraform/projects/aicoeaiworkshop/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 aicoeaiworkshop_static_apply:
   extends: .terraform_apply
@@ -229,13 +251,15 @@ aicoeaiworkshop_static_apply:
     TF_LAYER: static
     TF_ENV: sandox
     TF_PROJECT: aicoeaiworkshop
-    GCP_PROJECT_ID: aicoeaiworkshopsandox
+    GCP_PROJECT_ID: aicoeaiworkshop
     TFSTATE_BUCKET: aicoeaiworkshopsandox-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
       changes:
         - terraform/projects/aicoeaiworkshop/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual
 
 svcmgmtops_static_plan:
@@ -253,6 +277,8 @@ svcmgmtops_static_plan:
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 svcmgmtops_static_apply:
   extends: .terraform_apply
@@ -272,6 +298,8 @@ svcmgmtops_static_apply:
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual
 
 svcmgmtops_infra_plan:
@@ -292,6 +320,8 @@ svcmgmtops_infra_plan:
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
 
 svcmgmtops_infra_apply:
   extends: .terraform_apply
@@ -311,4 +341,6 @@ svcmgmtops_infra_apply:
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
+        - .gitlab/ci/**
+        - .terraform-version
       when: manual

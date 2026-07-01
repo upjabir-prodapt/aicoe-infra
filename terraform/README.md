@@ -24,6 +24,16 @@ Each project layer uses its own GCS state prefix:
 
 `{project_name}/tfstate-{static|network|infra}`
 
+| Project | State bucket | `make` defaults |
+|---------|--------------|-----------------|
+| aicoesandox | `aicoesandox-bucket-tf-state` | `ENVNAME=sandox`, `PROJECT=aicoe` |
+| ai-research | `ai-research-sandbox-bucket-tf-state` | `ENVNAME=sandbox` |
+| pricing-agent | `pricingagent-sandbox-bucket-tf-state` | `ENVNAME=sandbox`, `PROJECT=pricingagent` |
+| svcmgmtops | `svcmgmtops-sandbox-bucket-tf-state` | `ENVNAME=sandbox` |
+| aicoeaiworkshop | `aicoeaiworkshopsandox-bucket-tf-state` | GCP project `aicoeaiworkshop`; `ENVNAME=sandox` for bucket/tag only |
+
+Set `state_bucket` in `params.tfvars` when the GCP bucket name does not match `${project}${envname}-bucket-tf-state`.
+
 If you renamed a project folder (e.g. `aicoe-core` → `aicoesandox`), copy or migrate existing state objects in GCS from the old prefix to the new one before the first apply, or Terraform will treat resources as new.
 
 ## Usage
@@ -96,6 +106,7 @@ Example: aicoesandox supplies bucket names, reserved IP maps, DNS records, trans
 
 - Root `.gitlab-ci.yml` — GitLab CI entrypoint
 - `.gitlab/ci/terraform-project.yml` — shared Terraform plan/apply template
+- [CONTRIBUTION.md](../CONTRIBUTION.md) — adding projects, lock files, state migration, CI checklist
 - `rules:changes` provisions only the sandbox project folder or shared module that changed
 
 ## Labels and tags

@@ -1,8 +1,8 @@
-ENVNAME=
+ENVNAME=sandbox
 PROJECT=ai-research
 PROJECT_NAME=ai-research
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
+TFSTATE_BUCKET=ai-research-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=$(PROJECT_NAME)/tfstate-static
 TFPLAN_FILE=../../$(PROJECT_NAME)-static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform

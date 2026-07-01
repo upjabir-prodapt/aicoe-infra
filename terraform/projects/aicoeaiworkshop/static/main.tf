@@ -7,9 +7,10 @@ module "base" {
   gcp_apis_required = var.gcp_apis_required
 }
 
-module "group_iam" {
-  source = "../../../modules/static-group-iam"
-
-  gcp_project_id = local.gcp_project_id
-  group_email    = var.group_email
-}
+# Group IAM disabled — matches aicoeaiworkshop branch (commented out in legacy iam.tf).
+# module "group_iam" {
+#   source = "../../../modules/static-group-iam"
+#
+#   gcp_project_id = local.gcp_project_id
+#   group_email    = var.group_email
+# }

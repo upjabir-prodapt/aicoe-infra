@@ -1,4 +1,4 @@
-ENVNAME=
+ENVNAME=sandox
 PROJECT=aicoeaiworkshop
 PROJECT_NAME=aicoeaiworkshop
 REGION=europe-west1
