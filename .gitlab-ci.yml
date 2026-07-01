@@ -3,7 +3,7 @@ include:
 
 workflow:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
 
 stages:
   - static_plan
@@ -27,7 +27,7 @@ aicoesandox_static_plan:
     GCP_PROJECT_ID: aicoesandox
     TFSTATE_BUCKET: aicoesandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
@@ -48,7 +48,7 @@ aicoesandox_static_apply:
     GCP_PROJECT_ID: aicoesandox
     TFSTATE_BUCKET: aicoesandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
@@ -70,7 +70,7 @@ aicoesandox_network_plan:
     GCP_PROJECT_ID: aicoesandox
     TFSTATE_BUCKET: aicoesandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
@@ -91,7 +91,7 @@ aicoesandox_network_apply:
     GCP_PROJECT_ID: aicoesandox
     TFSTATE_BUCKET: aicoesandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
@@ -113,7 +113,7 @@ aicoesandox_infra_plan:
     GCP_PROJECT_ID: aicoesandox
     TFSTATE_BUCKET: aicoesandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
@@ -134,7 +134,7 @@ aicoesandox_infra_apply:
     GCP_PROJECT_ID: aicoesandox
     TFSTATE_BUCKET: aicoesandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoesandox/**
         - terraform/modules/**
@@ -153,7 +153,7 @@ ai_research_static_plan:
     GCP_PROJECT_ID: ai-research-sandbox-499209
     TFSTATE_BUCKET: ai-research-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/ai-research/**
         - terraform/modules/**
@@ -174,7 +174,7 @@ ai_research_static_apply:
     GCP_PROJECT_ID: ai-research-sandbox-499209
     TFSTATE_BUCKET: ai-research-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/ai-research/**
         - terraform/modules/**
@@ -193,7 +193,7 @@ pricing_agent_static_plan:
     GCP_PROJECT_ID: pricingagent-sandbox
     TFSTATE_BUCKET: pricingagent-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/pricing-agent/**
         - terraform/modules/**
@@ -214,7 +214,7 @@ pricing_agent_static_apply:
     GCP_PROJECT_ID: pricingagent-sandbox
     TFSTATE_BUCKET: pricingagent-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/pricing-agent/**
         - terraform/modules/**
@@ -233,7 +233,7 @@ aicoeaiworkshop_static_plan:
     GCP_PROJECT_ID: aicoeaiworkshop
     TFSTATE_BUCKET: aicoeaiworkshopsandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoeaiworkshop/**
         - terraform/modules/**
@@ -254,7 +254,7 @@ aicoeaiworkshop_static_apply:
     GCP_PROJECT_ID: aicoeaiworkshop
     TFSTATE_BUCKET: aicoeaiworkshopsandox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/aicoeaiworkshop/**
         - terraform/modules/**
@@ -273,7 +273,7 @@ svcmgmtops_static_plan:
     GCP_PROJECT_ID: svcmgmtops-sandbox
     TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
@@ -294,7 +294,7 @@ svcmgmtops_static_apply:
     GCP_PROJECT_ID: svcmgmtops-sandbox
     TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
@@ -316,7 +316,7 @@ svcmgmtops_infra_plan:
     GCP_PROJECT_ID: svcmgmtops-sandbox
     TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
@@ -337,7 +337,7 @@ svcmgmtops_infra_apply:
     GCP_PROJECT_ID: svcmgmtops-sandbox
     TFSTATE_BUCKET: svcmgmtops-sandbox-bucket-tf-state
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox-v1"'
+    - if: '$CI_COMMIT_BRANCH == "sandbox"'
       changes:
         - terraform/projects/svcmgmtops/**
         - terraform/modules/**
