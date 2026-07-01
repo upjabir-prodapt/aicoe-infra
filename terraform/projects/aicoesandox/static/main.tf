@@ -54,19 +54,21 @@ module "storage" {
     "vector-search",
     "vxai-cont-mgmt-app-001",
   ]
+  bucket_kms_key_ring_name_suffix    = "app-bucket-key-ring"
+  bucket_kms_key_name_suffix         = "app-bucket-key"
   workbench_kms_key_ring_name_suffix = "vxai-wkb-key-ring"
   workbench_kms_key_name_suffix      = "vxai-wkb-key"
-  labels               = local.default_labels
+  labels                             = local.default_labels
 }
 
 module "artifact" {
   source = "../../../modules/static-artifact"
 
-  gcp_project_id            = local.gcp_project_id
-  region                    = var.region
-  resource_prefix           = local.resource_prefix
-  artifact_format           = var.artifact_format
-  labels                    = local.default_labels
+  gcp_project_id  = local.gcp_project_id
+  region          = var.region
+  resource_prefix = local.resource_prefix
+  artifact_format = var.artifact_format
+  labels          = local.default_labels
   bucket_iam_members = {
     vector_search_vertex_ai = {
       bucket = module.storage.bucket_names["vector-search"]

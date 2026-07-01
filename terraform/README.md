@@ -28,6 +28,30 @@ If you renamed a project folder (e.g. `aicoe-core` → `aicoesandox`), copy or m
 
 ## Usage
 
+### Prerequisites
+
+- **Terraform** `1.15.7` (see repo-root `.terraform-version`)
+- **Google providers** `7.39.0` (pinned in each layer's `.terraform.lock.hcl`)
+- GCP credentials with access to the target project and state bucket
+
+Install Terraform locally (with corporate proxy if required):
+
+```bash
+export https_proxy="${HTTPS_PROXY:-$HTTP_PROXY}"
+curl -fsSL ${https_proxy:+-x "$https_proxy"} \
+  "https://releases.hashicorp.com/terraform/1.15.7/terraform_1.15.7_linux_amd64.zip" \
+  -o /tmp/terraform.zip
+unzip -o /tmp/terraform.zip -d ~/.local/bin
+terraform version
+```
+
+GitLab CI installs Terraform automatically in `before_script` via `.gitlab/ci/install-terraform.sh`, using `HTTP_PROXY` / `HTTPS_PROXY` GitLab CI/CD variables.
+
+| Variable | Example |
+|----------|---------|
+| `HTTP_PROXY` | `http://proxy.example:8080` |
+| `HTTPS_PROXY` | `http://proxy.example:8080` |
+
 ```bash
 cd terraform/projects/aicoesandox/static
 make plan ENVNAME=sandox

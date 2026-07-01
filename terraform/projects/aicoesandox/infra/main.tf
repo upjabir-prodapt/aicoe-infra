@@ -25,8 +25,8 @@ module "notebook" {
   boot_disk_type    = var.boot_disk_type
   data_disk_size_gb = var.data_disk_size_gb
   data_disk_type    = var.data_disk_type
-  network_self_link = data.terraform_remote_state.network.outputs.network_self_link
-  subnet_self_link  = data.terraform_remote_state.network.outputs.subnet_self_link
+  network_self_link = local.network_self_link
+  subnet_self_link  = local.subnet_self_link
   labels            = local.default_labels
 }
 
@@ -36,8 +36,8 @@ module "load_balancer" {
   gcp_project_id    = local.gcp_project_id
   region            = var.region
   resource_prefix   = local.resource_prefix
-  network_self_link = data.terraform_remote_state.network.outputs.network_self_link
-  subnet_self_link  = data.terraform_remote_state.network.outputs.subnet_self_link
+  network_self_link = local.network_self_link
+  subnet_self_link  = local.subnet_self_link
   services          = local.ilb_services
   labels            = local.default_labels
 }
@@ -48,7 +48,7 @@ module "vector_search" {
   gcp_project_id                 = local.gcp_project_id
   region                         = var.region
   resource_prefix                = local.resource_prefix
-  network_id                     = data.terraform_remote_state.network.outputs.network_id
+  network_id                     = local.network_id
   vector_search_psc_ip_self_link = data.terraform_remote_state.network.outputs.vector_search_psc_ip_self_link
   index_display_name             = "${local.resource_prefix}_salesagent_index"
   endpoint_display_name          = "${local.resource_prefix}-salesagent-endpoint"

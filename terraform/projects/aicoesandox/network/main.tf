@@ -26,17 +26,17 @@ module "network_base" {
 module "network_connectivity" {
   source = "../../../modules/network-connectivity"
 
-  gcp_project_id                 = local.gcp_project_id
-  region                         = var.region
-  resource_prefix                = local.resource_prefix
-  network_id                     = module.network_base.network_id
-  network_self_link              = module.network_base.network_self_link
-  subnet_id                      = module.network_base.subnet_id
-  psc_google_apis_address        = var.psc_google_apis_address
-  reserved_internal_addresses    = var.reserved_internal_addresses
-  regional_psc_addresses         = var.regional_psc_addresses
-  internal_dns_zone              = var.internal_dns_zone
-  labels                         = local.default_labels
+  gcp_project_id              = local.gcp_project_id
+  region                      = var.region
+  resource_prefix             = local.resource_prefix
+  network_id                  = module.network_base.network_id
+  network_self_link           = module.network_base.network_self_link
+  subnet_id                   = module.network_base.subnet_id
+  psc_google_apis_address     = var.psc_google_apis_address
+  reserved_internal_addresses = var.reserved_internal_addresses
+  regional_psc_addresses      = var.regional_psc_addresses
+  internal_dns_zone           = var.internal_dns_zone
+  labels                      = local.default_labels
   internal_dns_records = {
     translation = {
       name    = "translation.aicoesandox-int.colt.net."

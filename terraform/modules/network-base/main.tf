@@ -2,7 +2,6 @@ resource "google_compute_network" "network" {
   name                    = "${var.resource_prefix}-vpc"
   auto_create_subnetworks = false
   project                 = var.gcp_project_id
-  labels                  = var.labels
 }
 
 resource "google_compute_subnetwork" "subnet" {
@@ -11,7 +10,6 @@ resource "google_compute_subnetwork" "subnet" {
   network       = google_compute_network.network.self_link
   ip_cidr_range = var.subnet_cidr_range
   project       = var.gcp_project_id
-  labels        = var.labels
 }
 
 resource "google_compute_subnetwork" "proxy_only_subnet" {
@@ -22,7 +20,6 @@ resource "google_compute_subnetwork" "proxy_only_subnet" {
   purpose       = "REGIONAL_MANAGED_PROXY"
   role          = "ACTIVE"
   project       = var.gcp_project_id
-  labels        = var.labels
 }
 
 resource "google_compute_firewall" "egress_deny_all" {
@@ -35,7 +32,6 @@ resource "google_compute_firewall" "egress_deny_all" {
   priority           = 65535
   destination_ranges = ["0.0.0.0/0"]
   project            = var.gcp_project_id
-  labels             = var.labels
 
   deny {
     protocol = "all"
@@ -56,7 +52,6 @@ resource "google_compute_firewall" "ingress_allow_iap" {
   direction   = "INGRESS"
   priority    = 65534
   project     = var.gcp_project_id
-  labels      = var.labels
 
   allow {
     protocol = "tcp"
@@ -76,7 +71,6 @@ resource "google_compute_firewall" "egress_allow_fastly_pypi" {
   priority           = 65534
   destination_ranges = ["23.235.32.0/20", "43.249.72.0/22", "103.244.50.0/24", "103.245.222.0/23", "103.245.224.0/24", "104.156.80.0/20", "140.248.64.0/18", "140.248.128.0/17", "146.75.0.0/17", "151.101.0.0/16", "157.52.64.0/18", "167.82.0.0/17", "167.82.128.0/20", "167.82.160.0/20", "167.82.224.0/20", "172.111.64.0/18", "185.31.16.0/22", "199.27.72.0/21", "199.232.0.0/16"]
   project            = var.gcp_project_id
-  labels             = var.labels
 
   allow {
     protocol = "tcp"
@@ -97,7 +91,6 @@ resource "google_compute_firewall" "ingress_allow_azure_devops" {
   direction   = "INGRESS"
   priority    = 65534
   project     = var.gcp_project_id
-  labels      = var.labels
   source_ranges = [
     "150.171.22.0/24",
     "150.171.23.0/24",
@@ -128,7 +121,6 @@ resource "google_compute_firewall" "egress_allow_azure_devops" {
   direction   = "EGRESS"
   priority    = 65534
   project     = var.gcp_project_id
-  labels      = var.labels
   destination_ranges = [
     "150.171.22.0/24",
     "150.171.23.0/24",
@@ -159,7 +151,6 @@ resource "google_compute_firewall" "ingress_allow_https" {
   direction     = "INGRESS"
   priority      = 65534
   project       = var.gcp_project_id
-  labels        = var.labels
   source_ranges = var.ingress_https_source_ranges
 
   allow {
@@ -181,7 +172,6 @@ resource "google_compute_firewall" "allow_internal_ilb" {
   priority           = 65534
   destination_ranges = var.internal_ilb_destination_ranges
   project            = var.gcp_project_id
-  labels             = var.labels
 
   allow {
     protocol = "tcp"
@@ -203,7 +193,6 @@ resource "google_compute_firewall" "egress_allow_google_apis_psc" {
   priority           = 65534
   destination_ranges = var.psc_egress_destination_ranges
   project            = var.gcp_project_id
-  labels             = var.labels
 
   allow {
     protocol = "tcp"

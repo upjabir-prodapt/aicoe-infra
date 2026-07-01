@@ -43,9 +43,14 @@
         \"service_account_impersonation_url\": \"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${SERVICE_ACCOUNT}:generateAccessToken\"
       }" > "$GOOGLE_APPLICATION_CREDENTIALS"
 
-      if ! command -v terraform >/dev/null 2>&1; then
-        echo "ERROR - terraform is not installed on this GitLab runner."
-        echo "Install Terraform on the Shell1 runner or provide it on PATH."
+      # Install Terraform (Shell1 runner has no system package); uses HTTP_PROXY/HTTPS_PROXY.
+      bash "${CI_PROJECT_DIR}/.gitlab/ci/install-terraform.sh"
+      export PATH="${CI_PROJECT_DIR}/bin:${PATH}"
+
+      REQUIRED_VERSION="$(tr -d '[:space:]' < "${CI_PROJECT_DIR}/.terraform-version")"
+      INSTALLED_VERSION="$(terraform version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)"
+      if [[ "${INSTALLED_VERSION}" != "${REQUIRED_VERSION}" ]]; then
+        echo "ERROR: Terraform version mismatch (required ${REQUIRED_VERSION}, got ${INSTALLED_VERSION})"
         exit 1
       fi
 
