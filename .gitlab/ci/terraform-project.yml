@@ -93,14 +93,14 @@
       export PATH="${CI_PROJECT_DIR}/bin:${PATH}"
 
       REQUIRED_VERSION="$(tr -d '[:space:]' < "${CI_PROJECT_DIR}/.terraform-version")"
-      INSTALLED_VERSION="$(terraform version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)"
+      INSTALLED_VERSION="$(terraform version 2>/dev/null | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 || true)"
       if [[ "${INSTALLED_VERSION}" != "${REQUIRED_VERSION}" ]]; then
         echo "ERROR: Terraform version mismatch (required ${REQUIRED_VERSION}, got ${INSTALLED_VERSION})"
         exit 1
       fi
 
       terraform version
-  after_script:
+      echo "==> Auth and Terraform ready; starting job script"
     - rm -f workload_identity.jwt credentials.json 2>/dev/null || true
 
 .terraform_plan:
@@ -126,7 +126,15 @@
   script:
     - |
       set -euo pipefail
-      cd "terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
+      PLAN_FILE="terraform/projects/${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      LAYER_DIR="terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
+      echo "==> Apply job: plan=${PLAN_FILE}"
+      if [[ ! -f "${CI_PROJECT_DIR}/${PLAN_FILE}" ]]; then
+        echo "ERROR: plan artifact missing at ${PLAN_FILE}"
+        ls -la "${CI_PROJECT_DIR}/terraform/projects/" || true
+        exit 1
+      fi
+      cd "${LAYER_DIR}"
       make apply \
         ENVNAME="${TF_ENV}" \
         PROJECT="${TF_PROJECT}" \

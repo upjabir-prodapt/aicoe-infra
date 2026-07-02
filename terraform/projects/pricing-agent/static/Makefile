@@ -26,8 +26,15 @@ init: layer_safety_check clean get
 plan: init
 	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params.tfvars
 
-apply: layer_safety_check init
-	$(TF_EXEC) apply $(TFPLAN_FILE) && rm $(TFPLAN_FILE)
+init_backend:
+	$(TF_EXEC) init \
+		-backend-config 'bucket=$(TFSTATE_BUCKET)' \
+		-backend-config 'prefix=$(TFSTATE_DIR)'
+
+apply: layer_safety_check
+	@test -f $(TFPLAN_FILE) || (echo "ERROR: plan file missing: $(TFPLAN_FILE)" && ls -la ../.. && exit 1)
+	@$(MAKE) init_backend
+	$(TF_EXEC) -chdir=$(PWD) apply -input=false $(TFPLAN_FILE) && rm -f $(TFPLAN_FILE)
 
 destroy: init
 	$(TF_EXEC) -chdir=$(PWD) plan -destroy -var-file=params.tfvars
