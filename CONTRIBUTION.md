@@ -301,6 +301,46 @@ Wire **stage dependencies**: static apply before network; network apply before i
 
 Apply jobs are **manual** by design.
 
+#### GitLab CI/CD variables (WIF + runner)
+
+Each Terraform project has its own Workload Identity pool in its GCP project. Set **prefixed** variables in GitLab → **Settings → CI/CD → Variables** (not in the repo). Jobs map them via `.wif_<project>` templates in [`.gitlab/ci/terraform-project.yml`](.gitlab/ci/terraform-project.yml).
+
+| GitLab variable | Example (aicoesandox) | Notes |
+|-----------------|----------------------|--------|
+| `AICOESANDOX_WIF_PROJECT_NUMBER` | `297743845367` | GCP project number where the WIF pool lives |
+| `AICOESANDOX_WIF_POOL` | `gitlab-pool` | Pool ID in that GCP project |
+| `AICOESANDOX_WIF_PROVIDER` | `gitlab-provider` | Provider ID |
+| `AICOESANDOX_WIF_SERVICE_ACCOUNT` | `gitlab-deployer@aicoesandox.iam.gserviceaccount.com` | SA to impersonate |
+
+Repeat for each repo project using the prefix below.
+
+| Repo folder | Variable prefix |
+|-------------|-----------------|
+| `aicoesandox` | `AICOESANDOX_WIF_*` |
+| `ai-research` | `AI_RESEARCH_WIF_*` |
+| `pricing-agent` | `PRICING_AGENT_WIF_*` |
+| `aicoeaiworkshop` | `AICOEAIWORKSHOP_WIF_*` |
+| `svcmgmtops` | `SVCMGMTOPS_WIF_*` |
+
+Sandbox values (verified in GCP):
+
+| Prefix | `_PROJECT_NUMBER` | `_SERVICE_ACCOUNT` |
+|--------|-------------------|-------------------|
+| `AICOESANDOX` | `297743845367` | `gitlab-deployer@aicoesandox.iam.gserviceaccount.com` |
+| `AI_RESEARCH` | `1074004789564` | `gitlab-deployer@ai-research-sandbox-499209.iam.gserviceaccount.com` |
+| `PRICING_AGENT` | `571016044556` | `gitlab-deployer@pricingagent-sandbox.iam.gserviceaccount.com` |
+| `SVCMGMTOPS` | `892497331362` | `gitlab-deployer@svcmgmtops-sandbox.iam.gserviceaccount.com` |
+| `AICOEAIWORKSHOP` | `775524029915` | *(create `gitlab-pool` + `gitlab-deployer` in GCP first)* |
+
+For all projects with GitLab WIF, `_POOL` = `gitlab-pool` and `_PROVIDER` = `gitlab-provider` (issuer `https://amsgit01`).
+
+**Shared runner variables** (optional, same for all jobs):
+
+| Variable | Example |
+|----------|---------|
+| `HTTP_PROXY` | `http://proxy.example:8080` |
+| `HTTPS_PROXY` | `http://proxy.example:8080` |
+
 ### 9. Group IAM (`static-group-iam`)
 
 - Only enable `module.group_iam` when the Google Group **exists** in Workspace.

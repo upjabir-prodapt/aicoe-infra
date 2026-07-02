@@ -17,7 +17,9 @@ variables:
   TF_REGION: europe-west1
 
 aicoesandox_static_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_aicoesandox
+    - .terraform_plan
   stage: static_plan
   variables:
     PROJECT_NAME: aicoesandox
@@ -35,7 +37,9 @@ aicoesandox_static_plan:
         - .terraform-version
 
 aicoesandox_static_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_aicoesandox
+    - .terraform_apply
   stage: static_apply
   needs:
     - job: aicoesandox_static_plan
@@ -57,7 +61,9 @@ aicoesandox_static_apply:
       when: manual
 
 aicoesandox_network_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_aicoesandox
+    - .terraform_plan
   stage: network_plan
   needs:
     - job: aicoesandox_static_apply
@@ -78,7 +84,9 @@ aicoesandox_network_plan:
         - .terraform-version
 
 aicoesandox_network_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_aicoesandox
+    - .terraform_apply
   stage: network_apply
   needs:
     - job: aicoesandox_network_plan
@@ -100,7 +108,9 @@ aicoesandox_network_apply:
       when: manual
 
 aicoesandox_infra_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_aicoesandox
+    - .terraform_plan
   stage: infra_plan
   needs:
     - job: aicoesandox_network_apply
@@ -121,7 +131,9 @@ aicoesandox_infra_plan:
         - .terraform-version
 
 aicoesandox_infra_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_aicoesandox
+    - .terraform_apply
   stage: infra_apply
   needs:
     - job: aicoesandox_infra_plan
@@ -143,7 +155,9 @@ aicoesandox_infra_apply:
       when: manual
 
 ai_research_static_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_ai_research
+    - .terraform_plan
   stage: static_plan
   variables:
     PROJECT_NAME: ai-research
@@ -161,7 +175,9 @@ ai_research_static_plan:
         - .terraform-version
 
 ai_research_static_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_ai_research
+    - .terraform_apply
   stage: static_apply
   needs:
     - job: ai_research_static_plan
@@ -183,7 +199,9 @@ ai_research_static_apply:
       when: manual
 
 pricing_agent_static_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_pricing_agent
+    - .terraform_plan
   stage: static_plan
   variables:
     PROJECT_NAME: pricing-agent
@@ -201,7 +219,9 @@ pricing_agent_static_plan:
         - .terraform-version
 
 pricing_agent_static_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_pricing_agent
+    - .terraform_apply
   stage: static_apply
   needs:
     - job: pricing_agent_static_plan
@@ -223,7 +243,9 @@ pricing_agent_static_apply:
       when: manual
 
 aicoeaiworkshop_static_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_aicoeaiworkshop
+    - .terraform_plan
   stage: static_plan
   variables:
     PROJECT_NAME: aicoeaiworkshop
@@ -241,7 +263,9 @@ aicoeaiworkshop_static_plan:
         - .terraform-version
 
 aicoeaiworkshop_static_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_aicoeaiworkshop
+    - .terraform_apply
   stage: static_apply
   needs:
     - job: aicoeaiworkshop_static_plan
@@ -263,7 +287,9 @@ aicoeaiworkshop_static_apply:
       when: manual
 
 svcmgmtops_static_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_svcmgmtops
+    - .terraform_plan
   stage: static_plan
   variables:
     PROJECT_NAME: svcmgmtops
@@ -281,7 +307,9 @@ svcmgmtops_static_plan:
         - .terraform-version
 
 svcmgmtops_static_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_svcmgmtops
+    - .terraform_apply
   stage: static_apply
   needs:
     - job: svcmgmtops_static_plan
@@ -303,7 +331,9 @@ svcmgmtops_static_apply:
       when: manual
 
 svcmgmtops_infra_plan:
-  extends: .terraform_plan
+  extends:
+    - .wif_svcmgmtops
+    - .terraform_plan
   stage: infra_plan
   needs:
     - job: svcmgmtops_static_apply
@@ -324,7 +354,9 @@ svcmgmtops_infra_plan:
         - .terraform-version
 
 svcmgmtops_infra_apply:
-  extends: .terraform_apply
+  extends:
+    - .wif_svcmgmtops
+    - .terraform_apply
   stage: infra_apply
   needs:
     - job: svcmgmtops_infra_plan
