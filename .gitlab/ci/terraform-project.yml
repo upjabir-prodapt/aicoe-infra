@@ -101,6 +101,7 @@
 
       terraform version
       echo "==> Auth and Terraform ready; starting job script"
+  after_script:
     - rm -f workload_identity.jwt credentials.json 2>/dev/null || true
 
 .terraform_plan:
