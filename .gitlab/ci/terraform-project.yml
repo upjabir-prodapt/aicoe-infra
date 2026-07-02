@@ -41,6 +41,14 @@
 
 .terraform_base:
   extends: .shell_runner
+  cache:
+    key:
+      files:
+        - .terraform-version
+    paths:
+      - bin/terraform
+      - .cache/terraform/
+    policy: pull-push
   environment:
     name: "$CI_COMMIT_BRANCH"
   id_tokens:
