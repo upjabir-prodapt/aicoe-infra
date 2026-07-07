@@ -1,13 +1,12 @@
 ENVNAME=
 PROJECT=aicoe
-PROJECT_NAME=aicoedev
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT_NAME)-bucket-tf-state
-TFSTATE_DIR=$(PROJECT_NAME)/tfstate-static
-TFPLAN_FILE=../../$(PROJECT_NAME)-static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
+TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
+TFSTATE_DIR=tfstate-static
+TFPLAN_FILE=../static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
-LAYER=static
+# CREDS_FILE=../$(PROJECT)$(ENVNAME).json
 
 all: plan
 
@@ -15,42 +14,55 @@ clean:
 	@rm -rf .terraform
 
 get:
-	$(TF_EXEC) -chdir=$(PWD) get
+	# terraform get - download and update modules mentioned in the root module. (https://www.terraform.io/docs/commands/get.html)
+	$(TF_EXEC) -chdir=$(PWD) get 
+	# terraform fmt - rewrite Terraform configuration files to a canonical format and style (https://www.terraform.io/docs/commands/fmt.html)
 	$(TF_EXEC) fmt
 
-init: layer_safety_check clean get
+init: static_safety_check clean get
+    # For GCP Bucket state
 	$(TF_EXEC) init \
 		-backend-config 'bucket=$(TFSTATE_BUCKET)' \
-		-backend-config 'prefix=$(TFSTATE_DIR)'
+ 		-backend-config 'prefix=$(TFSTATE_DIR)'
+    # For Hashicorp hosted state
+	#$(TF_EXEC) init \
+	#	-backend-config 'workspace{name=$(PROJECT)$(ENVNAME)}'
 
 plan: init
-	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars
 
-init_backend:
-	$(TF_EXEC) init \
-		-backend-config 'bucket=$(TFSTATE_BUCKET)' \
-		-backend-config 'prefix=$(TFSTATE_DIR)'
+landscape: init
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars | landscape
 
-apply: layer_safety_check
-	@test -f $(TFPLAN_FILE) || (echo "ERROR: plan file missing: $(TFPLAN_FILE)" && ls -la ../.. && exit 1)
-	@$(MAKE) init_backend
-	$(TF_EXEC) -chdir=$(PWD) apply -input=false $(TFPLAN_FILE) && rm -f $(TFPLAN_FILE)
+apply: static_safety_check init
+	$(TF_EXEC) apply $(TFPLAN_FILE) && rm $(TFPLAN_FILE)
 
 destroy: init
-	$(TF_EXEC) -chdir=$(PWD) plan -destroy -var-file=params.tfvars
-	$(TF_EXEC) -chdir=$(PWD) destroy -var-file=params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) plan -destroy -var-file=params/${ENVNAME}/params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) destroy -var-file=params/${ENVNAME}/params.tfvars
 
 show: init
 	$(TF_EXEC) -chdir=$(PWD) show
 
-layer_safety_check:
+refresh: init
+	$(TF_EXEC) -chdir=$(PWD) refresh -var-file=params/${ENVNAME}.tfvars
+
+#importresource: init
+	#$(TF_EXEC) import -var-file=params/$(ENVNAME)/params.tfvars aws_iam_user.ses resource_name
+
+
+static_safety_check:
 ifeq ($(SKIP_INTERACTIVE_SAFETY_PROMPT), true)
 	@echo "SKIP_INTERACTIVE_SAFETY_PROMPT set to true, continuing without interactive safety check prompt."
 else
-	@echo -n "\nWARNING: $(LAYER) layer for project $(PROJECT_NAME)"
+	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+	@echo -n "\nSTATIC LAYER SELECTED - YOU MUST DOUBLE CHECK THE PLAN FOR ANY UNINTENDED CHANGES (SUCH AS RESERVED IPS CHANGING)"
 	@echo -n "\n[type 'UNDERSTOOD' then <enter> to continue] " && read ans && [ $${ans:-N} = UNDERSTOOD ]
 ifeq ($(ENVNAME), prod)
-	@echo -n "\nLIVE SELECTED - ARE YOU SURE?"
+	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+	@echo -n "\nLIVE SELECTED - ARE YOU SURE YOU WANT TO CONTINUE?"
 	@echo -n "\n[type '$(PROJECT)$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
+else
+	@echo "non-live selected, continuing without safety check prompt."
 endif
 endif
