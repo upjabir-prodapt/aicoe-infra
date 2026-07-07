@@ -113,7 +113,7 @@
   script:
     - |
       set -euo pipefail
-      cd "terraform/${TF_LAYER}"
+      cd "terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
       make plan \
         ENVNAME="${TF_ENV}" \
         PROJECT="${TF_PROJECT}" \
