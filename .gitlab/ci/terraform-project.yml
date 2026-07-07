@@ -104,12 +104,16 @@
   after_script:
     - rm -f workload_identity.jwt credentials.json 2>/dev/null || true
 
+# NOTE: Repo layout is terraform/<layer>/ (e.g. terraform/static, terraform/network,
+# terraform/infra, terraform/modules) — there is NO terraform/projects/<project>/ nesting.
+# PROJECT_NAME is therefore not part of the directory path; only TF_LAYER is.
+
 .terraform_plan:
   extends: .terraform_base
   script:
     - |
       set -euo pipefail
-      cd "terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
+      cd "terraform/${TF_LAYER}"
       make plan \
         ENVNAME="${TF_ENV}" \
         PROJECT="${TF_PROJECT}" \
@@ -119,7 +123,9 @@
     when: always
     expire_in: 7 days
     paths:
-      - "terraform/projects/${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      # Matches Makefile's TFPLAN_FILE=../../$(PROJECT_NAME)-static-...
+      # which resolves 2 levels up from terraform/<layer>/ i.e. the repo root.
+      - "${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
 
 .terraform_apply:
   extends: .terraform_base
@@ -127,12 +133,12 @@
   script:
     - |
       set -euo pipefail
-      PLAN_FILE="terraform/projects/${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-      LAYER_DIR="terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
+      PLAN_FILE="${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      LAYER_DIR="terraform/${TF_LAYER}"
       echo "==> Apply job: plan=${PLAN_FILE}"
       if [[ ! -f "${CI_PROJECT_DIR}/${PLAN_FILE}" ]]; then
         echo "ERROR: plan artifact missing at ${PLAN_FILE}"
-        ls -la "${CI_PROJECT_DIR}/terraform/projects/" || true
+        ls -la "${CI_PROJECT_DIR}" || true
         exit 1
       fi
       cd "${LAYER_DIR}"

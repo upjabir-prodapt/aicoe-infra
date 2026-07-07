@@ -16,22 +16,6 @@ stages:
 variables:
   TF_REGION: europe-west1
 
-# ---------------------------------------------------------------------------
-# DEBUG JOB — run this first to confirm what terraform/projects/ actually
-# contains in this branch's checkout. Remove once the path issue is resolved.
-# ---------------------------------------------------------------------------
-debug_show_terraform_tree:
-  extends: .shell_runner
-  stage: static_plan
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev-env"'
-  script:
-    - |
-      echo "==> Listing terraform/projects tree (up to 4 levels deep):"
-      find terraform/projects -maxdepth 4 -type d 2>/dev/null || echo "terraform/projects does not exist at all"
-      echo "==> Full repo top-level listing:"
-      ls -la
-
 aicoedev_static_plan:
   extends:
     - .wif_aicoedev
@@ -47,7 +31,7 @@ aicoedev_static_plan:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoedev/**
+        - terraform/static/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -70,7 +54,7 @@ aicoedev_static_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoedev/**
+        - terraform/static/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -94,7 +78,7 @@ aicoedev_network_plan:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoedev/**
+        - terraform/network/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -117,7 +101,7 @@ aicoedev_network_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoedev/**
+        - terraform/network/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -141,7 +125,7 @@ aicoedev_infra_plan:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoedev/**
+        - terraform/infra/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -164,9 +148,8 @@ aicoedev_infra_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoedev/**
+        - terraform/infra/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
       when: manual
- 
