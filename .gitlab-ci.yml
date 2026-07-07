@@ -24,7 +24,7 @@ aicoedev_static_plan:
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: static
-    TF_ENV: sandox
+    TF_ENV: dev
     TF_PROJECT: aicoe
     GCP_PROJECT_ID: aicoedev
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
@@ -47,7 +47,7 @@ aicoedev_static_apply:
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: static
-    TF_ENV: sandox
+    TF_ENV: dev
     TF_PROJECT: aicoe
     GCP_PROJECT_ID: aicoedev
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
@@ -71,7 +71,7 @@ aicoedev_network_plan:
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: network
-    TF_ENV: sandox
+    TF_ENV: dev
     TF_PROJECT: aicoe
     GCP_PROJECT_ID: aicoedev
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
@@ -94,7 +94,7 @@ aicoedev_network_apply:
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: network
-    TF_ENV: sandox
+    TF_ENV: dev
     TF_PROJECT: aicoe
     GCP_PROJECT_ID: aicoedev
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
@@ -118,7 +118,7 @@ aicoedev_infra_plan:
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: infra
-    TF_ENV: sandox
+    TF_ENV: dev
     TF_PROJECT: aicoe
     GCP_PROJECT_ID: aicoedev
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
@@ -141,7 +141,7 @@ aicoedev_infra_apply:
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: infra
-    TF_ENV: sandox
+    TF_ENV: dev
     TF_PROJECT: aicoe
     GCP_PROJECT_ID: aicoedev
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
