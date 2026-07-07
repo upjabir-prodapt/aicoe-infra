@@ -31,7 +31,7 @@ aicoedev_static_plan:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoe/**
+        - terraform/static/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -54,7 +54,7 @@ aicoedev_static_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoe/**
+        - terraform/static/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -78,7 +78,7 @@ aicoedev_network_plan:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoe/**
+        - terraform/network/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -101,7 +101,7 @@ aicoedev_network_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoe/**
+        - terraform/network/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -125,7 +125,7 @@ aicoedev_infra_plan:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoe/**
+        - terraform/infra/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
@@ -148,7 +148,7 @@ aicoedev_infra_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
       changes:
-        - terraform/projects/aicoe/**
+        - terraform/infra/**
         - terraform/modules/**
         - .gitlab/ci/**
         - .terraform-version
