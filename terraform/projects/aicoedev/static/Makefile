@@ -1,6 +1,6 @@
 ENVNAME=dev
 PROJECT=aicoe
-PROJECT_NAME=svcmgmtops
+PROJECT_NAME=aicoe
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=$(PROJECT_NAME)/tfstate-static
