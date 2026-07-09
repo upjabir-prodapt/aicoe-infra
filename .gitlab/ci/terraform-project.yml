@@ -2,7 +2,7 @@
   tags:
     - Shell1
 
-# Per-project WIF: set prefixed variables in GitLab → Settings → CI/CD → Variables.
+# Per-project WIF: set prefixed variables in GitLab -> Settings -> CI/CD -> Variables.
 # Pool/provider names are the same in each GCP project; project number and SA differ.
 .wif_aicoedev:
   variables:
@@ -120,7 +120,8 @@
     expire_in: 7 days
     paths:
       # Matches Makefile's TFPLAN_FILE=../../$(PROJECT_NAME)-static-...
-      # which resolves 2 levels up from terraform/<layer>/ i.e. the repo root.
+      # which resolves 2 levels up from terraform/projects/<project>/<layer>/
+      # i.e. terraform/projects/ at the repo root.
       - "terraform/projects/${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
 
 .terraform_apply:
@@ -130,11 +131,11 @@
     - |
       set -euo pipefail
       PLAN_FILE="${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
-      LAYER_DIR="terraform/${TF_LAYER}"
+      LAYER_DIR="terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
       echo "==> Apply job: plan=${PLAN_FILE}"
-      if [[ ! -f "${CI_PROJECT_DIR}/${PLAN_FILE}" ]]; then
-        echo "ERROR: plan artifact missing at ${PLAN_FILE}"
-        ls -la "${CI_PROJECT_DIR}" || true
+      if [[ ! -f "${CI_PROJECT_DIR}/terraform/projects/${PLAN_FILE}" ]]; then
+        echo "ERROR: plan artifact missing at terraform/projects/${PLAN_FILE}"
+        ls -la "${CI_PROJECT_DIR}/terraform/projects" || true
         exit 1
       fi
       cd "${LAYER_DIR}"
@@ -143,3 +144,4 @@
         PROJECT="${TF_PROJECT}" \
         REGION="${TF_REGION}" \
         TFSTATE_BUCKET="${TFSTATE_BUCKET}"
+ 
