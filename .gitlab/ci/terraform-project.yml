@@ -104,16 +104,12 @@
   after_script:
     - rm -f workload_identity.jwt credentials.json 2>/dev/null || true
 
-# NOTE: Repo layout is terraform/<layer>/ (e.g. terraform/static, terraform/network,
-# terraform/infra, terraform/modules) — there is NO terraform/projects/<project>/ nesting.
-# PROJECT_NAME is therefore not part of the directory path; only TF_LAYER is.
-
 .terraform_plan:
   extends: .terraform_base
   script:
     - |
       set -euo pipefail
-      cd "terraform/projects/${TF_LAYER}"
+      cd "terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
       make plan \
         ENVNAME="${TF_ENV}" \
         PROJECT="${TF_PROJECT}" \
@@ -125,7 +121,7 @@
     paths:
       # Matches Makefile's TFPLAN_FILE=../../$(PROJECT_NAME)-static-...
       # which resolves 2 levels up from terraform/<layer>/ i.e. the repo root.
-      - "${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      - "terraform/projects/${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
 
 .terraform_apply:
   extends: .terraform_base
