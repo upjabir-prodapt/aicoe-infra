@@ -20,6 +20,7 @@ get:
 
 init: layer_safety_check clean get
 	$(TF_EXEC) init \
+		-reconfigure \
 		-backend-config 'bucket=$(TFSTATE_BUCKET)' \
 		-backend-config 'prefix=$(TFSTATE_DIR)'
 
