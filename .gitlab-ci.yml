@@ -68,6 +68,7 @@ aicoedev_network_plan:
   needs:
     - job: aicoedev_static_apply
       artifacts: false
+      optional: true
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: network
@@ -91,6 +92,7 @@ aicoedev_network_apply:
   needs:
     - job: aicoedev_network_plan
       artifacts: true
+      optional: true
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: network
