@@ -65,7 +65,7 @@ module "network_connectivity" {
 }
 
 ###########################################
-### Dev-only firewall rules             ###
+### Dev-only firewall rules            ####
 ### (Colt on-prem / Zscaler / HTTPS ILB / IAP SSH) ###
 ### Kept as plain resources - see comments above for why. ###
 ###########################################
