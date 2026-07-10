@@ -1,8 +1,9 @@
-ENVNAME=
+ENVNAME=dev
 PROJECT=aicoe
 PROJECT_NAME=aicoedev
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT_NAME)-bucket-tf-state
+##TFSTATE_BUCKET=$(PROJECT_NAME)-bucket-tf-state
+TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=$(PROJECT_NAME)/tfstate-network
 TFPLAN_FILE=../../$(PROJECT_NAME)-network-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
