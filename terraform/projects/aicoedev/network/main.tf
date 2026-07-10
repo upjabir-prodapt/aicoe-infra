@@ -80,7 +80,7 @@ resource "google_compute_firewall" "aicoe_egress_allow_onprem_ip" {
   description = "Allow traffic from Colt On-prem IP"
   direction   = "EGRESS"
   priority    = 65534
-  destination_ranges = [
+  source_ranges = [
     "10.100.254.206",
     "10.100.209.0/29",
     "10.100.4.66"
