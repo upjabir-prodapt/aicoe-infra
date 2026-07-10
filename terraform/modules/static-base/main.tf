@@ -18,10 +18,10 @@ resource "google_project_iam_audit_config" "data_access" {
   project = var.gcp_project_id
   service = each.value
 
-  audit_log_config {
+  /*audit_log_config {
     log_type = "ADMIN_READ"
   }
-
+*/
   audit_log_config {
     log_type = "DATA_READ"
   }
