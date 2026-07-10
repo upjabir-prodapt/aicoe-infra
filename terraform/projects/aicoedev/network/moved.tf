@@ -1,6 +1,7 @@
 # State migration from pre-module layout to modular layout (dev).
 # Mirrors projects/aicoesandox/network/moved.tf, adjusted for what
-# actually exists in dev today.
+# actually exists in dev today, and for the pieces we deliberately kept
+# out of the modules (see main.tf comments) to hit a true 0/0/0 plan.
 
 moved {
   from = google_compute_network.aicoe_network
@@ -20,16 +21,6 @@ moved {
 moved {
   from = google_compute_firewall.aicoe_egress_deny_all
   to   = module.network_base.google_compute_firewall.egress_deny_all[0]
-}
-
-moved {
-  from = google_compute_firewall.aicoe_ingress_allow_iap
-  to   = module.network_base.google_compute_firewall.ingress_allow_iap[0]
-}
-
-moved {
-  from = google_compute_firewall.aicoe_ingress_allow_https
-  to   = module.network_base.google_compute_firewall.ingress_allow_https[0]
 }
 
 moved {
@@ -53,21 +44,6 @@ moved {
 }
 
 moved {
-  from = google_dns_managed_zone.aicoe_googleapis_private
-  to   = module.network_connectivity.google_dns_managed_zone.googleapis_private[0]
-}
-
-moved {
-  from = google_dns_record_set.aicoe_wildcard_googleapis
-  to   = module.network_connectivity.google_dns_record_set.wildcard_googleapis[0]
-}
-
-moved {
-  from = google_dns_managed_zone.aicoe_internal
-  to   = module.network_connectivity.google_dns_managed_zone.internal[0]
-}
-
-moved {
   from = google_compute_address.aicoe_staticip_ilb
   to   = module.network_connectivity.google_compute_address.reserved_internal_address["translation-ilb"]
 }
@@ -82,23 +58,16 @@ moved {
   to   = module.network_connectivity.google_compute_address.reserved_internal_address["frontend-ilb"]
 }
 
-moved {
-  from = google_dns_record_set.aicoe_translation_dns
-  to   = module.network_connectivity.google_dns_record_set.internal_records["translation"]
-}
-
-moved {
-  from = google_dns_record_set.aicoe_salesagent_dns
-  to   = module.network_connectivity.google_dns_record_set.internal_records["salesagent"]
-}
-
-moved {
-  from = google_dns_record_set.aicoe_aihub_dns
-  to   = module.network_connectivity.google_dns_record_set.internal_records["aihub"]
-}
-
-# NOTE: google_compute_firewall.aicoe_egress_allow_onprem_ip and
-# google_compute_firewall.aicoe_ingress_allow_zscaler_ip are intentionally
-# NOT moved - they stay as plain resources in main.tf (see comment there),
-# so no state move is needed for them.
+# NOT moved (deliberately kept as plain resources in main.tf, same
+# addresses as before - see the comments above each module block there):
+#   google_compute_firewall.aicoe_egress_allow_onprem_ip
+#   google_compute_firewall.aicoe_ingress_allow_zscaler_ip
+#   google_compute_firewall.aicoe_ingress_allow_https
+#   google_compute_firewall.aicoe_ingress_allow_iap
+#   google_dns_managed_zone.aicoe_googleapis_private
+#   google_dns_record_set.aicoe_wildcard_googleapis
+#   google_dns_managed_zone.aicoe_internal
+#   google_dns_record_set.aicoe_translation_dns
+#   google_dns_record_set.aicoe_salesagent_dns
+#   google_dns_record_set.aicoe_aihub_dns
  
