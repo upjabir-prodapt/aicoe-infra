@@ -37,7 +37,7 @@ resource "google_vertex_ai_index_endpoint" "vector_index_endpoint" {
   project      = var.gcp_project_id
   display_name = var.endpoint_display_name
   description  = "PSC-enabled index endpoint"
-  labels       = var.labels
+  #labels       = var.labels
 
   private_service_connect_config {
     enable_private_service_connect = true
