@@ -11,9 +11,17 @@ locals {
   frontend_ilb_ip    = data.terraform_remote_state.network.outputs.aicoe_staticip_ilb_aihub
 
   # Same rationale as the other layers - keep dev's existing label shape.
+  ###default_labels = {
+  ###  env    = var.envname
+  ###  system = local.resource_prefix
+  ###}
+
   default_labels = {
     env    = var.envname
+    environment = var.envname
     system = local.resource_prefix
+    managed_by  = "terraform"
+    project     = var.project_name
   }
 }
  
