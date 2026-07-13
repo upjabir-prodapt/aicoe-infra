@@ -44,7 +44,7 @@ show: init
 	$(TF_EXEC) -chdir=$(PWD) show
 
 import_psc_vector_index_fr: init_backend
-  	$(TF_EXEC) -chdir=$(PWD) import -var-file=params.tfvars \
+  $(TF_EXEC) -chdir=$(PWD) import -var-file=params.tfvars \
 	module.vector_search.google_compute_forwarding_rule.psc_vector_index_fr \
 	projects/aicoedev/regions/europe-west1/forwardingRules/aicoedev-psc-vector-index-fr
 
