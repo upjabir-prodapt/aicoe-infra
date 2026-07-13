@@ -60,7 +60,7 @@
 ###}###
 
 ###module "notebook" {
-#### NOTE: no module "notebook" block here on purpose. In the old code the
+###### NOTE: no module "notebook" block here on purpose. In the old code the
 ###  source = "../../../modules/infra-notebook"
 #### workbench instance was gated by `count = var.envname == "sandox" ? 1 : 0`,
 #### so dev has never actually created one. Adding `module "notebook" {...}`
