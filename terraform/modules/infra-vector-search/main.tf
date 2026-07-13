@@ -7,7 +7,7 @@ resource "google_vertex_ai_index" "vector_search_index" {
   region       = var.region
   project      = var.gcp_project_id
   display_name = var.index_display_name
-  labels       = var.labels
+  #labels       = var.labels
 
   metadata {
     config {
