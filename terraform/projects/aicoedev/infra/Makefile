@@ -42,17 +42,6 @@ destroy: init
 
 show: init
 	$(TF_EXEC) -chdir=$(PWD) show
-	
-import: init_backend
-	@test -n "$(ADDR)" || (echo "ERROR: set ADDR=<terraform resource address>" && exit 1)
-	@test -n "$(ID)" || (echo "ERROR: set ID=<cloud resource id>" && exit 1)
-	$(TF_EXEC) -chdir=$(PWD) import -var-file=params.tfvars $(ADDR) $(ID)
-
-import_psc_vector_index_fr: init_backend
-    $(TF_EXEC) -chdir=$(PWD) import -var-file=params.tfvars \
-	module.vector_search.google_compute_forwarding_rule.psc_vector_index_fr \
-	projects/aicoedev/regions/europe-west1/forwardingRules/aicoedev-psc-vector-index-fr
-
 
 layer_safety_check:
 ifeq ($(SKIP_INTERACTIVE_SAFETY_PROMPT), true)
