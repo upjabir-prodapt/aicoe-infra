@@ -12,7 +12,7 @@ data "terraform_remote_state" "network" {
   config = {
     bucket = local.state_bucket
     #prefix = "tfstate-network"
-    prefix = "${var.project_name}/tfstate-static"
+    prefix = "${var.project_name}/tfstate-network"
   }
 }
 
