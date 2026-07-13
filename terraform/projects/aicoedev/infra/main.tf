@@ -58,3 +58,24 @@ module "bigquery" {
   labels         = local.default_labels
   datasets       = local.bigquery_datasets
 }
+
+module "notebook" {
+# NOTE: no module "notebook" block here on purpose. In the old code the
+  source = "../../../modules/infra-notebook"
+# workbench instance was gated by `count = var.envname == "sandox" ? 1 : 0`,
+# so dev has never actually created one. Adding `module "notebook" {...}`
+  gcp_project_id    = local.gcp_project_id
+# unconditionally (as aicoesandox does) would show up as "1 to add" in
+  region            = var.region
+# `terraform plan`. Uncomment/add it later if/when dev is meant to get a
+  resource_prefix   = local.resource_prefix
+# notebook too - see modules/infra-notebook for the interface.
+  machine_type      = var.machine_type
+  boot_disk_size_gb = var.boot_disk_size_gb
+  boot_disk_type    = var.boot_disk_type
+  data_disk_size_gb = var.data_disk_size_gb
+  data_disk_type    = var.data_disk_type
+  network_self_link = local.network_self_link
+  subnet_self_link  = local.subnet_self_link
+  labels            = local.default_labels
+}
