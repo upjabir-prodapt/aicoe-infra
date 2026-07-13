@@ -42,6 +42,11 @@ destroy: init
 
 show: init
 	$(TF_EXEC) -chdir=$(PWD) show
+	
+import: init_backend
+	@test -n "$(ADDR)" || (echo "ERROR: set ADDR=<terraform resource address>" && exit 1)
+	@test -n "$(ID)" || (echo "ERROR: set ID=<cloud resource id>" && exit 1)
+	$(TF_EXEC) -chdir=$(PWD) import -var-file=params.tfvars $(ADDR) $(ID)
 
 layer_safety_check:
 ifeq ($(SKIP_INTERACTIVE_SAFETY_PROMPT), true)
@@ -54,3 +59,4 @@ ifeq ($(ENVNAME), prod)
 	@echo -n "\n[type '$(PROJECT)$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
 endif
 endif
+
