@@ -12,7 +12,7 @@ LAYER=infra
 all: plan
 
 clean:
-  @rm -rf .terraform
+	@rm -rf .terraform
 
 get:
   $(TF_EXEC) -chdir=$(PWD) get
