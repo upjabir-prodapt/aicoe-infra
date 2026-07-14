@@ -298,82 +298,82 @@ aicoedev_network_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-# ---------------- VECTOR PSC STATE MIGRATION ----------------
+# # ---------------- VECTOR PSC STATE MIGRATION ----------------
 
-aicoedev_vector_psc_state_migration:
-  extends:
-    - .wif_aicoedev
-    - .terraform_base
-  stage: vector_psc_state_migration
-  needs:
-    - job: aicoedev_network_apply
-      artifacts: false
-      optional: true
-  variables:
-    PROJECT_NAME: aicoedev
-    TF_LAYER: network          # only needed to satisfy .terraform_base's required-var check
-    TF_ENV: dev
-    TF_PROJECT: aicoe
-    TF_REGION: europe-west1
-    GCP_PROJECT_ID: aicoedev
-    TFSTATE_BUCKET: aicoedev-bucket-tf-state
-    FROM_ADDR: google_compute_forwarding_rule.aicoe_psc_vector_index_fr
-    TO_ADDR: module.vector_search.google_compute_forwarding_rule.psc_vector_index_fr
-  script:
-    - |
-      set -euo pipefail
-      REPO_ROOT="${CI_PROJECT_DIR}"
-      NETWORK_DIR="${REPO_ROOT}/terraform/projects/${PROJECT_NAME}/network"
-      INFRA_DIR="${REPO_ROOT}/terraform/projects/${PROJECT_NAME}/infra"
-      BACKUP_DIR="${REPO_ROOT}/state-backup"
-      mkdir -p "${BACKUP_DIR}"
+# aicoedev_vector_psc_state_migration:
+#   extends:
+#     - .wif_aicoedev
+#     - .terraform_base
+#   stage: vector_psc_state_migration
+#   needs:
+#     - job: aicoedev_network_apply
+#       artifacts: false
+#       optional: true
+#   variables:
+#     PROJECT_NAME: aicoedev
+#     TF_LAYER: network          # only needed to satisfy .terraform_base's required-var check
+#     TF_ENV: dev
+#     TF_PROJECT: aicoe
+#     TF_REGION: europe-west1
+#     GCP_PROJECT_ID: aicoedev
+#     TFSTATE_BUCKET: aicoedev-bucket-tf-state
+#     FROM_ADDR: google_compute_forwarding_rule.aicoe_psc_vector_index_fr
+#     TO_ADDR: module.vector_search.google_compute_forwarding_rule.psc_vector_index_fr
+#   script:
+#     - |
+#       set -euo pipefail
+#       REPO_ROOT="${CI_PROJECT_DIR}"
+#       NETWORK_DIR="${REPO_ROOT}/terraform/projects/${PROJECT_NAME}/network"
+#       INFRA_DIR="${REPO_ROOT}/terraform/projects/${PROJECT_NAME}/infra"
+#       BACKUP_DIR="${REPO_ROOT}/state-backup"
+#       mkdir -p "${BACKUP_DIR}"
 
-      echo "==> terraform init (network)"
-      cd "${NETWORK_DIR}"
-      terraform init -reconfigure \
-        -backend-config "bucket=${TFSTATE_BUCKET}" \
-        -backend-config "prefix=${PROJECT_NAME}/tfstate-network"
-      terraform state pull > "${BACKUP_DIR}/network.tfstate.orig"
+#       echo "==> terraform init (network)"
+#       cd "${NETWORK_DIR}"
+#       terraform init -reconfigure \
+#         -backend-config "bucket=${TFSTATE_BUCKET}" \
+#         -backend-config "prefix=${PROJECT_NAME}/tfstate-network"
+#       terraform state pull > "${BACKUP_DIR}/network.tfstate.orig"
 
-      echo "==> terraform init (infra)"
-      cd "${INFRA_DIR}"
-      terraform init -reconfigure \
-        -backend-config "bucket=${TFSTATE_BUCKET}" \
-        -backend-config "prefix=${PROJECT_NAME}/tfstate-infra"
-      terraform state pull > "${BACKUP_DIR}/infra.tfstate.orig"
+#       echo "==> terraform init (infra)"
+#       cd "${INFRA_DIR}"
+#       terraform init -reconfigure \
+#         -backend-config "bucket=${TFSTATE_BUCKET}" \
+#         -backend-config "prefix=${PROJECT_NAME}/tfstate-infra"
+#       terraform state pull > "${BACKUP_DIR}/infra.tfstate.orig"
 
-      cp "${BACKUP_DIR}/network.tfstate.orig" "${BACKUP_DIR}/network.tfstate"
-      cp "${BACKUP_DIR}/infra.tfstate.orig" "${BACKUP_DIR}/infra.tfstate"
+#       cp "${BACKUP_DIR}/network.tfstate.orig" "${BACKUP_DIR}/network.tfstate"
+#       cp "${BACKUP_DIR}/infra.tfstate.orig" "${BACKUP_DIR}/infra.tfstate"
 
-      cd "${REPO_ROOT}"
-      if terraform state list -state="${BACKUP_DIR}/network.tfstate" | grep -qx "${FROM_ADDR}"; then
-        echo "Resource found in network state - moving it."
-        terraform state mv \
-          -state="${BACKUP_DIR}/network.tfstate" \
-          -state-out="${BACKUP_DIR}/infra.tfstate" \
-          "${FROM_ADDR}" "${TO_ADDR}"
-      else
-        echo "Resource not present in network state - already migrated or never existed. Skipping move."
-      fi
+#       cd "${REPO_ROOT}"
+#       if terraform state list -state="${BACKUP_DIR}/network.tfstate" | grep -qx "${FROM_ADDR}"; then
+#         echo "Resource found in network state - moving it."
+#         terraform state mv \
+#           -state="${BACKUP_DIR}/network.tfstate" \
+#           -state-out="${BACKUP_DIR}/infra.tfstate" \
+#           "${FROM_ADDR}" "${TO_ADDR}"
+#       else
+#         echo "Resource not present in network state - already migrated or never existed. Skipping move."
+#       fi
 
-      echo "==> pushing network state"
-      cd "${NETWORK_DIR}"
-      terraform state push "${BACKUP_DIR}/network.tfstate"
+#       echo "==> pushing network state"
+#       cd "${NETWORK_DIR}"
+#       terraform state push "${BACKUP_DIR}/network.tfstate"
 
-      echo "==> pushing infra state"
-      cd "${INFRA_DIR}"
-      terraform state push "${BACKUP_DIR}/infra.tfstate"
+#       echo "==> pushing infra state"
+#       cd "${INFRA_DIR}"
+#       terraform state push "${BACKUP_DIR}/infra.tfstate"
 
-      echo "Done. Re-run network_plan and infra_plan to confirm 0/0/0."
-  artifacts:
-    when: always
-    expire_in: 14 days
-    paths:
-      - state-backup/network.tfstate.orig
-      - state-backup/infra.tfstate.orig
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      when: manual
+#       echo "Done. Re-run network_plan and infra_plan to confirm 0/0/0."
+#   artifacts:
+#     when: always
+#     expire_in: 14 days
+#     paths:
+#       - state-backup/network.tfstate.orig
+#       - state-backup/infra.tfstate.orig
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+#       when: manual
 
 # ---------------- INFRA ----------------
 
