@@ -390,7 +390,7 @@ resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
 }
 
 ###########################################
-### Dev-only DNS zones/records            ###
+### Dev-only DNS zones/records          ###
 ### Kept as plain resources - see enable_cloud_dns comment above. ###
 ###########################################
 
