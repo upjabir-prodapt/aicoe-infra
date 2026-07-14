@@ -198,6 +198,10 @@ resource "google_compute_firewall" "egress_allow_google_apis_psc" {
     protocol = "tcp"
     ports    = ["443"]
   }
+  allow {
+    protocol = "tcp"
+    ports    = ["10000"]
+  }
 
   log_config {
     metadata = "INCLUDE_ALL_METADATA"
