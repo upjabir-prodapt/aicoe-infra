@@ -118,7 +118,7 @@ module "load_balancer" {
 }
 
 import {
-  to = google_compute_forwarding_rule.psc_vector_index_fr
+  to = module.vector_search.google_compute_forwarding_rule.psc_vector_index_fr
   id = "projects/aicoedev/regions/europe-west1/forwardingRules/aicoedev-psc-vector-index-fr"
 } 
 module "vector_search" {
