@@ -7,14 +7,19 @@ workflow:
 
 stages:
   - static_plan
+  - static_approve
   - static_apply
   - network_plan
+  - network_approve
   - network_apply
   - infra_plan
+  - infra_approve
   - infra_apply
 
 variables:
   TF_REGION: europe-west1
+
+# ---------------- STATIC ----------------
 
 aicoedev_static_plan:
   extends:
@@ -30,11 +35,18 @@ aicoedev_static_plan:
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/aicoedev/static/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
+
+aicoedev_static_approve:
+  stage: static_approve
+  needs:
+    - job: aicoedev_static_plan
+      artifacts: false
+  script:
+    - echo "Static layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
 aicoedev_static_apply:
   extends:
@@ -44,6 +56,8 @@ aicoedev_static_apply:
   needs:
     - job: aicoedev_static_plan
       artifacts: true
+    - job: aicoedev_static_approve
+      artifacts: false
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: static
@@ -53,12 +67,8 @@ aicoedev_static_apply:
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/aicoedev/static/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
-      when: manual
+
+# ---------------- NETWORK ----------------
 
 aicoedev_network_plan:
   extends:
@@ -78,11 +88,18 @@ aicoedev_network_plan:
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/aicoedev/network/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
+
+aicoedev_network_approve:
+  stage: network_approve
+  needs:
+    - job: aicoedev_network_plan
+      artifacts: false
+  script:
+    - echo "Network layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
 aicoedev_network_apply:
   extends:
@@ -92,6 +109,8 @@ aicoedev_network_apply:
   needs:
     - job: aicoedev_network_plan
       artifacts: true
+    - job: aicoedev_network_approve
+      artifacts: false
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: network
@@ -101,12 +120,8 @@ aicoedev_network_apply:
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/aicoedev/network/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
-      when: manual
+
+# ---------------- INFRA ----------------
 
 aicoedev_infra_plan:
   extends:
@@ -126,11 +141,18 @@ aicoedev_infra_plan:
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/aicoedev/infra/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
+
+aicoedev_infra_approve:
+  stage: infra_approve
+  needs:
+    - job: aicoedev_infra_plan
+      artifacts: false
+  script:
+    - echo "Infra layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
 aicoedev_infra_apply:
   extends:
@@ -140,6 +162,8 @@ aicoedev_infra_apply:
   needs:
     - job: aicoedev_infra_plan
       artifacts: true
+    - job: aicoedev_infra_approve
+      artifacts: false
   variables:
     PROJECT_NAME: aicoedev
     TF_LAYER: infra
@@ -149,9 +173,3 @@ aicoedev_infra_apply:
     TFSTATE_BUCKET: aicoedev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/aicoedev/infra/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
-      when: manual
