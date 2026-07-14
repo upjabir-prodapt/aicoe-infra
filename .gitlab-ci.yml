@@ -108,7 +108,7 @@ aicoedev_network_apply:
         - .gitlab/ci/**
         - .terraform-version
       when: manual
-###
+
 ###aicoedev_vector_psc_state_migration:
 ###  extends:
 ###    - .wif_aicoedev
@@ -187,9 +187,6 @@ aicoedev_infra_plan:
   stage: infra_plan
   needs:
     - job: aicoedev_network_apply
-      artifacts: false
-      optional: true
-    - job: aicoedev_vector_psc_state_migration
       artifacts: false
       optional: true
   variables:
