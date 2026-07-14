@@ -117,6 +117,10 @@ module "load_balancer" {
   labels            = local.default_labels
 }
 
+import {
+  to = google_compute_forwarding_rule.psc_vector_index_fr
+  id = "projects/aicoedev/regions/europe-west1/forwardingRules/aicoedev-psc-vector-index-fr"
+} 
 module "vector_search" {
   source = "../../../modules/infra-vector-search"
 
