@@ -38,8 +38,6 @@ output "aicoe_staticip_ilb_aihub" {
   value = module.network_connectivity.reserved_internal_addresses["frontend-ilb"].address
 }
 
-# Kept for the infra layer's vector-search module, which now owns the PSC
-# forwarding rule to the vector index (see infra/moved.tf note).
 output "vector_search_psc_ip_self_link" {
   value = module.network_connectivity.regional_psc_addresses["vector-index"].self_link
 }

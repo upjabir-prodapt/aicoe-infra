@@ -1,5 +1,3 @@
-# State migration from pre-module layout to modular layout (dev).
-
 moved {
   from = google_bigquery_dataset.aicoe_translation_dataset
   to   = module.bigquery.google_bigquery_dataset.dataset["translation"]
@@ -184,25 +182,3 @@ moved {
   from = google_secret_manager_secret_version.aihub_private_key
   to   = module.load_balancer.google_secret_manager_secret_version.private_key["aihub"]
 }
-
-# IMPORTANT - NOT a `moved` block, cannot be done in code:
-# google_compute_forwarding_rule.aicoe_psc_vector_index_fr currently lives in
-# the NETWORK layer's state, but module.vector_search (used above) creates
-# it at module.vector_search.google_compute_forwarding_rule.psc_vector_index_fr
-# in the INFRA layer's state. `moved` blocks only work within a single
-# state/root module, so this one resource has to be relocated by hand,
-# BEFORE you run `terraform plan` on either layer with the new code:
-#
-#   terraform -chdir=network state pull > /tmp/aicoedev-network.tfstate
-#   terraform -chdir=infra   state pull > /tmp/aicoedev-infra.tfstate
-#   terraform state mv \
-#     -state=/tmp/aicoedev-network.tfstate \
-#     -state-out=/tmp/aicoedev-infra.tfstate \
-#     'google_compute_forwarding_rule.aicoe_psc_vector_index_fr' \
-#     'module.vector_search.google_compute_forwarding_rule.psc_vector_index_fr'
-#   terraform -chdir=network state push /tmp/aicoedev-network.tfstate
-#   terraform -chdir=infra   state push /tmp/aicoedev-infra.tfstate
-#
-# Back up both state files before doing this. Do it once, then the moved
-# blocks above (plus the module code) take care of everything else.
- 

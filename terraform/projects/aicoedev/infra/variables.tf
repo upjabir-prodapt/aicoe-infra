@@ -45,4 +45,3 @@ variable "boot_disk_type" {
 variable "cloud_run_service_name" {}
 variable "cloud_run_service_name2" {}
 variable "cloud_run_service_name3" {}
- 

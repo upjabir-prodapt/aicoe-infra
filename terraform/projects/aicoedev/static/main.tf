@@ -33,11 +33,6 @@ module "identities" {
       roles = [
         "roles/run.invoker",
       ]
-      # NOTE: this reproduces the existing dev behaviour exactly - the
-      # "ui" role binding is actually granted to the "app" service account
-      # (google_project_iam_member.aicoe_ui_sa_iam in the old code binds to
-      # aicoe_app_sa.email, not aicoe_ui_sa.email). Change this to "ui" if
-      # that was a bug you want fixed - doing so will show as a plan change.
       grant_roles_to_account_key = "app"
     }
   }

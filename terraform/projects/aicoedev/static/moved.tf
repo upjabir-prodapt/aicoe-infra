@@ -147,16 +147,3 @@ moved {
   from = google_artifact_registry_repository.aicoe_artifact_repo
   to   = module.artifact.google_artifact_registry_repository.repository
 }
-
-# NOTE: google_project_iam_member.aicoe_app_sa_iam / aicoe_ui_sa_iam were
-# for_each over toset([...]) in the old code, so their instance keys ARE the
-# role strings themselves (e.g. "roles/run.admin") - matches the "from"
-# addresses above.
-
-# NOTE on data "google_project" "current" - data sources aren't tracked with
-# `moved`, nothing to do; module.storage declares its own copy internally.
-
-# NOTE: the google_secret_manager_secret.* resources in secrets.tf are
-# intentionally left at their original addresses (no module exists for
-# them yet), so no moved block is needed for those.
- 
