@@ -78,3 +78,16 @@ module "artifact" {
   }
 }
  
+#PAM
+module "pam" {
+  count = var.pam_enabled ? 1 : 0
+  source               = "../../../modules/static-pam"
+ 
+  gcp_project_id       = local.gcp_project_id
+  entitlement_id       = var.pam_entitlement_id
+  max_request_duration = var.pam_max_request_duration
+  requester_principals = var.pam_requester_principals
+  approver_principals  = var.pam_approver_principals
+  elevated_roles       = var.pam_elevated_roles
+  require_approval     = var.pam_max_request_duration
+}

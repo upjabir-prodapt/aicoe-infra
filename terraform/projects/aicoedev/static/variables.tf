@@ -23,3 +23,38 @@ variable "state_bucket" {
 variable "project_number" {}
 variable "gcp_apis_required" {}
 variable "artifact_format" {}
+
+variable "pam_enabled" {
+  type = bool
+  default =false
+}
+ 
+variable "pam_entitlement_id" {
+  type = string
+  default = ""
+}
+ 
+variable "pam_max_request_duration" {
+  type = string
+  default = "3600s"
+}
+ 
+variable "pam_requester_principals" {
+  type = list(string)
+  default = [ ]
+}
+ 
+variable "pam_approver_principals" {
+  type = list(string)
+   default = [ ]
+}
+ 
+variable "pam_elevated_roles" {
+  type = list(string)
+  default = [ ]
+}
+ 
+variable "pam_require_approval" {
+  type    = bool
+  default = true
+}
