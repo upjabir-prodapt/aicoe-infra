@@ -20,6 +20,7 @@ gcp_apis_required = [
     "compute.googleapis.com",                  # Compute Engine API
     "dlp.googleapis.com",                      # DLP API
     "privilegedaccessmanager.googleapis.com"   #PAM API
+    "binaryauthorization.googleapis.com"       #Binary Authorization API
  
 ]
 artifact_format = "docker"
