@@ -4,8 +4,8 @@ import {
 }
 
 import {
-    to = module.group_iam["Aicoedev-platformadmin@colt.net"].google_project_iam_member.group_members["iap.webServiceVersions.accessViaIAP"]
-    id = "aicoedev iap.webServiceVersions.accessViaIAP group:Aicoedev-platformadmin@colt.net"
+    to = module.group_iam["Aicoedev-platformadmin@colt.net"].google_project_iam_member.group_members["roles/iap.webServiceVersions.accessViaIAP"]
+    id = "aicoedev roles/iap.webServiceVersions.accessViaIAP group:Aicoedev-platformadmin@colt.net"
 }
 
 import {
