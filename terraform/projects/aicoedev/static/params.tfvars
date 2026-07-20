@@ -19,7 +19,7 @@ gcp_apis_required = [
     "serviceusage.googleapis.com",             # Service Usage API - enable/disable APIs
     "compute.googleapis.com",                  # Compute Engine API
     "dlp.googleapis.com",                      # DLP API
-    "privilegedaccessmanager.googleapis.com"   #PAM API
+    "privilegedaccessmanager.googleapis.com",   #PAM API
     "binaryauthorization.googleapis.com"       #Binary Authorization API
  
 ]
