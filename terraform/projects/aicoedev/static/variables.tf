@@ -58,3 +58,7 @@ variable "pam_require_approval" {
   type    = bool
   default = true
 }
+
+variable "group_access" {
+  type = map(list(string))
+}
