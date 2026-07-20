@@ -27,7 +27,7 @@ artifact_format = "docker"
 pam_enabled = false
 
 group_access = {
-    "Aicoedev-platformadmin@colt.net" = ["roles/compute.osAdminLogin", "iap.webServiceVersions.accessViaIAP", "roles/owner", "roles/iap.admin"]
+    "Aicoedev-platformadmin@colt.net" = ["roles/compute.osAdminLogin", "roles/iap.httpsResourceAccessor", "roles/owner", "roles/iap.admin"]
 }
  
  
