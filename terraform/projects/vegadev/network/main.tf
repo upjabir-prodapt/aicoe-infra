@@ -1,6 +1,5 @@
 module "network_base" {
-  source = "../modules/network-base"
-
+  source = "../../../modules/network-base"
   gcp_project_id  = local.gcp_project_id
   region          = var.region
   resource_prefix = local.resource_prefix
@@ -32,7 +31,7 @@ module "network_base" {
 }
 
 module "network_connectivity" {
-  source = "../modules/network-connectivity"
+  source = "../../../modules/network-connectivity"
 
   gcp_project_id           = local.gcp_project_id
   region                   = var.region
