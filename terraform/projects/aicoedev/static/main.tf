@@ -91,3 +91,12 @@ module "pam" {
   elevated_roles       = var.pam_elevated_roles
   require_approval     = var.pam_max_request_duration
 }
+
+#IAM
+module "group_iam" {
+  source               = "../../../modules/static-group-iam"
+  for_each             = var.group_access
+  gcp_project_id       = local.gcp_project_id
+  group_email          = each.key
+  roles                = each.value
+}

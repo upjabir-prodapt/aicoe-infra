@@ -8,8 +8,4 @@ variable "group_email" {
 
 variable "roles" {
   type = list(string)
-  default = [
-    "roles/viewer",
-    "roles/aiplatform.user",
-  ]
 }
