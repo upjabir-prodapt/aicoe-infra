@@ -1,9 +1,10 @@
-ENVNAME=dev
+ENVNAME=
 PROJECT=ai-product-security
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-static
-TFPLAN_FILE=../static-$(PROJECT)-$(ENVNAME)-$(REGION)-tf.plan
+#TFPLAN_FILE=../static-$(PROJECT)-$(ENVNAME)-$(REGION)-tf.plan
+TFPLAN_FILE=../../$(PROJECT_NAME)-static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 # CREDS_FILE=../$(PROJECT)$(ENVNAME).json
@@ -29,26 +30,25 @@ init: static_safety_check clean get
 	#	-backend-config 'workspace{name=$(PROJECT)-$(ENVNAME)}'
 
 plan: init
-	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params.tfvars
 
 landscape: init
-	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/$(ENVNAME)/params.tfvars | landscape
-
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params.tfvars | landscape
 apply: static_safety_check init
 	$(TF_EXEC) apply $(TFPLAN_FILE) && rm $(TFPLAN_FILE)
 
 destroy: init
-	$(TF_EXEC) -chdir=$(PWD) plan -destroy -var-file=params/${ENVNAME}/params.tfvars
-	$(TF_EXEC) -chdir=$(PWD) destroy -var-file=params/${ENVNAME}/params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) plan -destroy -var-file=params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) destroy -var-file=params.tfvars
 
 show: init
 	$(TF_EXEC) -chdir=$(PWD) show
 
 refresh: init
-	$(TF_EXEC) -chdir=$(PWD) refresh -var-file=params/${ENVNAME}.tfvars
+	$(TF_EXEC) -chdir=$(PWD) refresh -var-file=params.tfvars
 
 #importresource: init
-	#$(TF_EXEC) import -var-file=params/$(ENVNAME)/params.tfvars aws_iam_user.ses resource_name
+	#$(TF_EXEC) import -var-file=params.tfvars aws_iam_user.ses resource_name
 
 
 static_safety_check:
