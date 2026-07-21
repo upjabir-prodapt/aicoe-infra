@@ -12,5 +12,6 @@ module "base" {
   # project id string, not a project_number (unlike aicoedev/vegadev).
   # Reproduce that exact parent path so this migration is a pure state
   # move with no resource diff.
-  tag_binding_parent = "//cloudresourcemanager.googleapis.com/projects/${local.gcp_project_id}"
+  #tag_binding_parent = "//cloudresourcemanager.googleapis.com/projects/${local.gcp_project_id}"
+  tag_binding_parent = "//cloudresourcemanager.googleapis.com/projects/${var.project_number}"
 }
