@@ -13,3 +13,8 @@ variable "project_number" {
 variable "gcp_apis_required" {
   type = list(string)
 }
+
+variable "audit_services" {
+  type    = list(string)
+  default = ["storage.googleapis.com", "aiplatform.googleapis.com", "bigquery.googleapis.com"]
+}

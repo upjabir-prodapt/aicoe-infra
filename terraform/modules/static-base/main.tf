@@ -9,14 +9,31 @@ resource "google_project_service" "service" {
   }
 }
 
+###resource "google_project_iam_audit_config" "data_access" {
+###  for_each = toset([
+###    "storage.googleapis.com",
+###    "aiplatform.googleapis.com",
+###    "bigquery.googleapis.com",
+###  ])
+###  project = var.gcp_project_id
+###  service = each.value
+###
+###  /*audit_log_config {
+###    log_type = "ADMIN_READ"
+###  }
+###*/
+###  audit_log_config {
+###    log_type = "DATA_READ"
+###  }
+###
+###  audit_log_config {
+###    log_type = "DATA_WRITE"
+###  }
+###}
 resource "google_project_iam_audit_config" "data_access" {
-  for_each = toset([
-    "storage.googleapis.com",
-    "aiplatform.googleapis.com",
-    "bigquery.googleapis.com",
-  ])
-  project = var.gcp_project_id
-  service = each.value
+  for_each = toset(var.audit_services)
+  project  = var.gcp_project_id
+  service  = each.value
 
   /*audit_log_config {
     log_type = "ADMIN_READ"
