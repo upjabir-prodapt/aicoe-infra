@@ -178,6 +178,126 @@ aicoedev_infra_apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
+###vegadev_static_plan:
+###  extends:
+###    - .wif_vegadev
+###    - .terraform_plan
+###  stage: static_plan
+###  variables:
+###    PROJECT_NAME: vegadev
+###    TF_LAYER: static
+###    TF_ENV: dev
+###    TF_PROJECT: vega
+###    GCP_PROJECT_ID: vegadev-499613
+###    TFSTATE_BUCKET: vegadev-bucket-tf-state
+###  rules:
+###    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+###      changes:
+###        - terraform/projects/vegadev/static/**
+###        - terraform/modules/**
+###        - .gitlab/ci/**
+###        - .terraform-version
+###
+###vegadev_static_approve:
+###  stage: static_approve
+###  needs:
+###    - job: vegadev_static_plan
+###      artifacts: false
+###  script:
+###    - echo "Static layer approved for apply"
+###  when: manual
+###  allow_failure: false
+###  rules:
+###    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+###
+###
+###vegadev_static_apply:
+###  extends:
+###    - .wif_vegadev
+###    - .terraform_apply
+###  stage: static_apply
+###  needs:
+###    - job: vegadev_static_approve
+###      artifacts: true
+###  variables:
+###    PROJECT_NAME: vegadev
+###    TF_LAYER: static
+###    TF_ENV: dev
+###    TF_PROJECT: vega
+###    GCP_PROJECT_ID: vegadev-499613
+###    TFSTATE_BUCKET: vegadev-bucket-tf-state
+###  rules:
+###    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+###      changes:
+###        - terraform/projects/vegadev/static/**
+###        - terraform/modules/**
+###        - .gitlab/ci/**
+###        - .terraform-version
+###      when: manual
+###
+###vegadev_network_plan:
+###  extends:
+###    - .wif_vegadev
+###    - .terraform_plan
+###  stage: network_plan
+###  needs:
+###    - job: vegadev_static_apply
+###      artifacts: false
+###      optional: true
+###  variables:
+###    PROJECT_NAME: vegadev
+###    TF_LAYER: network
+###    TF_ENV: dev
+###    TF_PROJECT: vega
+###    GCP_PROJECT_ID: vegadev-499613
+###    TFSTATE_BUCKET: vegadev-bucket-tf-state
+###  rules:
+###    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+###      changes:
+###        - terraform/projects/vegadev/network/**
+###        - terraform/modules/**
+###        - .gitlab/ci/**
+###        - .terraform-version
+###
+###vegadev_network_approve:
+###  stage: network_approve
+###  needs:
+###    - job: vegadev_network_plan
+###      artifacts: false
+###  script:
+###    - echo "Network layer approved for apply"
+###  when: manual
+###  allow_failure: false
+###  rules:
+###    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+###
+###vegadev_network_apply:
+###  extends:
+###    - .wif_vegadev
+###    - .terraform_apply
+###  stage: network_apply
+###  needs:
+###    - job: vegadev_network_plan
+###      artifacts: true
+###  variables:
+###    PROJECT_NAME: vegadev
+###    TF_LAYER: network
+###    TF_ENV: dev
+###    TF_PROJECT: vega
+###    GCP_PROJECT_ID: vegadev-499613
+###    TFSTATE_BUCKET: vegadev-bucket-tf-state
+###  rules:
+###    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+###      changes:
+###        - terraform/projects/vegadev/network/**
+###        - terraform/modules/**
+###        - .gitlab/ci/**
+###        - .terraform-version
+###      when: manual
+
+
+# ---------------- VEGADEV STATIC ----------------
+
 vegadev_static_plan:
   extends:
     - .wif_vegadev
@@ -192,11 +312,6 @@ vegadev_static_plan:
     TFSTATE_BUCKET: vegadev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/vegadev/static/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
 
 vegadev_static_approve:
   stage: static_approve
@@ -210,15 +325,16 @@ vegadev_static_approve:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-
 vegadev_static_apply:
   extends:
     - .wif_vegadev
     - .terraform_apply
   stage: static_apply
   needs:
-    - job: vegadev_static_approve
+    - job: vegadev_static_plan
       artifacts: true
+    - job: vegadev_static_approve
+      artifacts: false
   variables:
     PROJECT_NAME: vegadev
     TF_LAYER: static
@@ -228,12 +344,8 @@ vegadev_static_apply:
     TFSTATE_BUCKET: vegadev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/vegadev/static/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
-      when: manual
+
+# ---------------- VEGADEV NETWORK ----------------
 
 vegadev_network_plan:
   extends:
@@ -253,11 +365,6 @@ vegadev_network_plan:
     TFSTATE_BUCKET: vegadev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/vegadev/network/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
 
 vegadev_network_approve:
   stage: network_approve
@@ -279,6 +386,8 @@ vegadev_network_apply:
   needs:
     - job: vegadev_network_plan
       artifacts: true
+    - job: vegadev_network_approve
+      artifacts: false
   variables:
     PROJECT_NAME: vegadev
     TF_LAYER: network
@@ -288,9 +397,3 @@ vegadev_network_apply:
     TFSTATE_BUCKET: vegadev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-      changes:
-        - terraform/projects/vegadev/network/**
-        - terraform/modules/**
-        - .gitlab/ci/**
-        - .terraform-version
-      when: manual
