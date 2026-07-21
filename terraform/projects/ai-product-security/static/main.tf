@@ -6,5 +6,5 @@ module "base" {
   gcp_apis_required = var.gcp_apis_required
   audit_services    = [ "aiplatform.googleapis.com" ]
   audit_log_types = ["ADMIN_READ", "DATA_READ", "DATA_WRITE"]
-  tag_binding_parent = "//cloudresourcemanager.googleapis.com/projects/${local.gcp_project_id}"
+  tag_binding_parent = "//cloudresourcemanager.googleapis.com/projects/${var.project_number}"
 }
