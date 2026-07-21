@@ -30,7 +30,7 @@ variable "environment_name" {
 
 variable "project_number" {
   type    = string
-  default = null
+  #default = null
   # Only required when tag_binding_parent is not set (see env_project binding
   # below) -- aicoedev/vegadev derive the tag-binding parent from this,
   # ai-product-security passes tag_binding_parent directly instead.
