@@ -259,6 +259,18 @@ vegadev_network_plan:
         - .gitlab/ci/**
         - .terraform-version
 
+vegadev_network_approve:
+  stage: network_approve
+  needs:
+    - job: vegadev_network_plan
+      artifacts: false
+  script:
+    - echo "Network layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
 vegadev_network_apply:
   extends:
     - .wif_vegadev
