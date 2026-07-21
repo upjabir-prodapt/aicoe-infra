@@ -5,4 +5,5 @@ module "base" {
   environment_name  = var.envname
   project_number    = var.project_number
   gcp_apis_required = var.gcp_apis_required
+  audit_services    = [ "aiplatform.googleapis.com" ]
 }
