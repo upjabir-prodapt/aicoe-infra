@@ -3,7 +3,8 @@ PROJECT=vega
 REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
 TFSTATE_DIR=tfstate-network
-TFPLAN_FILE=../network-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
+#TFPLAN_FILE=../network-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
+TFPLAN_FILE=../../$(PROJECT_NAME)-network-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 # CREDS_FILE=../$(PROJECT)$(ENVNAME).json
@@ -29,26 +30,25 @@ init: network_safety_check clean get
 	#	-backend-config 'workspace{name=$(PROJECT)$(ENVNAME)}'
 
 plan: init
-	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/${ENVNAME}/params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params.tfvars
 
 landscape: init
-	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params/${ENVNAME}/params.tfvars | landscape
+	$(TF_EXEC) -chdir=$(PWD) plan $(TF_EXTRA_OPTS) -refresh=true -out=$(TFPLAN_FILE) -var-file=params.tfvars | landscape
 
 apply: network_safety_check init
 	$(TF_EXEC) apply $(TFPLAN_FILE) && rm $(TFPLAN_FILE)
 
 destroy: init
-	$(TF_EXEC) -chdir=$(PWD) plan -destroy -var-file=params/${ENVNAME}/params.tfvars
-	$(TF_EXEC) -chdir=$(PWD) destroy -var-file=params/${ENVNAME}/params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) plan -destroy -var-file=params.tfvars
+	$(TF_EXEC) -chdir=$(PWD) destroy -var-file=params.tfvars
 
 show: init
 	$(TF_EXEC) -chdir=$(PWD) show
 
 refresh: init
-	$(TF_EXEC) -chdir=$(PWD) refresh -var-file=params/${ENVNAME}.tfvars
-
+	$(TF_EXEC) -chdir=$(PWD) refresh -var-file=params.tfvars
 #importresource: init
-	#$(TF_EXEC) import -var-file=params/${ENVNAME}/params.tfvars aws_iam_user.ses resource_name
+	#$(TF_EXEC) import -var-file=params.tfvars aws_iam_user.ses resource_name
 
 
 network_safety_check:
@@ -58,7 +58,7 @@ else
 	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	@echo -n "\nnetwork LAYER SELECTED - YOU MUST DOUBLE CHECK THE PLAN FOR ANY UNINTENDED CHANGES (SUCH AS RESERVED IPS CHANGING)"
 	@echo -n "\n[type 'UNDERSTOOD' then <enter> to continue] " && read ans && [ $${ans:-N} = UNDERSTOOD ]
-ifeq (, prod)
+ifeq ($(ENVNAME), prod)
 	@echo -n "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	@echo -n "\nLIVE SELECTED - ARE YOU SURE YOU WANT TO CONTINUE?"
 	@echo -n "\n[type '$(PROJECT)$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
