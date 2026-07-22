@@ -17,7 +17,7 @@ gcp_apis_required = [
     "monitoring.googleapis.com",               # Cloud Monitoring - metrics, dashboards, alerts
     "serviceusage.googleapis.com",             # Service Usage API - enable/disable APIs
     "compute.googleapis.com",                  # Compute Engine API
-    "iamcredentials.googleapis.com"
+    "iamcredentials.googleapis.com"            # IAM API
  
 ]
 artifact_format = "docker"
