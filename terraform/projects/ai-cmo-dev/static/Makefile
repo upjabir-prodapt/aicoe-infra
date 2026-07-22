@@ -56,3 +56,4 @@ ifeq ($(ENVNAME), prod)
 	@echo -n "\n[type '$(PROJECT)-$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
 endif
 endif
+ 
