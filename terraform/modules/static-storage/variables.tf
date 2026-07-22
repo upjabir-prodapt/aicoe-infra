@@ -25,13 +25,13 @@ variable "enable_kms" {
 
 variable "bucket_kms_key_ring_name_suffix" {
   type        = string
-  default     = "bucket-key-ring"
+  default     = "bkt-key-ring"
   description = "Suffix appended to resource_prefix for the bucket KMS key ring"
 }
 
 variable "bucket_kms_key_name_suffix" {
   type        = string
-  default     = "bucket-key"
+  default     = "bkt-key"
   description = "Suffix appended to resource_prefix for the bucket KMS key"
 }
 
