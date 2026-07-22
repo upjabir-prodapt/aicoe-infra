@@ -6,29 +6,29 @@ locals {
   vertex_ai_service_agent = "serviceAccount:service-${data.google_project.current.number}@gcp-sa-aiplatform.iam.gserviceaccount.com"
 }
 
-resource "google_kms_key_ring" "bucket_key_ring" {
-  count    = var.enable_kms ? 1 : 0
-  name     = "${var.resource_prefix}-${var.bucket_kms_key_ring_name_suffix}"
-  location = var.region
-  project  = var.gcp_project_id
-}
+# resource "google_kms_key_ring" "bucket_key_ring" {
+#   count    = var.enable_kms ? 1 : 0
+#   name     = "${var.resource_prefix}-${var.bucket_kms_key_ring_name_suffix}"
+#   location = var.region
+#   project  = var.gcp_project_id
+# }
 
-resource "google_kms_crypto_key" "bucket_key" {
-  count           = var.enable_kms ? 1 : 0
-  name            = "${var.resource_prefix}-${var.bucket_kms_key_name_suffix}"
-  key_ring        = google_kms_key_ring.bucket_key_ring[0].id
-  rotation_period = "1000000s"
+# resource "google_kms_crypto_key" "bucket_key" {
+#   count           = var.enable_kms ? 1 : 0
+#   name            = "${var.resource_prefix}-${var.bucket_kms_key_name_suffix}"
+#   key_ring        = google_kms_key_ring.bucket_key_ring[0].id
+#   rotation_period = "1000000s"
 
-  lifecycle {
-    prevent_destroy = true
-  }
+#   lifecycle {
+#     prevent_destroy = true
+#   }
 
-  labels = var.labels
+#   labels = var.labels
 
-  version_template {
-    algorithm = "GOOGLE_SYMMETRIC_ENCRYPTION"
-  }
-}
+#   version_template {
+#     algorithm = "GOOGLE_SYMMETRIC_ENCRYPTION"
+#   }
+# }
 
 
 resource "google_storage_bucket" "buckets" {
