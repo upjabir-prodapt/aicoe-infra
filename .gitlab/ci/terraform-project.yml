@@ -115,7 +115,7 @@
       # Matches Makefile's TFPLAN_FILE=../../$(PROJECT_NAME)-static-...
       # which resolves 2 levels up from terraform/projects/<project>/<layer>/
       # i.e. terraform/projects/ at the repo root.
-      - "terraform/projects/${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}-${TF_ENV}-${TF_REGION}-tf.plan"
+      - "terraform/projects/${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}-${TF_REGION}-tf.plan"
 
 .terraform_apply:
   extends: .terraform_base
