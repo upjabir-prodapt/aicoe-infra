@@ -18,7 +18,9 @@ gcp_apis_required = [
     "serviceusage.googleapis.com",             # Service Usage API - enable/disable APIs
     "compute.googleapis.com",                  # Compute Engine API
     "iamcredentials.googleapis.com",           # IAM API
-    "cloudresourcemanager.googleapis.com"      # Cloud Resource Manager API 
+    "cloudresourcemanager.googleapis.com",     # Cloud Resource Manager API 
+    "iam.googleapis.com",                      #IAM API
+    "storage.googleapis.com",                  #GCS API
   
 ]
 artifact_format = "docker"

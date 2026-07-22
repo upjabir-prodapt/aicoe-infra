@@ -39,7 +39,6 @@ module "storage" {
   app_sa_email          = module.identities.service_account_emails["app"]
   enable_kms            = true
   bucket_suffixes = [
-    "vx-app-001",
     "vxai-bs",
     "vxai-sales-app-001",
     "vector-search",
