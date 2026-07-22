@@ -43,12 +43,12 @@ resource "google_storage_bucket" "buckets" {
     enabled = true
   }
 
-  dynamic "encryption" {
-    for_each = var.enable_kms ? [1] : []
-    content {
-      default_kms_key_name = google_kms_crypto_key.bucket_key[0].id
-    }
-  }
+  # dynamic "encryption" {
+  #   for_each = var.enable_kms ? [1] : []
+  #   content {
+  #     default_kms_key_name = google_kms_crypto_key.bucket_key[0].id
+  #   }
+  # }
 
   labels = var.labels
 }
