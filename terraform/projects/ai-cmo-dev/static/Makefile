@@ -5,7 +5,7 @@ REGION=europe-west1
 TFSTATE_BUCKET=$(PROJECT_NAME)-bucket-tf-state
 ####gs://aicoedev-tf-state/aicoedev/tfstate-static/default.tfstate
 TFSTATE_DIR=$(PROJECT_NAME)/tfstate-static
-../../$(PROJECT_NAME)-static-$(PROJECT_NAME)-$(REGION)-tf.plan
+TFPLAN_FILE=../../$(PROJECT_NAME)-static-$(PROJECT_NAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 
