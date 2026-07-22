@@ -27,6 +27,7 @@ module "identities" {
       ]
     }
   }
+  depends_on = [module.base]
 }
 
 module "storage" {
@@ -47,6 +48,8 @@ module "storage" {
   bucket_kms_key_name_suffix         = "app-bucket-key"
 
   labels                              = local.default_labels
+
+  depends_on = [module.base]
 }
 
 module "artifact" {
@@ -64,5 +67,6 @@ module "artifact" {
       member = "serviceAccount:${module.storage.vertex_ai_service_agent_email}"
     }
   }
+  depends_on = [module.base]
 }
  

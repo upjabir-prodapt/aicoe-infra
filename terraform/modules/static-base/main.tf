@@ -8,7 +8,7 @@ resource "google_project_service" "service" {
     ignore_changes = [deletion_policy]
   }
 }
-
+  
 resource "google_project_iam_audit_config" "data_access" {
   for_each = toset(var.audit_services)
   project  = var.gcp_project_id
