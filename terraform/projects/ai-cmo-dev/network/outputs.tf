@@ -23,9 +23,9 @@ output "psc_endpoint_ip" {
   value = module.network_connectivity.psc_google_apis_ip
 }
 
-output "dns_zone_name" {
-  value = google_dns_managed_zone.aicoe_googleapis_private.name
-}
+# output "dns_zone_name" {
+#   value = google_dns_managed_zone.aicoe_googleapis_private.name
+# }
 
 output "aicoe_staticip_ilb_salesagent" {
   value = module.network_connectivity.reserved_internal_addresses["salesagent-ilb"].address
