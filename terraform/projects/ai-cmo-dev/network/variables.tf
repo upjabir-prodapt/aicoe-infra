@@ -62,4 +62,13 @@ variable "internal_dns_zone" {
   type    = string
   default = "ai-cmo-dev-int.colt.net."
 }
+
+variable "internal_dns_records" {
+  type = map(object({
+    name    = string
+    address = string
+  }))
+  default = {}
+}
+
  

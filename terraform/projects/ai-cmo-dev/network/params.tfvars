@@ -6,6 +6,14 @@ subnet_cidr_range        = "10.110.73.0/24"
 proxy_subnet_cidr_range  = "192.168.5.0/24"
 psc_google_apis_address  = "192.168.2.3"
 internal_dns_zone        = "ai-cmo-dev-int.colt.net."
+
+internal_dns_records     = {
+  salesagent = {
+    name    = "salesagent.ai-cmo-dev-int.colt.net."
+    address = "10.110.73.22"
+  }
+}
+
  
 # TODO: confirm these two lists against dev's real requirements - they were
 # not parameterized in the old dev code (ingress_allow_https had a fixed

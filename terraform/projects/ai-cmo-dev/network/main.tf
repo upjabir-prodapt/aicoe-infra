@@ -50,7 +50,8 @@ module "network_connectivity" {
   psc_google_apis_address     = var.psc_google_apis_address
   reserved_internal_addresses = var.reserved_internal_addresses
   regional_psc_addresses      = var.regional_psc_addresses
-
+  internal_dns_zone           = var.internal_dns_zone
+  internal_dns_records        = var.internal_dns_records
 
   enable_cloud_dns = true
 
@@ -113,53 +114,53 @@ resource "google_compute_firewall" "aicoe_ingress_allow_zscaler_ip" {
 }
 
 
-###########################################
-### Dev-only DNS zones/records            ###
-### Kept as plain resources - see enable_cloud_dns comment above. ###
-###########################################
+# ###########################################
+# ### Dev-only DNS zones/records            ###
+# ### Kept as plain resources - see enable_cloud_dns comment above. ###
+# ###########################################
 
-resource "google_dns_managed_zone" "aicoe_googleapis_private" {
-  name        = "${local.resource_prefix}-googleapis-private"
-  dns_name    = "googleapis.com."
-  description = "Private DNS zone for Google APIs via PSC"
-  visibility  = "private"
+# resource "google_dns_managed_zone" "aicoe_googleapis_private" {
+#   name        = "${local.resource_prefix}-googleapis-private"
+#   dns_name    = "googleapis.com."
+#   description = "Private DNS zone for Google APIs via PSC"
+#   visibility  = "private"
 
-  private_visibility_config {
-    networks {
-      network_url = module.network_base.network_id
-    }
-  }
-}
+#   private_visibility_config {
+#     networks {
+#       network_url = module.network_base.network_id
+#     }
+#   }
+# }
 
-resource "google_dns_record_set" "aicoe_wildcard_googleapis" {
-  name         = "*.googleapis.com."
-  managed_zone = google_dns_managed_zone.aicoe_googleapis_private.name
-  type         = "A"
-  ttl          = 300
-  rrdatas      = [module.network_connectivity.psc_google_apis_ip]
-}
+# resource "google_dns_record_set" "aicoe_wildcard_googleapis" {
+#   name         = "*.googleapis.com."
+#   managed_zone = google_dns_managed_zone.aicoe_googleapis_private.name
+#   type         = "A"
+#   ttl          = 300
+#   rrdatas      = [module.network_connectivity.psc_google_apis_ip]
+# }
 
-resource "google_dns_managed_zone" "aicoe_internal" {
-  name        = "${local.resource_prefix}-internal"
-  dns_name    = var.internal_dns_zone
-  description = "Private DNS zone for internal ILB"
-  visibility  = "private"
+# resource "google_dns_managed_zone" "aicoe_internal" {
+#   name        = "${local.resource_prefix}-internal"
+#   dns_name    = var.internal_dns_zone
+#   description = "Private DNS zone for internal ILB"
+#   visibility  = "private"
 
-  private_visibility_config {
-    networks {
-      network_url = module.network_base.network_id
-    }
-  }
-}
+#   private_visibility_config {
+#     networks {
+#       network_url = module.network_base.network_id
+#     }
+#   }
+# }
 
 
-resource "google_dns_record_set" "aicoe_salesagent_dns" {
-  name         = "salesagent.aicmodev-int.colt.net."
-  project      = local.gcp_project_id
-  managed_zone = google_dns_managed_zone.aicoe_internal.name
-  type         = "A"
-  ttl          = 300
-  rrdatas      = [var.reserved_internal_addresses["salesagent-ilb"].address]
-}
+# resource "google_dns_record_set" "aicoe_salesagent_dns" {
+#   name         = "salesagent.ai-cmo-dev-int.colt.net."
+#   project      = local.gcp_project_id
+#   managed_zone = google_dns_managed_zone.aicoe_internal.name
+#   type         = "A"
+#   ttl          = 300
+#   rrdatas      = [var.reserved_internal_addresses["salesagent-ilb"].address]
+# }
 
  
