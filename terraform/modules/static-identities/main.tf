@@ -1,4 +1,4 @@
-resource "google_service_account" "this" {
+resource "google_service_account" "sa" {
   for_each = var.service_accounts
 
   account_id   = each.value.account_id
@@ -17,7 +17,7 @@ locals {
   ]...)
 }
 
-resource "google_project_iam_member" "this" {
+resource "google_project_iam_member" "iam" {
   for_each = local.iam_bindings
 
   project = var.gcp_project_id

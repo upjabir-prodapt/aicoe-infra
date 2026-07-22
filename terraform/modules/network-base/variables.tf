@@ -53,15 +53,6 @@ variable "enable_iap_ssh_ingress" {
   default = true
 }
 
-variable "enable_fastly_pypi_egress" {
-  type    = bool
-  default = false
-}
-
-variable "enable_azure_devops_rules" {
-  type    = bool
-  default = false
-}
 
 variable "enable_https_ilb_ingress" {
   type    = bool

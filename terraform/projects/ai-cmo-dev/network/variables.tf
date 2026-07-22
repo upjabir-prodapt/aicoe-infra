@@ -60,6 +60,6 @@ variable "regional_psc_addresses" {
 
 variable "internal_dns_zone" {
   type    = string
-  default = "aicoedev-int.colt.net."
+  default = "ai-cmo-dev-int.colt.net."
 }
  

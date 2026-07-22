@@ -16,7 +16,6 @@ module "identities" {
       account_id   = "${local.resource_prefix}-app-sa"
       display_name = "Service Account for Application WIF"
       roles = [
-        "roles/aiplatform.admin",
         "roles/aiplatform.user",
         "roles/storage.admin",
         "roles/bigquery.dataEditor",
@@ -26,19 +25,6 @@ module "identities" {
         "roles/iap.httpsResourceAccessor",
         "roles/secretmanager.secretAccessor",
       ]
-    }
-    ui = {
-      account_id   = "${local.resource_prefix}-ui-sa"
-      display_name = "Service Account for UI"
-      roles = [
-        "roles/run.invoker",
-      ]
-      # NOTE: this reproduces the existing dev behaviour exactly - the
-      # "ui" role binding is actually granted to the "app" service account
-      # (google_project_iam_member.aicoe_ui_sa_iam in the old code binds to
-      # aicoe_app_sa.email, not aicoe_ui_sa.email). Change this to "ui" if
-      # that was a bug you want fixed - doing so will show as a plan change.
-      grant_roles_to_account_key = "app"
     }
   }
 }
@@ -51,7 +37,6 @@ module "storage" {
   resource_prefix       = local.resource_prefix
   app_sa_email          = module.identities.service_account_emails["app"]
   enable_kms            = true
-  enable_workbench_kms  = true
   bucket_suffixes = [
     "vx-app-001",
     "vxai-bs",
@@ -60,8 +45,7 @@ module "storage" {
   ]
   bucket_kms_key_ring_name_suffix    = "app-bucket-key-ring"
   bucket_kms_key_name_suffix         = "app-bucket-key"
-  workbench_kms_key_ring_name_suffix = "vxai-wkb-key-ring"
-  workbench_kms_key_name_suffix      = "vxai-wkb-key"
+
   labels                              = local.default_labels
 }
 

@@ -24,17 +24,16 @@ module "network_base" {
 
   # These flags reproduce today's dev environment exactly (all currently
   # false/absent in dev, unlike sandox where they are enabled).
-  enable_fastly_pypi_egress     = false
-  enable_azure_devops_rules     = false
-  enable_internal_ilb_egress    = false
+  enable_internal_ilb_egress    = true
   enable_google_apis_psc_egress = true
+  enable_egress_deny_all = true
 
   # Disabled here and recreated as plain resources below - the module
   # hardcodes a shorter description, and (for https) a fixed ports=["443"]
   # list. Dev needs 443 AND 8000, plus the original descriptions, so
   # routing these through the module would show as a permanent plan diff.
-  enable_https_ilb_ingress = false
-  enable_iap_ssh_ingress   = false
+  enable_https_ilb_ingress = true
+  enable_iap_ssh_ingress   = true
 
   labels = local.default_labels
 }
@@ -52,14 +51,8 @@ module "network_connectivity" {
   reserved_internal_addresses = var.reserved_internal_addresses
   regional_psc_addresses      = var.regional_psc_addresses
 
-  # dev has no Cloud NAT today (sandox-only in the old code) - keep it that way.
-  enable_cloud_nat = false
 
-  # Disabled here and recreated as plain resources below - the module
-  # bundles an unrequested *.googleusercontent.com private DNS zone into
-  # every enable_cloud_dns=true call, with no flag to skip just that piece.
-  # Dev only wants the googleapis + internal zones it already has.
-  enable_cloud_dns = false
+  enable_cloud_dns = true
 
   labels = local.default_labels
 }
@@ -119,46 +112,6 @@ resource "google_compute_firewall" "aicoe_ingress_allow_zscaler_ip" {
   }
 }
 
-resource "google_compute_firewall" "aicoe_ingress_allow_https" {
-  name        = "ingress-allow-https-ilb"
-  network     = module.network_base.network_id
-  description = "Allow HTTPS traffic for Internal Load Balancer - Ingress"
-  direction   = "INGRESS"
-  priority    = 65534
-  source_ranges = var.ingress_https_source_ranges
-  source_tags             = null
-  source_service_accounts = null
-  target_tags              = null
-  target_service_accounts  = null
-
-  allow {
-    protocol = "tcp"
-    ports    = ["443", "8000"]
-  }
-
-  log_config {
-    metadata = "INCLUDE_ALL_METADATA"
-  }
-}
-
-resource "google_compute_firewall" "aicoe_ingress_allow_iap" {
-  name        = "ingress-allow-iap-ssh"
-  network     = module.network_base.network_id
-  description = "FW rules required to ssh into instances via IAP - useful for diagnosing faulty notebooks/instances"
-  direction   = "INGRESS"
-  source_tags             = null
-  source_service_accounts = null
-  target_tags              = null
-  target_service_accounts  = null
-  priority                 = 65534
-
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = ["35.235.240.0/20"]
-}
 
 ###########################################
 ### Dev-only DNS zones/records            ###
@@ -200,7 +153,6 @@ resource "google_dns_managed_zone" "aicoe_internal" {
 }
 
 
-
 resource "google_dns_record_set" "aicoe_salesagent_dns" {
   name         = "salesagent.aicoedev-int.colt.net."
   project      = local.gcp_project_id
@@ -210,12 +162,4 @@ resource "google_dns_record_set" "aicoe_salesagent_dns" {
   rrdatas      = [var.reserved_internal_addresses["salesagent-ilb"].address]
 }
 
-resource "google_dns_record_set" "aicoe_aihub_dns" {
-  name         = "aihub.aicoedev-int.colt.net."
-  project      = local.gcp_project_id
-  managed_zone = google_dns_managed_zone.aicoe_internal.name
-  type         = "A"
-  ttl          = 300
-  rrdatas      = [var.reserved_internal_addresses["frontend-ilb"].address]
-}
  

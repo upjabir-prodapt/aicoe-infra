@@ -1,11 +1,10 @@
 ENVNAME=dev
-PROJECT=ai-cmo-dev
-PROJECT_NAME=ai-cmo-dev
+PROJECT=ai-cmo
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)$(ENVNAME)-bucket-tf-state
+TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
 ####gs://aicoedev-tf-state/aicoedev/tfstate-static/default.tfstate
-TFSTATE_DIR=$(PROJECT_NAME)/tfstate-static
-TFPLAN_FILE=../../$(PROJECT_NAME)-static-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
+TFSTATE_DIR=$(PROJECT)-$(ENVNAME)/tfstate-static
+TFPLAN_FILE=../../$(PROJECT)-$(ENVNAME)-static-$(PROJECT)-$(ENVNAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 
@@ -49,10 +48,10 @@ layer_safety_check:
 ifeq ($(SKIP_INTERACTIVE_SAFETY_PROMPT), true)
 	@echo "SKIP_INTERACTIVE_SAFETY_PROMPT set to true, continuing without interactive safety check prompt."
 else
-	@echo -n "\nWARNING: $(LAYER) layer for project $(PROJECT_NAME)"
+	@echo -n "\nWARNING: $(LAYER) layer for project $(PROJECT)-$(ENVNAME)"
 	@echo -n "\n[type 'UNDERSTOOD' then <enter> to continue] " && read ans && [ $${ans:-N} = UNDERSTOOD ]
 ifeq ($(ENVNAME), prod)
 	@echo -n "\nLIVE SELECTED - ARE YOU SURE?"
-	@echo -n "\n[type '$(PROJECT)$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
+	@echo -n "\n[type '$(PROJECT)-$(ENVNAME)' then <enter> to continue] " && read ans && [ $${ans:-N} = $(PROJECT)$(ENVNAME) ]
 endif
 endif

@@ -71,10 +71,6 @@ variable "internal_dns_records" {
   default = {}
 }
 
-variable "enable_cloud_nat" {
-  type    = bool
-  default = true
-}
 
 variable "enable_cloud_dns" {
   type    = bool
@@ -84,12 +80,6 @@ variable "enable_cloud_dns" {
 variable "enable_psc" {
   type    = bool
   default = true
-}
-
-variable "cloud_nat_ip_name_suffixes" {
-  type        = list(string)
-  default     = ["staticip-nat-1", "staticip-nat-2"]
-  description = "Name suffixes for regional static IPs used by Cloud NAT"
 }
 
 variable "labels" {

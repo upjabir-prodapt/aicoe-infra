@@ -1,7 +1,3 @@
-variable "project_name" {
-  type = string
-}
-
 variable "project" {}
 variable "envname" {}
 variable "region" {}

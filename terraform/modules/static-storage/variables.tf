@@ -22,10 +22,6 @@ variable "enable_kms" {
   default     = true
 }
 
-variable "enable_workbench_kms" {
-  type    = bool
-  default = true
-}
 
 variable "bucket_kms_key_ring_name_suffix" {
   type        = string
@@ -39,17 +35,6 @@ variable "bucket_kms_key_name_suffix" {
   description = "Suffix appended to resource_prefix for the bucket KMS key"
 }
 
-variable "workbench_kms_key_ring_name_suffix" {
-  type        = string
-  default     = "workbench-key-ring"
-  description = "Suffix appended to resource_prefix for the optional workbench KMS key ring"
-}
-
-variable "workbench_kms_key_name_suffix" {
-  type        = string
-  default     = "workbench-key"
-  description = "Suffix appended to resource_prefix for the optional workbench KMS key"
-}
 
 variable "bucket_suffixes" {
   type        = list(string)

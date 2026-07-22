@@ -1,8 +1,7 @@
-project_name   = "ai-cmo-dev"
 project        = "ai-cmo-dev"
 envname        = "dev"
 region         = "europe-west1"
-project_number = "32"
+project_number = "32658888279"
 gcp_apis_required = [
  
     "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training
@@ -21,5 +20,4 @@ gcp_apis_required = [
  
 ]
 artifact_format = "docker"
- 
  

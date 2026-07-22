@@ -2,10 +2,6 @@ output "aicoe_app_bucket_key_id" {
   value = module.storage.bucket_key_id
 }
 
-output "aicoe_vxai_wkb_key_id" {
-  value = module.storage.workbench_key_id
-}
-
 output "vector_search_bucket_name" {
   value       = module.storage.bucket_names["vector-search"]
   description = "GCS bucket for catalog embeddings and vector search artifacts"

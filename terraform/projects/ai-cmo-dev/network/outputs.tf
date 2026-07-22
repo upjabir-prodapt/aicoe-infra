@@ -14,9 +14,6 @@ output "aicoe_proxy_only_subnet_name" {
   value = module.network_base.proxy_only_subnet_self_link
 }
 
-output "aicoe_staticip_ilb" {
-  value = module.network_connectivity.reserved_internal_addresses["translation-ilb"].address
-}
 
 output "aicoe_subnet_cidr" {
   value = module.network_base.subnet_cidr_range
@@ -34,9 +31,6 @@ output "aicoe_staticip_ilb_salesagent" {
   value = module.network_connectivity.reserved_internal_addresses["salesagent-ilb"].address
 }
 
-output "aicoe_staticip_ilb_aihub" {
-  value = module.network_connectivity.reserved_internal_addresses["frontend-ilb"].address
-}
 
 # Kept for the infra layer's vector-search module, which now owns the PSC
 # forwarding rule to the vector index (see infra/moved.tf note).

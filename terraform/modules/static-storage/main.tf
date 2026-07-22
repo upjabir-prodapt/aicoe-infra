@@ -30,29 +30,6 @@ resource "google_kms_crypto_key" "bucket_key" {
   }
 }
 
-resource "google_kms_key_ring" "workbench_key_ring" {
-  count    = var.enable_kms && var.enable_workbench_kms ? 1 : 0
-  name     = "${var.resource_prefix}-${var.workbench_kms_key_ring_name_suffix}"
-  location = var.region
-  project  = var.gcp_project_id
-}
-
-resource "google_kms_crypto_key" "workbench_key" {
-  count           = var.enable_kms && var.enable_workbench_kms ? 1 : 0
-  name            = "${var.resource_prefix}-${var.workbench_kms_key_name_suffix}"
-  key_ring        = google_kms_key_ring.workbench_key_ring[0].id
-  rotation_period = "1000000s"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
-  labels = var.labels
-
-  version_template {
-    algorithm = "GOOGLE_SYMMETRIC_ENCRYPTION"
-  }
-}
 
 resource "google_storage_bucket" "buckets" {
   for_each                    = toset(var.bucket_suffixes)
