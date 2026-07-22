@@ -1,10 +1,10 @@
 ENVNAME=dev
-PROJECT=ai-cmo
+PROJECT=ai-cmo-dev
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
+TFSTATE_BUCKET=$(PROJECT)-bucket-tf-state
 ####gs://aicoedev-tf-state/aicoedev/tfstate-static/default.tfstate
-TFSTATE_DIR=$(PROJECT)-$(ENVNAME)/tfstate-static
-TFPLAN_FILE=../../$(PROJECT)-$(ENVNAME)-static-$(PROJECT)-$(ENVNAME)-$(REGION)-tf.plan
+TFSTATE_DIR=$(PROJECT)tfstate-static
+TFPLAN_FILE=../../$(PROJECT)-network-$(PROJECT)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 
