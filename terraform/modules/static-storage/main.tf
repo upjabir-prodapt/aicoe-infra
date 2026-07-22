@@ -49,7 +49,7 @@ resource "google_storage_bucket" "buckets" {
   #     default_kms_key_name = google_kms_crypto_key.bucket_key[0].id
   #   }
   # }
-
+ 
   labels = var.labels
 }
 
