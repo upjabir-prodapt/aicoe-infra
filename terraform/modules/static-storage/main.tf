@@ -53,17 +53,17 @@ resource "google_storage_bucket" "buckets" {
   labels = var.labels
 }
 
-resource "google_kms_crypto_key_iam_member" "app_sa_bucket_key" {
-  count         = var.enable_kms && var.app_sa_email != "" ? 1 : 0
-  crypto_key_id = google_kms_crypto_key.bucket_key[0].id
-  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member        = "serviceAccount:${var.app_sa_email}"
-}
+# resource "google_kms_crypto_key_iam_member" "app_sa_bucket_key" {
+#   count         = var.enable_kms && var.app_sa_email != "" ? 1 : 0
+#   crypto_key_id = google_kms_crypto_key.bucket_key[0].id
+#   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+#   member        = "serviceAccount:${var.app_sa_email}"
+# }
 
-resource "google_kms_crypto_key_iam_member" "vertex_sa_bucket_key" {
-  count         = var.enable_kms ? 1 : 0
-  crypto_key_id = google_kms_crypto_key.bucket_key[0].id
-  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member        = local.vertex_ai_service_agent
-}
+# resource "google_kms_crypto_key_iam_member" "vertex_sa_bucket_key" {
+#   count         = var.enable_kms ? 1 : 0
+#   crypto_key_id = google_kms_crypto_key.bucket_key[0].id
+#   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+#   member        = local.vertex_ai_service_agent
+# }
  
