@@ -1,9 +1,10 @@
 ENVNAME=dev
 PROJECT=ai-cmo
+PROJECT_NAME=ai-cmo-dev
 REGION=europe-west1
-TFSTATE_BUCKET=$(PROJECT)-$(ENVNAME)-bucket-tf-state
-TFSTATE_DIR=$(PROJECT)-$(ENVNAME)/tfstate-network
-TFPLAN_FILE=../../$(PROJECT)-$(ENVNAME)-network-$(PROJECT)$(ENVNAME)-$(REGION)-tf.plan
+TFSTATE_BUCKET=$(PROJECT_NAME)-bucket-tf-state
+TFSTATE_DIR=tfstate-network
+TFPLAN_FILE=../../$(PROJECT_NAME)-network-$(PROJECT_NAME)-$(REGION)-tf.plan
 TF_EXEC=terraform
 TF_EXTRA_OPTS=
 LAYER=network
