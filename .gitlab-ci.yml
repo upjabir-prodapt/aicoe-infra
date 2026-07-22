@@ -292,7 +292,7 @@ ai-cmo-dev_static_plan:
     PROJECT_NAME: ai-cmo-dev
     TF_LAYER: static
     TF_ENV: dev
-    TF_PROJECT: ai-cmo
+    TF_PROJECT: ai-cmo-dev
     TF_REGION: europe-west1
     GCP_PROJECT_ID: ai-cmo-dev
     TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
