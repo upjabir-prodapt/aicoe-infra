@@ -428,7 +428,7 @@ ai-cmo-dev_network_apply:
 ###########################################
 # ----------AI-CMO-DEV INFRA -------------##
 ###########################################
-aicoedev_infra_plan:
+ai-cmo-dev_infra_plan:
   extends:
     - .wif_ai-cmo-dev
     - .terraform_plan
@@ -450,7 +450,7 @@ aicoedev_infra_plan:
         - terraform/projects/ai-cmo-dev/**/*
         - terraform/modules/**/*
 
-aicoedev_infra_approve:
+ai-cmo-dev_infra_approve:
   stage: infra_approve
   needs:
     - job: ai-cmo-dev_infra_plan
@@ -465,7 +465,7 @@ aicoedev_infra_approve:
         - terraform/projects/ai-cmo-dev/**/*
         - terraform/modules/**/*
 
-aicoedev_infra_apply:
+ai-cmo-dev_infra_apply:
   extends:
     - .wif_ai-cmo-dev
     - .terraform_apply
