@@ -13,9 +13,9 @@ resource "google_secret_manager_secret" "sales_agent_service_secret" {
     user_managed {
       replicas {
         location = var.region
-        customer_managed_encryption {
-          kms_key_name = module.storage.bucket_key_id
-        }
+        # customer_managed_encryption {
+        #   kms_key_name = module.storage.bucket_key_id
+        # }
       }
     }
   }
