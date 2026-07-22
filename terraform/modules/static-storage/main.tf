@@ -66,4 +66,3 @@ resource "google_kms_crypto_key_iam_member" "vertex_sa_bucket_key" {
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member        = local.vertex_ai_service_agent
 }
- 
