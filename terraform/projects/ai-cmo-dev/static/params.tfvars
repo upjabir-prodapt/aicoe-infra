@@ -19,7 +19,7 @@ gcp_apis_required = [
     "compute.googleapis.com",                  # Compute Engine API
     "iamcredentials.googleapis.com"            # IAM API
     "cloudresourcemanager.googleapis.com"      # Cloud Resource Manager API
- 
+  
 ]
 artifact_format = "docker"
  
