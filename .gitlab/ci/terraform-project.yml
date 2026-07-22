@@ -123,7 +123,7 @@
   script:
     - |
       set -euo pipefail
-      PLAN_FILE="${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}${TF_ENV}-${TF_REGION}-tf.plan"
+      PLAN_FILE="${PROJECT_NAME}-${TF_LAYER}-${TF_PROJECT}-${TF_REGION}-tf.plan"
       LAYER_DIR="terraform/projects/${PROJECT_NAME}/${TF_LAYER}"
       echo "==> Apply job: plan=${PLAN_FILE}"
       if [[ ! -f "${CI_PROJECT_DIR}/terraform/projects/${PLAN_FILE}" ]]; then
