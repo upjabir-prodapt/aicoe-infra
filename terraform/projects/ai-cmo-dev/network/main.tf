@@ -154,7 +154,7 @@ resource "google_dns_managed_zone" "aicoe_internal" {
 
 
 resource "google_dns_record_set" "aicoe_salesagent_dns" {
-  name         = "salesagent.aicoedev-int.colt.net."
+  name         = "salesagent.aicmodev-int.colt.net."
   project      = local.gcp_project_id
   managed_zone = google_dns_managed_zone.aicoe_internal.name
   type         = "A"
