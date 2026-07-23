@@ -51,6 +51,14 @@ resource "google_storage_bucket" "buckets" {
   }
  
   labels = var.labels
+
+  lifecycle {
+    ignore_changes = [ 
+      encryption[0].customer_managed_encrption_enforcement_config,
+      encryption[0].customer_supplied_encrption_enforcement_config,
+      encryption[0].google_managed_encrption_enforcement_config,
+     ]
+  }
 }
 
 resource "google_kms_crypto_key_iam_member" "app_sa_bucket_key" {

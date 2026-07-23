@@ -362,68 +362,68 @@ ai-cmo-dev_static_apply:
       changes:
         - terraform/projects/ai-cmo-dev/**/*
         - terraform/modules/**/*
-# ###################################################
-# # --------------  AI-CMO-DEV NETWORK -------------#
-# ###################################################
-# ai-cmo-dev_network_plan:
-#   extends:
-#     - .wif_ai-cmo-dev
-#     - .terraform_plan
-#   stage: network_plan
-#   needs:
-#     - job: ai-cmo-dev_static_apply
-#       artifacts: false
-#       optional: true
-#   variables:
-#     PROJECT_NAME: ai-cmo-dev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: ai-cmo-dev
-#     GCP_PROJECT_ID: ai-cmo-dev
-#     TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+###################################################
+# --------------  AI-CMO-DEV NETWORK -------------#
+###################################################
+ai-cmo-dev_network_plan:
+  extends:
+    - .wif_ai-cmo-dev
+    - .terraform_plan
+  stage: network_plan
+  needs:
+    - job: ai-cmo-dev_static_apply
+      artifacts: false
+      optional: true
+  variables:
+    PROJECT_NAME: ai-cmo-dev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: ai-cmo-dev
+    GCP_PROJECT_ID: ai-cmo-dev
+    TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 
-# ai-cmo-dev_network_approve:
-#   stage: network_approve
-#   needs:
-#     - job: ai-cmo-dev_network_plan
-#       artifacts: false
-#   script:
-#     - echo "Network layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_network_approve:
+  stage: network_approve
+  needs:
+    - job: ai-cmo-dev_network_plan
+      artifacts: false
+  script:
+    - echo "Network layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 
-# ai-cmo-dev_network_apply:
-#   extends:
-#     - .wif_ai-cmo-dev
-#     - .terraform_apply
-#   stage: network_apply
-#   needs:
-#     - job: ai-cmo-dev_network_plan
-#       artifacts: true
-#     - job: ai-cmo-dev_network_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: ai-cmo-dev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: ai-cmo-dev
-#     GCP_PROJECT_ID: ai-cmo-dev
-#     TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_network_apply:
+  extends:
+    - .wif_ai-cmo-dev
+    - .terraform_apply
+  stage: network_apply
+  needs:
+    - job: ai-cmo-dev_network_plan
+      artifacts: true
+    - job: ai-cmo-dev_network_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: ai-cmo-dev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: ai-cmo-dev
+    GCP_PROJECT_ID: ai-cmo-dev
+    TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 
 ###########################################
 # ----------AI-CMO-DEV INFRA -------------##
