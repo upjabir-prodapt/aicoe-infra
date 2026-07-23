@@ -16,17 +16,17 @@ data "terraform_remote_state" "network" {
 
 
 
-# module "load_balancer" {
-#   source = "../../../modules/infra-serverless-ilb"
+module "load_balancer" {
+  source = "../../../modules/infra-serverless-ilb"
 
-#   gcp_project_id    = local.gcp_project_id
-#   region            = var.region
-#   resource_prefix   = local.resource_prefix
-#   network_self_link = local.network_self_link
-#   subnet_self_link  = local.subnet_self_link
-#   services          = local.ilb_services
-#   labels            = local.default_labels
-# }
+  gcp_project_id    = local.gcp_project_id
+  region            = var.region
+  resource_prefix   = local.resource_prefix
+  network_self_link = local.network_self_link
+  subnet_self_link  = local.subnet_self_link
+  services          = local.ilb_services
+  labels            = local.default_labels
+}
 
 # module "vector_search" {
 #   source = "../../../modules/infra-vector-search"

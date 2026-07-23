@@ -16,5 +16,5 @@ variable "state_bucket" {
   default = ""
 }
 
-# variable "cloud_run_service_name" {}
+variable "cloud_run_service_name" {}
  
