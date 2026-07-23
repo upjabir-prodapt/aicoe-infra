@@ -54,9 +54,9 @@ resource "google_storage_bucket" "buckets" {
 
   lifecycle {
     ignore_changes = [ 
-      encryption[0].customer_managed_encrption_enforcement_config,
-      encryption[0].customer_supplied_encrption_enforcement_config,
-      encryption[0].google_managed_encrption_enforcement_config,
+      encryption[0].customer_managed_encryption_enforcement_config,
+      encryption[0].customer_supplied_encryption_enforcement_config,
+      encryption[0].google_managed_encryption_enforcement_config,
      ]
   }
 }
