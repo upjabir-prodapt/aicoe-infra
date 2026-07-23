@@ -1,7 +1,7 @@
 locals {
   bigquery_datasets = {
     sales_agent = {
-      dataset_id = "${local.resource_prefix}_sales_agent_dataset"
+      dataset_id = "sales_agent_dataset"
       tables = {
         cost_attribution = {
           table_id = "cost_attribution"
