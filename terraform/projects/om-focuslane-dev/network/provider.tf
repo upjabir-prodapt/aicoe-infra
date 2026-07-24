@@ -1,9 +1,19 @@
 provider "google" {
-  project     = "${var.project}"
-  region      = var.region # Choose the appropriate region for your bucket
+  project = local.gcp_project_id
+  region  = var.region
+
+  default_labels = {
+    environment = var.envname
+    managed_by  = "terraform"
+  }
 }
 
 provider "google-beta" {
-  project     = "${var.project}"
-  region      = var.region # Choose the appropriate region for your bucket
+  project = local.gcp_project_id
+  region  = var.region
+
+  default_labels = {
+    environment = var.envname
+    managed_by  = "terraform"
+  }
 }

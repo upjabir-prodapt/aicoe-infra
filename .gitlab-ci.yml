@@ -539,6 +539,12 @@ ai-cmo-dev_infra_apply:
 #     - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
 # ---------------- OM-FOCUSLANE-DEV STATIC ----------------
+# NOTE: TFSTATE_BUCKET/GCP_PROJECT_ID/TF_PROJECT below match the existing
+# pre-module GCS layout (om-focus-lane-dev-bucket-tf-state, flat
+# tfstate-static/tfstate-network/tfstate-infra prefixes) - see the Makefile
+# and terraform/projects/om-focuslane-dev/*/main.tf comments. Requires the
+# OM_FOCUSLANE_DEV_WIF_* CI/CD variables (see .wif_om-focuslane-dev in
+# .gitlab/ci/terraform-project.yml) to be set in GitLab before this can run.
 
 om-focuslane-dev_static_plan:
   extends:
@@ -550,10 +556,13 @@ om-focuslane-dev_static_plan:
     TF_LAYER: static
     TF_ENV: dev
     TF_PROJECT: om-focus-lane
-    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    GCP_PROJECT_ID: om-focus-lane
     TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 om-focuslane-dev_static_approve:
   stage: static_approve
@@ -566,6 +575,9 @@ om-focuslane-dev_static_approve:
   allow_failure: false
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 om-focuslane-dev_static_apply:
   extends:
@@ -582,10 +594,13 @@ om-focuslane-dev_static_apply:
     TF_LAYER: static
     TF_ENV: dev
     TF_PROJECT: om-focus-lane
-    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    GCP_PROJECT_ID: om-focus-lane
     TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 # ---------------- OM-FOCUSLANE-DEV NETWORK ----------------
 
@@ -603,10 +618,13 @@ om-focuslane-dev_network_plan:
     TF_LAYER: network
     TF_ENV: dev
     TF_PROJECT: om-focus-lane
-    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    GCP_PROJECT_ID: om-focus-lane
     TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 om-focuslane-dev_network_approve:
   stage: network_approve
@@ -619,6 +637,9 @@ om-focuslane-dev_network_approve:
   allow_failure: false
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 om-focuslane-dev_network_apply:
   extends:
@@ -635,10 +656,13 @@ om-focuslane-dev_network_apply:
     TF_LAYER: network
     TF_ENV: dev
     TF_PROJECT: om-focus-lane
-    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    GCP_PROJECT_ID: om-focus-lane
     TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 # ---------------- OM-FOCUSLANE-DEV INFRA ----------------
 
@@ -656,10 +680,13 @@ om-focuslane-dev_infra_plan:
     TF_LAYER: infra
     TF_ENV: dev
     TF_PROJECT: om-focus-lane
-    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    GCP_PROJECT_ID: om-focus-lane
     TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 om-focuslane-dev_infra_approve:
   stage: infra_approve
@@ -672,6 +699,9 @@ om-focuslane-dev_infra_approve:
   allow_failure: false
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*
 
 om-focuslane-dev_infra_apply:
   extends:
@@ -688,8 +718,10 @@ om-focuslane-dev_infra_apply:
     TF_LAYER: infra
     TF_ENV: dev
     TF_PROJECT: om-focus-lane
-    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    GCP_PROJECT_ID: om-focus-lane
     TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-env"'
- 
+  changes:
+        - terraform/projects/om-focus-lane/**/*
+        - terraform/modules/**/*

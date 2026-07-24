@@ -1,13 +1,3 @@
-###########################################
-### GCP APIs & Services Enable          ###
-###########################################
-# NOTE: modules/static-base also unconditionally creates a
-# google_project_iam_audit_config (storage/aiplatform/bigquery DATA_READ +
-# DATA_WRITE logging) and a "environment" resource tag (key + value +
-# binding on the project). Neither of those exist in om-focus-lane's
-# current state - this is a genuine, intentional addition that comes
-# bundled with the module (same shape aicoedev already carries), not a
-# side effect of a pure refactor. Review/confirm before applying.
 module "base" {
   source = "../../../modules/static-base"
 
@@ -15,11 +5,13 @@ module "base" {
   environment_name  = var.envname
   project_number    = var.project_number
   gcp_apis_required = var.gcp_apis_required
+
+  # om-focus-lane never had audit-log config or the org env tag resources -
+  # keep both off so this migration is a true 0-diff moved{} exercise.
+  audit_services  = []
+  enable_env_tag  = false
 }
 
-###########################################
-### Service Accounts + project IAM      ###
-###########################################
 module "identities" {
   source = "../../../modules/static-identities"
 
@@ -54,9 +46,29 @@ module "identities" {
   }
 }
 
-###########################################
-### Artifact Registry                   ###
-###########################################
+module "storage" {
+  source = "../../../modules/static-storage"
+
+  gcp_project_id = local.gcp_project_id
+  region         = var.region
+  resource_prefix = local.resource_prefix
+
+  # KMS key ring/key only - no buckets exist yet in dev today (they're all
+  # still commented out in the old code, see buckets.tf.disabled note below).
+  enable_kms           = true
+  enable_workbench_kms = false
+  bucket_suffixes      = []
+
+  bucket_kms_key_ring_name_suffix = "app-bucket-key-ring"
+  bucket_kms_key_name_suffix      = "app-bucket-key"
+
+  # Original key had no IAM bindings at all - keep it that way.
+  app_sa_email                 = ""
+  bind_vertex_sa_to_bucket_key = false
+
+  labels = local.default_labels
+}
+
 module "artifact" {
   source = "../../../modules/static-artifact"
 
@@ -66,12 +78,3 @@ module "artifact" {
   artifact_format = var.artifact_format
   labels          = local.default_labels
 }
-
-# NOTE: modules/static-storage was deliberately NOT used here. om-focus-lane's
-# KMS keyring/key in cloud_kms.tf don't back any bucket today (buckets.tf is
-# fully commented out), but static-storage unconditionally grants the
-# Vertex AI service agent encrypt/decrypt on the key the moment enable_kms
-# is true, with no flag to turn that binding off. Adopting the module here
-# would silently add a new IAM grant that isn't in current state. Kept as
-# plain resources in cloud_kms.tf until buckets are actually introduced -
-# at that point use modules/static-storage the way aicoedev/static does.

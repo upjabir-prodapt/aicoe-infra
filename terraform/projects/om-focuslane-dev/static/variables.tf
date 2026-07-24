@@ -4,8 +4,25 @@ variable "region" {}
 variable "gcp_apis_required" {}
 variable "artifact_format" {}
 
-# Required by modules/static-base for the project resource-tag binding.
-# Fill this in with om-focus-lane's actual GCP project number
-# (Console > IAM & Admin > Settings, or `gcloud projects describe
-# om-focus-lane --format='value(projectNumber)'`).
-variable "project_number" {}
+variable "gcp_project_id" {
+  type    = string
+  default = ""
+}
+
+variable "resource_prefix" {
+  type    = string
+  default = ""
+}
+
+variable "state_bucket" {
+  type    = string
+  default = ""
+}
+
+# Required by the shared static-base module's tag-binding resources, but
+# unused here since enable_env_tag = false in main.tf. Kept optional so
+# params.tfvars doesn't need to define it.
+variable "project_number" {
+  type    = string
+  default = ""
+}
