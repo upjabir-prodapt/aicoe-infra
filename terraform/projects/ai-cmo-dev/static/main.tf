@@ -68,4 +68,12 @@ module "artifact" {
   }
   depends_on = [module.base]
 }
+
+module "group_iam" {
+  source               = "../../../modules/static-group-iam"
+  for_each             = var.group_access
+  gcp_project_id       = local.gcp_project_id
+  group_email          = each.key
+  roles                = each.value
+}
  

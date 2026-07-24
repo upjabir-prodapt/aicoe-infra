@@ -20,4 +20,8 @@ variable "project_number" {}
 variable "gcp_apis_required" {}
 variable "artifact_format" {}
 
+variable "group_access" {
+  type = map(list(string))
+}
+
  

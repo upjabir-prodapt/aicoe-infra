@@ -24,4 +24,24 @@ gcp_apis_required = [
   
 ]
 artifact_format = "docker"
+
+group_access = {
+    "aicoesandox-view-members@colt.net" = [
+    "roles/aiplatform.admin",              # Agent Platform Administrator - VERIFY exact role name
+    "roles/bigquery.admin",                # BigQuery Admin
+    "roles/cloudkms.admin",                # Cloud KMS Admin
+    "roles/run.admin",                     # Cloud Run Admin
+    "roles/compute.networkAdmin",          # Compute Network Admin
+    "roles/dns.admin",                     # DNS Administrator
+    "roles/editor",                        # Editor
+    "roles/iap.tunnelResourceAccessor",    # IAP-secured Tunnel User
+    "roles/logging.admin",                 # Logging Admin
+    "roles/monitoring.admin",              # Monitoring Admin
+    "roles/secretmanager.admin",           # Secret Manager Admin
+    "roles/iam.serviceAccountAdmin",       # Service Account Admin
+    "roles/serviceusage.serviceUsageAdmin",# Service Usage Admin
+    "roles/storage.admin",                 # Storage Admin
+    "roles/storage.objectAdmin"            # Storage Object Admin
+    ]
+}
  

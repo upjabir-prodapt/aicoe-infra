@@ -19,187 +19,187 @@ stages:
 
 variables:
   TF_REGION: europe-west1
-# ###########################################
-# # ----------AICOE-DEV STATIC -------------#
-# ###########################################
-# aicoedev_static_plan:
-#   extends:
-#     - .wif_aicoedev
-#     - .terraform_plan
-#   stage: static_plan
-#   variables:
-#     PROJECT_NAME: aicoedev
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: aicoe
-#     GCP_PROJECT_ID: aicoedev
-#     TFSTATE_BUCKET: aicoedev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
+###########################################
+# ----------AICOE-DEV STATIC -------------#
+###########################################
+aicoedev_static_plan:
+  extends:
+    - .wif_aicoedev
+    - .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: aicoedev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoedev
+    TFSTATE_BUCKET: aicoedev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
 
-# aicoedev_static_approve:
-#   stage: static_approve
-#   needs:
-#     - job: aicoedev_static_plan
-#       artifacts: false
-#   script:
-#     - echo "Static layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
+aicoedev_static_approve:
+  stage: static_approve
+  needs:
+    - job: aicoedev_static_plan
+      artifacts: false
+  script:
+    - echo "Static layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
 
-# aicoedev_static_apply:
-#   extends:
-#     - .wif_aicoedev
-#     - .terraform_apply
-#   stage: static_apply
-#   needs:
-#     - job: aicoedev_static_plan
-#       artifacts: true
-#     - job: aicoedev_static_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: aicoedev
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: aicoe
-#     GCP_PROJECT_ID: aicoedev
-#     TFSTATE_BUCKET: aicoedev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
-# ############################################
-# # -------- AICOE-DEV NETWORK --------------#
-# ############################################
-# aicoedev_network_plan:
-#   extends:
-#     - .wif_aicoedev
-#     - .terraform_plan
-#   stage: network_plan
-#   needs:
-#     - job: aicoedev_static_apply
-#       artifacts: false
-#       optional: true
-#   variables:
-#     PROJECT_NAME: aicoedev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: aicoe
-#     GCP_PROJECT_ID: aicoedev
-#     TFSTATE_BUCKET: aicoedev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
+aicoedev_static_apply:
+  extends:
+    - .wif_aicoedev
+    - .terraform_apply
+  stage: static_apply
+  needs:
+    - job: aicoedev_static_plan
+      artifacts: true
+    - job: aicoedev_static_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: aicoedev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoedev
+    TFSTATE_BUCKET: aicoedev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
+############################################
+# -------- AICOE-DEV NETWORK --------------#
+############################################
+aicoedev_network_plan:
+  extends:
+    - .wif_aicoedev
+    - .terraform_plan
+  stage: network_plan
+  needs:
+    - job: aicoedev_static_apply
+      artifacts: false
+      optional: true
+  variables:
+    PROJECT_NAME: aicoedev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoedev
+    TFSTATE_BUCKET: aicoedev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
 
-# aicoedev_network_approve:
-#   stage: network_approve
-#   needs:
-#     - job: aicoedev_network_plan
-#       artifacts: false
-#   script:
-#     - echo "Network layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
-# aicoedev_network_apply:
-#   extends:
-#     - .wif_aicoedev
-#     - .terraform_apply
-#   stage: network_apply
-#   needs:
-#     - job: aicoedev_network_plan
-#       artifacts: true
-#     - job: aicoedev_network_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: aicoedev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: aicoe
-#     GCP_PROJECT_ID: aicoedev
-#     TFSTATE_BUCKET: aicoedev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
-# ###########################################
-# # ----------AICOE-DEV INFRA -------------##
-# ###########################################
-# aicoedev_infra_plan:
-#   extends:
-#     - .wif_aicoedev
-#     - .terraform_plan
-#   stage: infra_plan
-#   needs:
-#     - job: aicoedev_network_apply
-#       artifacts: false
-#       optional: true
-#   variables:
-#     PROJECT_NAME: aicoedev
-#     TF_LAYER: infra
-#     TF_ENV: dev
-#     TF_PROJECT: aicoe
-#     GCP_PROJECT_ID: aicoedev
-#     TFSTATE_BUCKET: aicoedev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
+aicoedev_network_approve:
+  stage: network_approve
+  needs:
+    - job: aicoedev_network_plan
+      artifacts: false
+  script:
+    - echo "Network layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
+aicoedev_network_apply:
+  extends:
+    - .wif_aicoedev
+    - .terraform_apply
+  stage: network_apply
+  needs:
+    - job: aicoedev_network_plan
+      artifacts: true
+    - job: aicoedev_network_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: aicoedev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoedev
+    TFSTATE_BUCKET: aicoedev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
+###########################################
+# ----------AICOE-DEV INFRA -------------##
+###########################################
+aicoedev_infra_plan:
+  extends:
+    - .wif_aicoedev
+    - .terraform_plan
+  stage: infra_plan
+  needs:
+    - job: aicoedev_network_apply
+      artifacts: false
+      optional: true
+  variables:
+    PROJECT_NAME: aicoedev
+    TF_LAYER: infra
+    TF_ENV: dev
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoedev
+    TFSTATE_BUCKET: aicoedev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
 
-# aicoedev_infra_approve:
-#   stage: infra_approve
-#   needs:
-#     - job: aicoedev_infra_plan
-#       artifacts: false
-#   script:
-#     - echo "Infra layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
+aicoedev_infra_approve:
+  stage: infra_approve
+  needs:
+    - job: aicoedev_infra_plan
+      artifacts: false
+  script:
+    - echo "Infra layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
 
-# aicoedev_infra_apply:
-#   extends:
-#     - .wif_aicoedev
-#     - .terraform_apply
-#   stage: infra_apply
-#   needs:
-#     - job: aicoedev_infra_plan
-#       artifacts: true
-#     - job: aicoedev_infra_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: aicoedev
-#     TF_LAYER: infra
-#     TF_ENV: dev
-#     TF_PROJECT: aicoe
-#     GCP_PROJECT_ID: aicoedev
-#     TFSTATE_BUCKET: aicoedev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/aicoedev/**/*
-#         - terraform/modules/**/*
+aicoedev_infra_apply:
+  extends:
+    - .wif_aicoedev
+    - .terraform_apply
+  stage: infra_apply
+  needs:
+    - job: aicoedev_infra_plan
+      artifacts: true
+    - job: aicoedev_infra_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: aicoedev
+    TF_LAYER: infra
+    TF_ENV: dev
+    TF_PROJECT: aicoe
+    GCP_PROJECT_ID: aicoedev
+    TFSTATE_BUCKET: aicoedev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/aicoedev/**/*
+        - terraform/modules/**/*
 # ###################################################
 # # ---------------- VEGADEV STATIC ----------------#
 # ###################################################
@@ -306,124 +306,124 @@ variables:
 #####################################################
 # ---------------- AI-CMO-DEV STATIC ----------------#
 #####################################################
-# ai-cmo-dev_static_plan:
-#   extends:
-#     - .wif_ai-cmo-dev
-#     - .terraform_plan
-#   stage: static_plan
-#   variables:
-#     PROJECT_NAME: ai-cmo-dev
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: ai-cmo-dev
-#     TF_REGION: europe-west1
-#     GCP_PROJECT_ID: ai-cmo-dev
-#     TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_static_plan:
+  extends:
+    - .wif_ai-cmo-dev
+    - .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: ai-cmo-dev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: ai-cmo-dev
+    TF_REGION: europe-west1
+    GCP_PROJECT_ID: ai-cmo-dev
+    TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 
-# ai-cmo-dev_static_approve:
-#   stage: static_approve
-#   needs:
-#     - job: ai-cmo-dev_static_plan
-#       artifacts: false
-#   script:
-#     - echo "Static layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_static_approve:
+  stage: static_approve
+  needs:
+    - job: ai-cmo-dev_static_plan
+      artifacts: false
+  script:
+    - echo "Static layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
       
-# ai-cmo-dev_static_apply:
-#   extends:
-#     - .wif_ai-cmo-dev
-#     - .terraform_apply
-#   stage: static_apply
-#   needs:
-#     - job: ai-cmo-dev_static_plan
-#       artifacts: true
-#     - job: ai-cmo-dev_static_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: ai-cmo-dev
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: ai-cmo-dev
-#     GCP_PROJECT_ID: ai-cmo-dev
-#     TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_static_apply:
+  extends:
+    - .wif_ai-cmo-dev
+    - .terraform_apply
+  stage: static_apply
+  needs:
+    - job: ai-cmo-dev_static_plan
+      artifacts: true
+    - job: ai-cmo-dev_static_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: ai-cmo-dev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: ai-cmo-dev
+    GCP_PROJECT_ID: ai-cmo-dev
+    TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 ###################################################
 # --------------  AI-CMO-DEV NETWORK -------------#
 ###################################################
-# ai-cmo-dev_network_plan:
-#   extends:
-#     - .wif_ai-cmo-dev
-#     - .terraform_plan
-#   stage: network_plan
-#   needs:
-#     - job: ai-cmo-dev_static_apply
-#       artifacts: false
-#       optional: true
-#   variables:
-#     PROJECT_NAME: ai-cmo-dev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: ai-cmo-dev
-#     GCP_PROJECT_ID: ai-cmo-dev
-#     TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_network_plan:
+  extends:
+    - .wif_ai-cmo-dev
+    - .terraform_plan
+  stage: network_plan
+  needs:
+    - job: ai-cmo-dev_static_apply
+      artifacts: false
+      optional: true
+  variables:
+    PROJECT_NAME: ai-cmo-dev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: ai-cmo-dev
+    GCP_PROJECT_ID: ai-cmo-dev
+    TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 
-# ai-cmo-dev_network_approve:
-#   stage: network_approve
-#   needs:
-#     - job: ai-cmo-dev_network_plan
-#       artifacts: false
-#   script:
-#     - echo "Network layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_network_approve:
+  stage: network_approve
+  needs:
+    - job: ai-cmo-dev_network_plan
+      artifacts: false
+  script:
+    - echo "Network layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 
-# ai-cmo-dev_network_apply:
-#   extends:
-#     - .wif_ai-cmo-dev
-#     - .terraform_apply
-#   stage: network_apply
-#   needs:
-#     - job: ai-cmo-dev_network_plan
-#       artifacts: true
-#     - job: ai-cmo-dev_network_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: ai-cmo-dev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: ai-cmo-dev
-#     GCP_PROJECT_ID: ai-cmo-dev
-#     TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-#       changes:
-#         - terraform/projects/ai-cmo-dev/**/*
-#         - terraform/modules/**/*
+ai-cmo-dev_network_apply:
+  extends:
+    - .wif_ai-cmo-dev
+    - .terraform_apply
+  stage: network_apply
+  needs:
+    - job: ai-cmo-dev_network_plan
+      artifacts: true
+    - job: ai-cmo-dev_network_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: ai-cmo-dev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: ai-cmo-dev
+    GCP_PROJECT_ID: ai-cmo-dev
+    TFSTATE_BUCKET: ai-cmo-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+      changes:
+        - terraform/projects/ai-cmo-dev/**/*
+        - terraform/modules/**/*
 
 ###########################################
 # ----------AI-CMO-DEV INFRA -------------##
