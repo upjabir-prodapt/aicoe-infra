@@ -41,7 +41,7 @@ module "vector_search" {
   deployed_index_id              = "${local.resource_prefix}_vector_index"
   deployed_index_display_name    = "Salesagent Deployed Index"
   labels                         = local.default_labels
-} 
+}
 
 module "bigquery" {
   source = "../../../modules/infra-bigquery"
