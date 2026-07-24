@@ -1,12 +1,7 @@
 project = "om-focus-lane"
 envname = "dev"
-region  = "europe-west1"
-
-# TODO: replace with om-focus-lane's real GCP project number - required by
-# modules/static-base for the "environment" resource-tag binding.
-project_number = "REPLACE_ME_PROJECT_NUMBER"
-
-gcp_apis_required = [
+region = "europe-west1"
+gcp_apis_required =[
     "aiplatform.googleapis.com",               # Vertex AI API - models, endpoints, pipelines, training  
     "bigquery.googleapis.com",                 # BigQuery API - datasets, tables, jobs
     "bigquerystorage.googleapis.com",          # BigQuery Storage API - fast read/write (used by Workbench)    

@@ -1,5 +1,5 @@
 output "aicoe_app_bucket_key_id" {
-  value = google_kms_crypto_key.aicoe_app_bucket_key.id
+  value = module.storage.bucket_key_id
 }
 
 output "aicoe_app_sa_email" {
