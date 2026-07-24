@@ -41,9 +41,16 @@ module "network_base" {
 ###########################################
 ### Reserved internal IP (ILB)          ###
 ###########################################
-# NOTE: enable_psc and enable_cloud_dns are both off here - see psc.tf and
-# cloud_dns.tf for why the PSC address/forwarding-rule and the DNS zone
-# stay as plain resources instead of going through this module.
+# NOTE: enable_cloud_dns stays off here - see cloud_dns.tf for why the DNS
+# zone stays a plain resource (the module still bundles an unrequested
+# *.googleusercontent.com zone into every enable_cloud_dns = true call,
+# with no flag to create just the googleapis zone).
+#
+# enable_psc is now ON: modules/network-connectivity gained
+# psc_google_apis_address_name / psc_google_apis_forwarding_rule_name
+# overrides, which removes the naming blocker that used to keep the PSC
+# address and forwarding rule as plain resources in psc.tf. See moved.tf
+# for the state migration.
 module "network_connectivity" {
   source = "../../../modules/network-connectivity"
 
@@ -61,12 +68,17 @@ module "network_connectivity" {
     }
   }
 
-  # Unused - enable_psc is false below, but the variable is required.
   psc_google_apis_address = "192.168.2.3"
+
+  # Default module name would be "omfocuslanedevpscapis" (22 chars) - over
+  # GCP's 20-char limit for all-apis-bundle forwarding rule names, and
+  # different from the existing "omfocuslanepscapis". Pin the legacy name
+  # so terraform doesn't try to destroy/recreate it.
+  psc_google_apis_forwarding_rule_name = "omfocuslanepscapis"
 
   enable_cloud_nat = false
   enable_cloud_dns = false
-  enable_psc       = false
+  enable_psc       = true
 
   labels = local.default_labels
 }

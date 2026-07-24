@@ -537,4 +537,159 @@ ai-cmo-dev_infra_apply:
 #     TFSTATE_BUCKET: ai-product-security-dev-bucket-tf-state
 #   rules:
 #     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+# ---------------- OM-FOCUSLANE-DEV STATIC ----------------
+
+om-focuslane-dev_static_plan:
+  extends:
+    - .wif_om-focuslane-dev
+    - .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: om-focuslane-dev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: om-focus-lane
+    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+om-focuslane-dev_static_approve:
+  stage: static_approve
+  needs:
+    - job: om-focuslane-dev_static_plan
+      artifacts: false
+  script:
+    - echo "Static layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+om-focuslane-dev_static_apply:
+  extends:
+    - .wif_om-focuslane-dev
+    - .terraform_apply
+  stage: static_apply
+  needs:
+    - job: om-focuslane-dev_static_plan
+      artifacts: true
+    - job: om-focuslane-dev_static_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: om-focuslane-dev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: om-focus-lane
+    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+# ---------------- OM-FOCUSLANE-DEV NETWORK ----------------
+
+om-focuslane-dev_network_plan:
+  extends:
+    - .wif_om-focuslane-dev
+    - .terraform_plan
+  stage: network_plan
+  needs:
+    - job: om-focuslane-dev_static_apply
+      artifacts: false
+      optional: true
+  variables:
+    PROJECT_NAME: om-focuslane-dev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: om-focus-lane
+    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+om-focuslane-dev_network_approve:
+  stage: network_approve
+  needs:
+    - job: om-focuslane-dev_network_plan
+      artifacts: false
+  script:
+    - echo "Network layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+om-focuslane-dev_network_apply:
+  extends:
+    - .wif_om-focuslane-dev
+    - .terraform_apply
+  stage: network_apply
+  needs:
+    - job: om-focuslane-dev_network_plan
+      artifacts: true
+    - job: om-focuslane-dev_network_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: om-focuslane-dev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: om-focus-lane
+    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+# ---------------- OM-FOCUSLANE-DEV INFRA ----------------
+
+om-focuslane-dev_infra_plan:
+  extends:
+    - .wif_om-focuslane-dev
+    - .terraform_plan
+  stage: infra_plan
+  needs:
+    - job: om-focuslane-dev_network_apply
+      artifacts: false
+      optional: true
+  variables:
+    PROJECT_NAME: om-focuslane-dev
+    TF_LAYER: infra
+    TF_ENV: dev
+    TF_PROJECT: om-focus-lane
+    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+om-focuslane-dev_infra_approve:
+  stage: infra_approve
+  needs:
+    - job: om-focuslane-dev_infra_plan
+      artifacts: false
+  script:
+    - echo "Infra layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+
+om-focuslane-dev_infra_apply:
+  extends:
+    - .wif_om-focuslane-dev
+    - .terraform_apply
+  stage: infra_apply
+  needs:
+    - job: om-focuslane-dev_infra_plan
+      artifacts: true
+    - job: om-focuslane-dev_infra_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: om-focuslane-dev
+    TF_LAYER: infra
+    TF_ENV: dev
+    TF_PROJECT: om-focus-lane
+    GCP_PROJECT_ID: om-focus-lane-dev  # TODO: confirm this matches your actual GCP project ID
+    TFSTATE_BUCKET: om-focus-lane-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
  

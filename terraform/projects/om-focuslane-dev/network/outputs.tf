@@ -27,7 +27,7 @@ output "aicoe_subnet_cidr" {
 }
 
 output "psc_endpoint_ip" {
-  value = google_compute_global_address.aicoe_psc_address.address
+  value = module.network_connectivity.psc_google_apis_ip
 }
 
 output "dns_zone_name" {
