@@ -38,7 +38,7 @@ module "vector_search" {
   vector_search_psc_ip_self_link = data.terraform_remote_state.network.outputs.vector_search_psc_ip_self_link
   index_display_name             = "${local.resource_prefix}_salesagent_index"
   endpoint_display_name          = "${local.resource_prefix}-salesagent-endpoint"
-  deployed_index_id              = "${local.resource_prefix}_vector_index"
+  deployed_index_id              = "salesagent_vector_index"
   deployed_index_display_name    = "Salesagent Deployed Index"
   labels                         = local.default_labels
 }
