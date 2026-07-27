@@ -1,6 +1,6 @@
 locals {
   # NOTE: unlike aicoedev/ai-cmo-dev (whose var.project is a short name and
-  # gcp_project_id = "${var.project}${var.envname}"), om-focus-lane's
+  ## gcp_project_id = "${var.project}${var.envname}"), om-focus-lane's
   # var.project already IS the full GCP project id ("om-focus-lane") - same
   # pattern as vegadev. gcp_project_id just passes it through unchanged.
   gcp_project_id  = var.gcp_project_id != "" ? var.gcp_project_id : var.project
