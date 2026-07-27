@@ -1,3 +1,6 @@
+###########################################
+### GCP APIs & Services Enable          ###
+###########################################
 module "base" {
   source = "../../../modules/static-base"
 
@@ -6,12 +9,18 @@ module "base" {
   project_number    = var.project_number
   gcp_apis_required = var.gcp_apis_required
 
-  # om-focus-lane never had audit-log config or the org env tag resources -
-  # keep both off so this migration is a true 0-diff moved{} exercise.
-  audit_services  = []
-  enable_env_tag  = false
+  # om-focus-lane never had audit-log config - keep that off. There's no
+  # flag on this module to skip the "environment" resource tag though, so
+  # unlike audit_services this WILL get created (key + value + project
+  # binding) the first time this applies - a real, intentional new
+  # resource, not a side effect of a 0-diff migration. Revisit if/when
+  # static-base gets an enable_env_tag flag.
+  audit_services = []
 }
 
+###########################################
+### Service Accounts + project IAM      ###
+###########################################
 module "identities" {
   source = "../../../modules/static-identities"
 
@@ -46,29 +55,17 @@ module "identities" {
   }
 }
 
-module "storage" {
-  source = "../../../modules/static-storage"
+# NOTE: modules/static-storage deliberately NOT used here. It force-adds a
+# Vertex AI service-agent KMS grant the moment enable_kms is true, with no
+# flag to turn that binding off, and the original key never had any IAM
+# bindings. Kept as plain resources in cloud_kms.tf. Revisit once
+# static-storage gets a bind_vertex_sa_to_bucket_key-style flag, or once
+# buckets are actually introduced (bucket_suffixes is empty today anyway -
+# see buckets.tf, still fully commented out).
 
-  gcp_project_id = local.gcp_project_id
-  region         = var.region
-  resource_prefix = local.resource_prefix
-
-  # KMS key ring/key only - no buckets exist yet in dev today (they're all
-  # still commented out in the old code, see buckets.tf.disabled note below).
-  enable_kms           = true
-  enable_workbench_kms = false
-  bucket_suffixes      = []
-
-  bucket_kms_key_ring_name_suffix = "app-bucket-key-ring"
-  bucket_kms_key_name_suffix      = "app-bucket-key"
-
-  # Original key had no IAM bindings at all - keep it that way.
-  app_sa_email                 = ""
-  bind_vertex_sa_to_bucket_key = false
-
-  labels = local.default_labels
-}
-
+###########################################
+### Artifact Registry                   ###
+###########################################
 module "artifact" {
   source = "../../../modules/static-artifact"
 
@@ -78,3 +75,4 @@ module "artifact" {
   artifact_format = var.artifact_format
   labels          = local.default_labels
 }
+ 
