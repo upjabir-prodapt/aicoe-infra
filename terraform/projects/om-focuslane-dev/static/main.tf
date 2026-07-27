@@ -52,13 +52,6 @@ module "identities" {
   }
 }
 
-# NOTE: modules/static-storage deliberately NOT used here. It force-adds a
-# Vertex AI service-agent KMS grant the moment enable_kms is true, with no
-# flag to turn that binding off, and the original key never had any IAM
-# bindings. Kept as plain resources in cloud_kms.tf. Revisit once
-# static-storage gets a bind_vertex_sa_to_bucket_key-style flag, or once
-# buckets are actually introduced (bucket_suffixes is empty today anyway -
-# see buckets.tf, still fully commented out).
 
 ###########################################
 ### Artifact Registry                   ###
