@@ -30,27 +30,27 @@
 
 #Allow HTTPS port 443 AND 8000 for ILB - kept as a plain resource, see the
 # enable_https_ilb_ingress comment in main.tf for why this isn't in the module.
-resource "google_compute_firewall" "aicoe_ingress_allow_https" {
-  name        = "ingress-allow-https-ilb"
-  network     = module.network_base.network_id
-  description = "Allow HTTPS traffic for Internal Load Balancer - Ingress"
-  direction   = "INGRESS"
-  priority    = 65534
-  source_ranges = var.ingress_https_source_ranges
-  source_tags             = null
-  source_service_accounts = null
-  target_tags             = null
-  target_service_accounts = null
-  allow {
-    protocol = "tcp"
-    ports    = ["443", "8000"]
-  }
-
-
-  log_config {
-    metadata = "INCLUDE_ALL_METADATA"
-  }
-}
+###resource "google_compute_firewall" "aicoe_ingress_allow_https" {
+###  name        = "ingress-allow-https-ilb"
+###  network     = module.network_base.network_id
+###  description = "Allow HTTPS traffic for Internal Load Balancer - Ingress"
+###  direction   = "INGRESS"
+###  priority    = 65534
+###  source_ranges = var.ingress_https_source_ranges
+###  source_tags             = null
+###  source_service_accounts = null
+###  target_tags             = null
+###  target_service_accounts = null
+###  allow {
+###    protocol = "tcp"
+###    ports    = ["443", "8000"]
+###  }
+###
+###
+###  log_config {
+###    metadata = "INCLUDE_ALL_METADATA"
+###  }
+###}
 
 # #Allow Colt On-prem IP (kept commented, matches the old code - never actually created)
 # import {
