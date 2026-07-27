@@ -41,7 +41,9 @@ group_access = {
     "roles/iam.serviceAccountAdmin",       # Service Account Admin
     "roles/serviceusage.serviceUsageAdmin",# Service Usage Admin
     "roles/storage.admin",                 # Storage Admin
-    "roles/storage.objectAdmin"            # Storage Object Admin
+    "roles/storage.objectAdmin",           # Storage Object Admin
+    "roles/container.admin",               #Container Admin
+    "roles/iam.workloadIdentityPoolAdmin"  #WIF Admin
     ]
 }
  

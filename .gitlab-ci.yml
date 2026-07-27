@@ -200,109 +200,109 @@ aicoedev_infra_apply:
       changes:
         - terraform/projects/aicoedev/**/*
         - terraform/modules/**/*
-# ###################################################
-# # ---------------- VEGADEV STATIC ----------------#
-# ###################################################
-# vegadev_static_plan:
-#   extends:
-#     - .wif_vegadev
-#     - .terraform_plan
-#   stage: static_plan
-#   variables:
-#     PROJECT_NAME: vegadev
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: vega
-#     GCP_PROJECT_ID: vegadev-499613
-#     TFSTATE_BUCKET: vegadev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+###################################################
+# ---------------- VEGADEV STATIC ----------------#
+###################################################
+vegadev_static_plan:
+  extends:
+    - .wif_vegadev
+    - .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: vegadev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: vega
+    GCP_PROJECT_ID: vegadev-499613
+    TFSTATE_BUCKET: vegadev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-# vegadev_static_approve:
-#   stage: static_approve
-#   needs:
-#     - job: vegadev_static_plan
-#       artifacts: false
-#   script:
-#     - echo "Static layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+vegadev_static_approve:
+  stage: static_approve
+  needs:
+    - job: vegadev_static_plan
+      artifacts: false
+  script:
+    - echo "Static layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-# vegadev_static_apply:
-#   extends:
-#     - .wif_vegadev
-#     - .terraform_apply
-#   stage: static_apply
-#   needs:
-#     - job: vegadev_static_plan
-#       artifacts: true
-#     - job: vegadev_static_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: vegadev
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: vega
-#     GCP_PROJECT_ID: vegadev-499613
-#     TFSTATE_BUCKET: vegadev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
-# ####################################################
-# # ---------------- VEGADEV NETWORK ----------------#
-# ####################################################
+vegadev_static_apply:
+  extends:
+    - .wif_vegadev
+    - .terraform_apply
+  stage: static_apply
+  needs:
+    - job: vegadev_static_plan
+      artifacts: true
+    - job: vegadev_static_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: vegadev
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: vega
+    GCP_PROJECT_ID: vegadev-499613
+    TFSTATE_BUCKET: vegadev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
+####################################################
+# ---------------- VEGADEV NETWORK ----------------#
+####################################################
 
-# vegadev_network_plan:
-#   extends:
-#     - .wif_vegadev
-#     - .terraform_plan
-#   stage: network_plan
-#   needs:
-#     - job: vegadev_static_apply
-#       artifacts: false
-#       optional: true
-#   variables:
-#     PROJECT_NAME: vegadev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: vega
-#     GCP_PROJECT_ID: vegadev-499613
-#     TFSTATE_BUCKET: vegadev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+vegadev_network_plan:
+  extends:
+    - .wif_vegadev
+    - .terraform_plan
+  stage: network_plan
+  needs:
+    - job: vegadev_static_apply
+      artifacts: false
+      optional: true
+  variables:
+    PROJECT_NAME: vegadev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: vega
+    GCP_PROJECT_ID: vegadev-499613
+    TFSTATE_BUCKET: vegadev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-# vegadev_network_approve:
-#   stage: network_approve
-#   needs:
-#     - job: vegadev_network_plan
-#       artifacts: false
-#   script:
-#     - echo "Network layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+vegadev_network_approve:
+  stage: network_approve
+  needs:
+    - job: vegadev_network_plan
+      artifacts: false
+  script:
+    - echo "Network layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-# vegadev_network_apply:
-#   extends:
-#     - .wif_vegadev
-#     - .terraform_apply
-#   stage: network_apply
-#   needs:
-#     - job: vegadev_network_plan
-#       artifacts: true
-#     - job: vegadev_network_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: vegadev
-#     TF_LAYER: network
-#     TF_ENV: dev
-#     TF_PROJECT: vega
-#     GCP_PROJECT_ID: vegadev-499613
-#     TFSTATE_BUCKET: vegadev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+vegadev_network_apply:
+  extends:
+    - .wif_vegadev
+    - .terraform_apply
+  stage: network_apply
+  needs:
+    - job: vegadev_network_plan
+      artifacts: true
+    - job: vegadev_network_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: vegadev
+    TF_LAYER: network
+    TF_ENV: dev
+    TF_PROJECT: vega
+    GCP_PROJECT_ID: vegadev-499613
+    TFSTATE_BUCKET: vegadev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 #####################################################
 # ---------------- AI-CMO-DEV STATIC ----------------#
 #####################################################
@@ -488,55 +488,55 @@ ai-cmo-dev_infra_apply:
         - terraform/projects/ai-cmo-dev/**/*
         - terraform/modules/**/*
 
-# ##############################################################
-# # ---------------- AI-PRODUCT-SECURITY STATIC ---------------#
-# ##############################################################
-# ai-product-security_static_plan:
-#   extends:
-#     - .wif_ai-product-security
-#     - .terraform_plan
-#   stage: static_plan
-#   variables:
-#     PROJECT_NAME: ai-product-security
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: ai-product-security
-#     GCP_PROJECT_ID: ai-product-security-dev
-#     TFSTATE_BUCKET: ai-product-security-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+##############################################################
+# ---------------- AI-PRODUCT-SECURITY STATIC ---------------#
+##############################################################
+ai-product-security_static_plan:
+  extends:
+    - .wif_ai-product-security
+    - .terraform_plan
+  stage: static_plan
+  variables:
+    PROJECT_NAME: ai-product-security
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: ai-product-security
+    GCP_PROJECT_ID: ai-product-security-dev
+    TFSTATE_BUCKET: ai-product-security-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-# ai-product-security_static_approve:
-#   stage: static_approve
-#   needs:
-#     - job: ai-product-security_static_plan
-#       artifacts: false
-#   script:
-#     - echo "Static layer approved for apply"
-#   when: manual
-#   allow_failure: false
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+ai-product-security_static_approve:
+  stage: static_approve
+  needs:
+    - job: ai-product-security_static_plan
+      artifacts: false
+  script:
+    - echo "Static layer approved for apply"
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
-# ai-product-security_static_apply:
-#   extends:
-#     - .wif_ai-product-security
-#     - .terraform_apply
-#   stage: static_apply
-#   needs:
-#     - job: ai-product-security_static_plan
-#       artifacts: true
-#     - job: ai-product-security_static_approve
-#       artifacts: false
-#   variables:
-#     PROJECT_NAME: ai-product-security
-#     TF_LAYER: static
-#     TF_ENV: dev
-#     TF_PROJECT: ai-product-security
-#     GCP_PROJECT_ID: ai-product-security-dev
-#     TFSTATE_BUCKET: ai-product-security-dev-bucket-tf-state
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "dev-env"'
+ai-product-security_static_apply:
+  extends:
+    - .wif_ai-product-security
+    - .terraform_apply
+  stage: static_apply
+  needs:
+    - job: ai-product-security_static_plan
+      artifacts: true
+    - job: ai-product-security_static_approve
+      artifacts: false
+  variables:
+    PROJECT_NAME: ai-product-security
+    TF_LAYER: static
+    TF_ENV: dev
+    TF_PROJECT: ai-product-security
+    GCP_PROJECT_ID: ai-product-security-dev
+    TFSTATE_BUCKET: ai-product-security-dev-bucket-tf-state
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev-env"'
 
 # ---------------- OM-FOCUSLANE-DEV STATIC ----------------
 om-focuslane-dev_static_plan:
