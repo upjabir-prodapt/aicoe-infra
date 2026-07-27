@@ -9,13 +9,10 @@ module "base" {
   project_number    = var.project_number
   gcp_apis_required = var.gcp_apis_required
 
-  # om-focus-lane never had audit-log config - keep that off. There's no
-  # flag on this module to skip the "environment" resource tag though, so
-  # unlike audit_services this WILL get created (key + value + project
-  # binding) the first time this applies - a real, intentional new
-  # resource, not a side effect of a 0-diff migration. Revisit if/when
-  # static-base gets an enable_env_tag flag.
-  audit_services = []
+  # audit_services intentionally omitted - the module default
+  # (storage/aiplatform/bigquery) matches what's already in state for
+  # this project, so this is a 0-diff migration via the moved{} blocks
+  # in moved.tf, not a new resource.
 }
 
 ###########################################
@@ -75,4 +72,3 @@ module "artifact" {
   artifact_format = var.artifact_format
   labels          = local.default_labels
 }
- 
