@@ -11,82 +11,82 @@ moved {
 
 moved {
   from = google_service_account.aicoe_app_sa
-  to   = module.identities.google_service_account.this["app"]
+  to   = module.identities.google_service_account.sa["app"]
 }
 
 moved {
   from = google_service_account.aicoe_vertex_sa
-  to   = module.identities.google_service_account.this["vertex"]
+  to   = module.identities.google_service_account.sa["vertex"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/aiplatform.user"]
-  to   = module.identities.google_project_iam_member.this["app-roles/aiplatform.user"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/aiplatform.user"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/datastore.user"]
-  to   = module.identities.google_project_iam_member.this["app-roles/datastore.user"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/datastore.user"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/storage.admin"]
-  to   = module.identities.google_project_iam_member.this["app-roles/storage.admin"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/storage.admin"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/bigquery.dataEditor"]
-  to   = module.identities.google_project_iam_member.this["app-roles/bigquery.dataEditor"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/bigquery.dataEditor"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/bigquery.jobUser"]
-  to   = module.identities.google_project_iam_member.this["app-roles/bigquery.jobUser"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/bigquery.jobUser"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/run.admin"]
-  to   = module.identities.google_project_iam_member.this["app-roles/run.admin"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/run.admin"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/cloudtrace.agent"]
-  to   = module.identities.google_project_iam_member.this["app-roles/cloudtrace.agent"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/cloudtrace.agent"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/iap.httpsResourceAccessor"]
-  to   = module.identities.google_project_iam_member.this["app-roles/iap.httpsResourceAccessor"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/iap.httpsResourceAccessor"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_app_sa_iam["roles/secretmanager.secretAccessor"]
-  to   = module.identities.google_project_iam_member.this["app-roles/secretmanager.secretAccessor"]
+  to   = module.identities.google_project_iam_member.iam["app-roles/secretmanager.secretAccessor"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_vertex_sa_iam["roles/aiplatform.user"]
-  to   = module.identities.google_project_iam_member.this["vertex-roles/aiplatform.user"]
+  to   = module.identities.google_project_iam_member.iam["vertex-roles/aiplatform.user"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_vertex_sa_iam["roles/bigquery.dataViewer"]
-  to   = module.identities.google_project_iam_member.this["vertex-roles/bigquery.dataViewer"]
+  to   = module.identities.google_project_iam_member.iam["vertex-roles/bigquery.dataViewer"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_vertex_sa_iam["roles/bigquery.jobUser"]
-  to   = module.identities.google_project_iam_member.this["vertex-roles/bigquery.jobUser"]
+  to   = module.identities.google_project_iam_member.iam["vertex-roles/bigquery.jobUser"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_vertex_sa_iam["roles/datastore.user"]
-  to   = module.identities.google_project_iam_member.this["vertex-roles/datastore.user"]
+  to   = module.identities.google_project_iam_member.iam["vertex-roles/datastore.user"]
 }
 
 moved {
   from = google_project_iam_member.aicoe_vertex_sa_iam["roles/storage.objectAdmin"]
-  to   = module.identities.google_project_iam_member.this["vertex-roles/storage.objectAdmin"]
+  to   = module.identities.google_project_iam_member.iam["vertex-roles/storage.objectAdmin"]
 }
 
 moved {
