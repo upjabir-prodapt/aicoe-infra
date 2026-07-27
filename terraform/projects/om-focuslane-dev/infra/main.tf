@@ -17,13 +17,13 @@ data "terraform_remote_state" "static" {
 ### Network Layer Remote TF State file   ###
 ###########################################
 
-data "terraform_remote_state" "network" {
-  backend = "gcs"
-  config = {
-    bucket = local.state_bucket
-    prefix = "tfstate-network"
-  }
-}
+###data "terraform_remote_state" "network" {
+###  backend = "gcs"
+###  config = {
+###    bucket = local.state_bucket
+###    prefix = "tfstate-network"
+###  }
+###}
 
 # NOTE: no infra-firestore module exists in ../../../modules yet, so
 # google_firestore_database stays as a plain resource - see firestore.tf.
