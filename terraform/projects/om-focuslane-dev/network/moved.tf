@@ -1,6 +1,3 @@
-# State migration from pre-module layout to modular layout (om-focuslane-dev).
-# Mirrors projects/ai-cmo-dev/network/moved.tf.
-
 moved {
   from = google_compute_network.aicoe_network
   to   = module.network_base.google_compute_network.network
@@ -41,9 +38,4 @@ moved {
   to   = module.network_connectivity.google_compute_address.reserved_internal_address["ilb"]
 }
 
-# NOT moved (deliberately kept as plain resources in main.tf/firewall.tf,
-# same addresses as before - see the comments above each module block):
-#   google_compute_firewall.aicoe_ingress_allow_https
-#   google_dns_managed_zone.aicoe_googleapis_private
-#   google_dns_record_set.aicoe_wildcard_googleapis
  
