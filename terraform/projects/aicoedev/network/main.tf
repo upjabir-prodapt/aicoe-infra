@@ -24,8 +24,6 @@ module "network_base" {
 
   # These flags reproduce today's dev environment exactly (all currently
   # false/absent in dev, unlike sandox where they are enabled).
-  enable_fastly_pypi_egress     = false
-  enable_azure_devops_rules     = false
   enable_internal_ilb_egress    = false
   enable_google_apis_psc_egress = true
 
@@ -52,8 +50,6 @@ module "network_connectivity" {
   reserved_internal_addresses = var.reserved_internal_addresses
   regional_psc_addresses      = var.regional_psc_addresses
 
-  # dev has no Cloud NAT today (sandox-only in the old code) - keep it that way.
-  enable_cloud_nat = false
 
   # Disabled here and recreated as plain resources below - the module
   # bundles an unrequested *.googleusercontent.com private DNS zone into
