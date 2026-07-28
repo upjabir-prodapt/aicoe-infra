@@ -1,3 +1,82 @@
+###variable "gcp_project_id" {
+###  type = string
+###}
+###
+###variable "region" {
+###  type = string
+###}
+###
+###variable "resource_prefix" {
+###  type = string
+###}
+###
+###variable "subnet_cidr_range" {
+###  type = string
+###}
+###
+###variable "create_subnet" {
+###  type    = bool
+###  default = true
+###}
+###
+###variable "create_proxy_only_subnet" {
+###  type    = bool
+###  default = true
+###}
+###
+###variable "proxy_subnet_cidr_range" {
+###  type = string
+###}
+###
+###variable "ingress_https_source_ranges" {
+###  type        = list(string)
+###  description = "Source CIDR ranges allowed to reach HTTPS internal load balancers"
+###}
+###
+###variable "internal_ilb_destination_ranges" {
+###  type        = list(string)
+###  description = "Destination CIDR ranges allowed for internal load balancer egress"
+###}
+###
+###variable "psc_egress_destination_ranges" {
+###  type        = list(string)
+###  description = "Destination CIDR ranges allowed for Private Service Connect egress"
+###}
+###
+###variable "enable_egress_deny_all" {
+###  type    = bool
+###  default = true
+###}
+###
+###variable "enable_iap_ssh_ingress" {
+###  type    = bool
+###  default = true
+###}
+###
+###
+###variable "enable_https_ilb_ingress" {
+###  type    = bool
+###  default = true
+###}
+###
+###variable "enable_internal_ilb_egress" {
+###  type    = bool
+###  default = true
+###}
+###
+###variable "enable_google_apis_psc_egress" {
+###  type    = bool
+###  default = false
+###}
+###
+###variable "labels" {
+###  type        = map(string)
+###  description = "Canonical labels applied to label-capable resources"
+###}
+### 
+
+
+
 variable "gcp_project_id" {
   type = string
 }
@@ -53,10 +132,28 @@ variable "enable_iap_ssh_ingress" {
   default = true
 }
 
+variable "iap_ssh_ingress_description" {
+  type        = string
+  description = "Description for the ingress_allow_iap firewall rule"
+  default     = "FW rules required to ssh into instances via IAP"
+}
+
 
 variable "enable_https_ilb_ingress" {
   type    = bool
   default = true
+}
+
+variable "https_ilb_ingress_description" {
+  type        = string
+  description = "Description for the ingress_allow_https firewall rule"
+  default     = "Allow HTTPS traffic for Internal Load Balancer"
+}
+
+variable "https_ilb_ingress_ports" {
+  type        = list(string)
+  description = "Allowed tcp ports for the ingress_allow_https firewall rule"
+  default     = ["443"]
 }
 
 variable "enable_internal_ilb_egress" {
@@ -67,6 +164,15 @@ variable "enable_internal_ilb_egress" {
 variable "enable_google_apis_psc_egress" {
   type    = bool
   default = false
+}
+
+variable "google_apis_psc_egress_allow_rules" {
+  type = list(object({
+    protocol = string
+    ports    = list(string)
+  }))
+  description = "Allow blocks for the egress_allow_google_apis_psc firewall rule"
+  default     = [{ protocol = "tcp", ports = ["443"] }]
 }
 
 variable "labels" {
