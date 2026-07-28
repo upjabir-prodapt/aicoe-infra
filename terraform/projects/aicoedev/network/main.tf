@@ -248,3 +248,4 @@ resource "google_dns_record_set" "aicoe_aihub_dns" {
   ttl          = 300
   rrdatas      = [var.reserved_internal_addresses["frontend-ilb"].address]
 }
+ 

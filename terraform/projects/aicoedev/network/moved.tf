@@ -3,22 +3,12 @@ moved {
   to   = module.network_base.google_compute_network.network
 }
 
-moved {
-  from = google_compute_subnetwork.aicoe_subnet
-  to   = module.network_base.google_compute_subnetwork.subnet[0]
-}
-
 # State currently sits at the unindexed module address (from an earlier apply,
 # before count was added to this resource) - chain it on to the indexed address
 # the count-based config now expects.
 moved {
   from = module.network_base.google_compute_subnetwork.subnet
   to   = module.network_base.google_compute_subnetwork.subnet[0]
-}
-
-moved {
-  from = google_compute_subnetwork.aicoe_proxy_only_subnet
-  to   = module.network_base.google_compute_subnetwork.proxy_only_subnet[0]
 }
 
 moved {
@@ -70,3 +60,5 @@ moved {
   from = google_compute_address.aicoe_staticip_ilb_aihub
   to   = module.network_connectivity.google_compute_address.reserved_internal_address["frontend-ilb"]
 }
+
+ 
