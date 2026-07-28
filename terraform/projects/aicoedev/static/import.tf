@@ -18,12 +18,3 @@
 #     id = "aicoedev roles/iap.admin group:Aicoedev-platformadmin@colt.net"
 # }
 
-import {
-    to = module.identities.google_service_account.sa["ui"]
-    id = "projects/aicoedev/serviceAccounts/aicoedev-ui-sa@aicoedev.iam.gserviceaccount.com"
-}
-
-import {
-    to = module.identities.google_service_account.sa["app"]
-    id = "projects/aicoedev/serviceAccounts/aicoedev-app-sa@aicoedev.iam.gserviceaccount.com"
-}
