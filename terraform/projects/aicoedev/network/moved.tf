@@ -97,6 +97,14 @@ moved {
   to   = module.network_base.google_compute_firewall.ingress_allow_iap[0]
 }
 
+# State currently sits at the plain resource address (from the earlier fix
+# that pulled this firewall out of the module) - move it back in now that
+# the module supports multiple allow blocks via google_apis_psc_egress_allow_rules.
+moved {
+  from = google_compute_firewall.aicoe_egress_allow_google_apis_psc
+  to   = module.network_base.google_compute_firewall.egress_allow_google_apis_psc[0]
+}
+
 moved {
   from = google_compute_global_address.aicoe_psc_address
   to   = module.network_connectivity.google_compute_global_address.psc_google_apis_address[0]
@@ -126,5 +134,3 @@ moved {
   from = google_compute_address.aicoe_staticip_ilb_aihub
   to   = module.network_connectivity.google_compute_address.reserved_internal_address["frontend-ilb"]
 }
-
- 
