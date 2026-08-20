@@ -1,0 +1,81 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+[31m-[0m/[32m+[0m destroy and then create replacement[0m
+
+Terraform will perform the following actions:
+
+[1m  # google_apigee_instance.instance[0m will be created
+[0m  [32m+[0m[0m resource "google_apigee_instance" "instance" {
+      [32m+[0m[0m consumer_accept_list     = [
+          [32m+[0m[0m "gclt-aicoe-dev-network",
+        ]
+      [32m+[0m[0m disk_encryption_key_name = (known after apply)
+      [32m+[0m[0m host                     = (known after apply)
+      [32m+[0m[0m id                       = (known after apply)
+      [32m+[0m[0m location                 = "europe-west3"
+      [32m+[0m[0m name                     = "aicoe-dev-ew1"
+      [32m+[0m[0m org_id                   = "organizations/gclt-aicoe-dev-apigee"
+      [32m+[0m[0m peering_cidr_range       = (known after apply)
+      [32m+[0m[0m port                     = (known after apply)
+      [32m+[0m[0m service_attachment       = (known after apply)
+    }
+
+[1m  # google_apigee_instance_attachment.int[0m will be created
+[0m  [32m+[0m[0m resource "google_apigee_instance_attachment" "int" {
+      [32m+[0m[0m environment = "int"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m instance_id = (known after apply)
+      [32m+[0m[0m name        = (known after apply)
+    }
+
+[1m  # google_apigee_instance_attachment.llm[0m will be created
+[0m  [32m+[0m[0m resource "google_apigee_instance_attachment" "llm" {
+      [32m+[0m[0m environment = "llm"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m instance_id = (known after apply)
+      [32m+[0m[0m name        = (known after apply)
+    }
+
+[1m  # module.kms_disk.google_kms_crypto_key.key["instance-disk"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "google_kms_crypto_key" "key" {
+      [32m+[0m[0m crypto_key_backend            = (known after apply)
+      [33m~[0m[0m destroy_scheduled_duration    = "2592000s" -> (known after apply)
+      [33m~[0m[0m id                            = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee-disk/cryptoKeys/instance-disk" -> (known after apply)
+      [33m~[0m[0m import_only                   = false -> (known after apply)
+      [33m~[0m[0m key_ring                      = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee-disk" -> (known after apply) [31m# forces replacement[0m[0m
+      [31m-[0m[0m labels                        = {} [90m-> null[0m[0m
+        name                          = "instance-disk"
+      [33m~[0m[0m primary                       = [
+          [31m-[0m[0m {
+              [31m-[0m[0m name  = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee-disk/cryptoKeys/instance-disk/cryptoKeyVersions/1"
+              [31m-[0m[0m state = "ENABLED"
+            },
+        ] -> (known after apply)
+      [31m-[0m[0m skip_initial_version_creation = false [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+
+        [90m# (1 unchanged block hidden)[0m[0m
+    }
+
+[1m  # module.kms_disk.google_kms_crypto_key_iam_member.grant["instance-disk:0"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "google_kms_crypto_key_iam_member" "grant" {
+      [33m~[0m[0m crypto_key_id = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee-disk/cryptoKeys/instance-disk" -> (known after apply) [31m# forces replacement[0m[0m
+      [33m~[0m[0m etag          = "BwZZGlePGfQ=" -> (known after apply)
+      [33m~[0m[0m id            = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee-disk/cryptoKeys/instance-disk/roles/cloudkms.cryptoKeyEncrypterDecrypter/serviceAccount:service-714830219716@gcp-sa-apigee.iam.gserviceaccount.com" -> (known after apply)
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.kms_disk.google_kms_key_ring.ring[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "google_kms_key_ring" "ring" {
+      [33m~[0m[0m id       = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee-disk" -> (known after apply)
+      [33m~[0m[0m location = "europe-west1" [33m->[0m[0m "europe-west3" [31m# forces replacement[0m[0m
+        name     = "apigee-disk"
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1mPlan:[0m 6 to add, 0 to change, 3 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m instance_service_attachment = (known after apply)

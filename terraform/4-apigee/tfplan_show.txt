@@ -1,0 +1,123 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # google_apigee_envgroup.aihub will be created
+  + resource "google_apigee_envgroup" "aihub" {
+      + hostnames = [
+          + "aihub-api.aicoedev-int.colt.net",
+        ]
+      + id        = (known after apply)
+      + name      = "aihub-int"
+      + org_id    = (known after apply)
+    }
+
+  # google_apigee_envgroup.llm will be created
+  + resource "google_apigee_envgroup" "llm" {
+      + hostnames = [
+          + "llm.aicoedev-int.colt.net",
+        ]
+      + id        = (known after apply)
+      + name      = "llm-int"
+      + org_id    = (known after apply)
+    }
+
+  # google_apigee_envgroup_attachment.aihub will be created
+  + resource "google_apigee_envgroup_attachment" "aihub" {
+      + envgroup_id = (known after apply)
+      + environment = "int"
+      + id          = (known after apply)
+      + name        = (known after apply)
+    }
+
+  # google_apigee_envgroup_attachment.llm will be created
+  + resource "google_apigee_envgroup_attachment" "llm" {
+      + envgroup_id = (known after apply)
+      + environment = "llm"
+      + id          = (known after apply)
+      + name        = (known after apply)
+    }
+
+  # google_apigee_environment.int will be created
+  + resource "google_apigee_environment" "int" {
+      + api_proxy_type  = (known after apply)
+      + deployment_type = (known after apply)
+      + id              = (known after apply)
+      + name            = "int"
+      + org_id          = (known after apply)
+      + type            = "BASE"
+
+      + node_config (known after apply)
+    }
+
+  # google_apigee_environment.llm will be created
+  + resource "google_apigee_environment" "llm" {
+      + api_proxy_type  = (known after apply)
+      + deployment_type = (known after apply)
+      + id              = (known after apply)
+      + name            = "llm"
+      + org_id          = (known after apply)
+      + type            = "INTERMEDIATE"
+
+      + node_config (known after apply)
+    }
+
+  # google_apigee_instance.instance will be created
+  + resource "google_apigee_instance" "instance" {
+      + consumer_accept_list     = [
+          + "gclt-aicoe-dev-network",
+        ]
+      + disk_encryption_key_name = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee/cryptoKeys/instance-disk"
+      + host                     = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "europe-west1"
+      + name                     = "aicoe-dev-ew1"
+      + org_id                   = (known after apply)
+      + peering_cidr_range       = (known after apply)
+      + port                     = (known after apply)
+      + service_attachment       = (known after apply)
+    }
+
+  # google_apigee_instance_attachment.int will be created
+  + resource "google_apigee_instance_attachment" "int" {
+      + environment = "int"
+      + id          = (known after apply)
+      + instance_id = (known after apply)
+      + name        = (known after apply)
+    }
+
+  # google_apigee_instance_attachment.llm will be created
+  + resource "google_apigee_instance_attachment" "llm" {
+      + environment = "llm"
+      + id          = (known after apply)
+      + instance_id = (known after apply)
+      + name        = (known after apply)
+    }
+
+  # google_apigee_organization.org will be created
+  + resource "google_apigee_organization" "org" {
+      + analytics_region                     = "europe-west2"
+      + api_consumer_data_location           = "europe-west1"
+      + apigee_project_id                    = (known after apply)
+      + billing_type                         = "PAYG"
+      + ca_certificate                       = (known after apply)
+      + disable_vpc_peering                  = true
+      + id                                   = (known after apply)
+      + name                                 = (known after apply)
+      + project_id                           = "gclt-aicoe-dev-apigee"
+      + retention                            = "DELETION_RETENTION_UNSPECIFIED"
+      + runtime_database_encryption_key_name = "projects/gclt-aicoe-dev-apigee/locations/europe-west1/keyRings/apigee/cryptoKeys/runtime-db"
+      + runtime_type                         = "CLOUD"
+      + subscription_type                    = (known after apply)
+
+      + properties (known after apply)
+    }
+
+Plan: 10 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + instance_service_attachment = (known after apply)
+  + org_id                      = (known after apply)

@@ -19,6 +19,12 @@
 | **08** | `08-llm-gateway.md` | Central Vertex AI project, token quotas, Model Armor, first-party sample mapping |
 | **12** | `12-status-register.md` | **One view of everything.** 21 settled, 13 corrected, 9 unverified, 23 open — with what blocks what |
 | **13** | `13-session-lifecycle-and-limits.md` | Logout, session rotation, refresh serialisation, fail-closed behaviour, and the platform limits inventory |
+| **16** | `16-terraform-staged-deployment.md` | **Staged Deployment Guide.** Authoritative reference for stage order, tfvars handoff matrix, security/WIF scoping, local runbook, and operational workflows. |
+| **17** | `17-apigee-locations.md` | **Apigee Location and Region Reference.** Reference on supported physical runtime regions, analytics regions, and regionalized data residency control planes. |
+| **18** | `18-entra-id-complete-setup-guide.md` | **Complete beginner's Entra ID setup guide.** One end-to-end walkthrough spanning Microsoft Entra ID app registrations, Google Workforce Identity Federation, and the Terraform stages that wire it together — with exact click-by-click steps and a full checklist. Complements the deep-dive design reasoning in `15`. |
+| **19** | `19-department-companyname-claim-options.md` | **`department`/`companyName` claim options.** Focused side-document for one sub-problem in `18` §3.2: Entra's optional-claims picker doesn't offer these two fields. Explains why, and gives the two working alternatives (Graph call vs. directory extension claim). |
+
+
 
 **Word document:** `AI-CoE-Dev-Platform-Implementation-Runbook.docx` — the runbook, 74 pages. In Word, right-click the Contents list and choose Update Field.
 
@@ -37,6 +43,7 @@
 │   ├── 10-validation-log.md    claims checked against Google docs
 │   ├── 03, 04                  spikes and gaps
 │   ├── 05, 08                  logging, LLM gateway
+│   ├── 17-apigee-locations.md  Apigee locations, analytics regions, and residency control planes
 │   └── superseded/             10 earlier documents, banner-marked
 │
 ├── diagrams/                   PNG and SVG

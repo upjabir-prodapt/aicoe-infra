@@ -1,0 +1,1 @@
+projects/gclt-aicoe-dev-auditlogs/locations/europe-west3/keyRings/logs-ew3

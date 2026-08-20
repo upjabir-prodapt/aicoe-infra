@@ -1,0 +1,5 @@
+LOCATION      BUCKET_ID            RETENTION_DAYS  CMEK  RESTRICTED_FIELDS  INDEX_CONFIGS  LIFECYCLE_STATE   LOCKED  CREATE_TIME                     UPDATE_TIME
+global        _Default             30                                                      ACTIVE
+global        _Required            400                                                     ACTIVE            True
+europe-west1  aicoe-dev-logs-400d  400             TRUE                                    DELETE_REQUESTED          2026-08-13T19:48:35.440699647Z  2026-08-16T11:16:03.111870044Z
+europe-west3  aicoe-dev-logs-400d  400             TRUE                                    ACTIVE                    2026-08-16T11:16:09.354393733Z  2026-08-16T11:16:56.539404287Z

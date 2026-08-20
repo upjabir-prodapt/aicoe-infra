@@ -1,0 +1,1 @@
+projects/gclt-aicoe-dev-st/locations/europe-west3/keyRings/st-ew3

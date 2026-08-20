@@ -1,0 +1,1 @@
+projects/gclt-aicoe-dev-aihub-ui/databases/(default)	europe-west1

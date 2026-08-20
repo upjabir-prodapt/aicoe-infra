@@ -1,0 +1,1 @@
+projects/gclt-aicoe-dev-ingress/locations/europe-west3/keyRings/ingress-ew3

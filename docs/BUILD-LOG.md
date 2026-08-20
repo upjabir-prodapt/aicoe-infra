@@ -21,9 +21,9 @@ This document records the step-by-step provisioning of the AI CoE dev platform f
 |---|---|---|
 | **0-bootstrap** | State bucket, CMEK key, 8 `tf-deployer` SAs, GitLab WIF pool | ✅ **COMPLETE** |
 | **1-org** | Read-only: verify the 7 existing projects, publish IDs | ✅ **COMPLETE** |
-| **2-foundations** | APIs, service agents, KMS, Artifact Registry, logging, Firestore, binauth, secrets, certs | ✅ **COMPLETE** (Model Armor parked) |
-| **3-network** | VPC, 5 subnets, firewall, DNS, Shared VPC | ⏳ **NEXT** |
-| **4-apigee** | Apigee org, instance, `int`+`llm` environments (30–60 min, immutable) | ⬜ Pending |
+| **2-foundations** | APIs, service agents, KMS, Artifact Registry, logging, Firestore, binauth, secrets, certs | ✅ **COMPLETE** (Migrated to `europe-west3`, KMS keys suffix `-ew3`) |
+| **3-network** | VPC, 5 subnets, firewall, DNS, Shared VPC | ✅ **COMPLETE** (Migrated to `europe-west3`, subnets suffix `-ew3`) |
+| **4-apigee** | Apigee org, instance, `int`+`llm` environments (30–60 min, immutable) | ✅ **COMPLETE** |
 | **5-network-psc** | PSC endpoints to Apigee + Google APIs | ⬜ Pending |
 
 **Later stages (blocked on items outside this repo):**
@@ -174,3 +174,38 @@ terraform plan -var-file="../envs/dev/terraform.tfvars" -var-file="../envs/dev/s
 | `2-foundations.auto.tfvars.json` | KMS key IDs, SA emails (incl. `apigee_runtime_sa`, `worker_invoker_sa`, `apigee_llm_runtime_sa`), cert IDs, log bucket, BQ dataset, artifacts bucket |
 
 All state in `gs://aicoe-sharedwif-tfstate/<stage>/`.
+
+---
+
+## 11. Regional Migration to europe-west3 (Frankfurt) (2026-08-16)
+
+To avoid inter-region latency and bandwidth charges, and to align with the immutable Apigee Instance running in `europe-west3` (due to Org Policies), the network topology and foundations were migrated from Belgium (`europe-west1`) to Frankfurt (`europe-west3`).
+
+**Execution Log:**
+1. **Destroyed Old Stage 3:** Executed a clean `terraform destroy` in `terraform/3-network/` (destroyed 18 resources in `europe-west1`). Cleaned up remaining Shared VPC project attachments manually via `gcloud` to bypass GCP propagation delay.
+2. **KMS State-Forget and Rename:** Since KMS keyrings are immutable in GCP, we ran `terraform state rm` on the old `europe-west1` KMS modules, appended `-ew3` suffixes to all Stage 2 keyring configurations (`aihub-ew3`, `logs-ew3`, `st-ew3`, `ingress-ew3`), and changed `region` in `terraform.tfvars` to `europe-west3` globally.
+3. **Disabled Old KMS Key Versions:** To secure the old keyrings and prevent any future operations from using them, we ran a `gcloud` script to disable version 1 of all keys in the old `europe-west1` keyrings (`aihub`, `logs`, `st`, `ingress`) across the four projects.
+4. **Re-applied Stage 2:** Deployed the new KMS keyrings and recreated regional elements (Firestore, BigQuery dataset, Logging bucket, GCS bucket) in `europe-west3`. SSL Certificate locations in Certificate Manager were updated to `europe-west3`.
+5. **Firestore Migration to europe-west3:** We disabled delete protection on the old `(default)` database and ran `gcloud firestore databases delete` to cleanly purge it from `europe-west1`. After waiting out the GCP cool-off lock, we ran a re-apply which successfully provisioned a brand new default Firestore Native database inside **`europe-west3`** (Frankfurt)!
+6. **Re-applied Stage 3:** Subnets were updated with the `_ew3` suffix and deployed in `europe-west3` (20 resources created).
+7. **Updated Handoffs:** Cleaned and exported updated `.auto.tfvars.json` handoffs for Stage 2 and Stage 3 into `terraform/vars-handoff/`.
+8. **BQ Log Analytics Linked Dataset 429 Quota Delay:** Recreating the log analytics dataset link (`google_logging_linked_dataset.gclt_aicoe_dev_auditlogs_main`) returned a `429: Reached quota limit of 1 links` with a 24-hour cooling lock. This is because GCP limits the project to 1 Log Analytics link per bucket, and the old bucket/link in `europe-west1` remains in a `DELETE_REQUESTED` state in Google's back-end for up to 7 days. This does **not** block logging itself (the `europe-west3` bucket is active and collecting logs perfectly); the BigQuery link will self-heal on next apply after the old link metadata is fully deleted by Google's background garbage collector.
+
+---
+
+## 12. Stage 5 — Network PSC ✅ (2026-08-16)
+
+**What was created:**
+- **Routable Apigee PSC Address:** Allocated static routable IP `10.110.73.10` in `gclt-aicoe-dev-subnet-ew3` (user-facing Colt-routable subnetwork) instead of `192.168.6.146` inside the unrouted internal subnetwork.
+- **Routable Apigee Forwarding Rule:** Bound `psc-apigee` rule in `europe-west3` targeting Apigee's service attachment.
+- **Google APIs Global PSC:** Re-created `psc-google-apis-ip` @ `192.168.6.164` and rule targeting `vpc-sc` (restored naming format to `pscgoogleapis` to bypass GCP's 1-20 character lowercase letters/numbers-only constraint).
+- **Private DNS records:** Created `aihub-api.aicoedev-int.colt.net` and `llm.aicoedev-int.colt.net` pointing to `10.110.73.10`.
+- **Model Armor Regional PSC Endpoint:** Created a `google_network_connectivity_regional_endpoint` `model-armor-ew3` @ `192.168.6.148` (Frankfurt regional `.rep.googleapis.com` endpoint targeting `modelarmor.europe-west3.rep.googleapis.com`) with access type set to `REGIONAL`, coupled with private DNS zone `modelarmor-private` and A record set.
+
+**Decisions & Refinements:**
+- **Colt DNS Exception:** Moving Apigee endpoint from `192.168.6.146` to `10.110.73.10` is a deliberate operational decision to satisfy Colt corporate DNS registration requirements (central DNS registration requires a routable IP address).
+- **Network API Service Class Enablement:** Enabled `aiplatform.googleapis.com` API in `gclt-aicoe-dev-network` (Shared VPC host project) to allow the Network Connectivity API to resolve and validate regional endpoints/service classes.
+- **Vector Search PSC Policy Parked:** The automatic Vector Search service connection policy was commented out because the `gcp-aiplatform-vector-search` service class is currently restricted/unavailable in the regional backend for Service Connection Policies. Since indexes aren't deployed until workload deployment stages, this does not block anything.
+
+**Handoffs:**
+- Exported `5-network-psc.auto.tfvars.json` to `vars-handoff/`.

@@ -1,0 +1,9 @@
+access_settings:
+  allowedDomainsSettings:
+    domains:
+      - "aihub.aicoeprod-int.colt.net"
+      - "salesagent.aicoeprod-int.colt.net"
+      - "translation.aicoeprod-int.colt.net"
+    enable: true
+  identity_sources: [] # Remove Workforce Identity Federation
+  workforce_identity_settings: {}

@@ -1,0 +1,1 @@
+projects/gclt-aicoe-dev-aihub-ui/locations/europe-west3/keyRings/aihub-ew3
